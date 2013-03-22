@@ -1,0 +1,71 @@
+<head>
+<title>Poloroids :: 0nehat0nehand Web Design Ideas</title> 
+
+<META NAME="ROBOTS" CONTENT="NOINDEX, NOFOLLOW">
+<!--Grab any fonts you want to use-->
+<link href='http://fonts.googleapis.com/css?family=Reenie+Beanie' rel='stylesheet' type='text/css'>
+<!--Lets have some Styles -->
+<style type="text/css">
+body{background: url(images/dark.jpg) rgba(0,10,30, .8); background-size: cover;}
+.poloroid_frame{ margin: 1em; float: left; background: #eee; padding: 8px 10px 0px 10px; -webkit-box-shadow: 3px 3px 5px rgba(0,0,0,.3), -2px -2px 1px rgba(255,255,255,1); -moz-box-shadow: 3px 3px 5px rgba(0,0,0,.3), -2px -2px 1px rgba(255,255,255,1); border-radius: 1px;
+position: absolute;
+  /*-webkit-transition-property: scale, rotate;
+  -webkit-transition-duration: .3s;*/
+  
+}
+#poloroids {position: relative; display: block; float: left; left:50px;}
+/* Hover Animation .poloroid_frame:hover{
+z-index: 100;
+-webkit-transform: scale(1.01);
+}*/
+#slideshow1 {}
+.logo {display: block;float:left;}
+ /*get the poloroids crooked  */
+.left{-webkit-transform: rotate(4deg); -moz-transform: rotate(4deg); left: 0px !important; display: block !important;
+}
+.middle{-webkit-transform: rotate(-2deg); -moz-transform: rotate(-2deg); left: 10px !important; display: block !important;}
+.right{-webkit-transform: rotate(3deg); -moz-transform: rotate(3deg); left:15px !important; display: block !important;}
+
+h2.handwrite{font-size: 2em; color:rgba(0,0,40, .5); padding: 0; margin: 0; line-height: 1em;
+font-family: 'Reenie Beanie', arial, serif;}
+p{font-size: 1.5em; color:rgba(80,0,40, .5); font-family: 'Reenie Beanie', arial, serif; padding: 0; margin:0 10px 3px 0; line-height: 1em; display: block; float:left;}
+ a.add_to_cart{text-decoration: none; font-size: .8em; color: rgba(200, 0, 0, .8);}
+</style>
+
+<!-- Now lets get some javascript functionality -->
+
+<!-- include jQuery library --> 
+<script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.3.2/jquery.min.js"></script> 
+
+<!-- include Cycle plugin --> 
+<script type="text/javascript" src="js/jquery.cycle.all.latest.js"></script> 
+
+<!--cycle functions that do the paging -->
+<script type="text/javascript">
+
+$(document).ready(function() {
+    $('#slideshow1')
+            .cycle({
+		fx: 'shuffle', // choose your transition type, ex: fade, scrollUp, shuffle, etc...
+		speed: 300, //change the transition speed
+		timeout: 0, //change the spped that slides progress
+		shuffle: { 
+	        top:  100, 
+	        left:  0,
+		    },  //change transition position
+	        next: '#slideshow1'
+	});
+		});
+	//end of document ready functions
+</script> 
+
+</head>
+<body>
+<div id="poloroids">
+<div id="slideshow1">
+<div class="poloroid_frame left"><img src="images/Screen%20shot%202011-01-04%20at%207.30.16%20PM.png" alt="Screen%20shot%202011-01-04%20at%207.30.16%20PM" width="383" height="390" /> <h2 class="handwrite">Image Title</h2><p class="price">description</p><p ><a href="#" class="add_to_cart">link</a></div>
+
+<div class="poloroid_frame middle"><img src="images/Screen%20shot%202011-01-04%20at%207.30.32%20PM.png" alt="Screen%20shot%202011-01-04%20at%207.30.32%20PM" width="345" height="333" /> <h2 class="handwrite">Image Title</h2><p class="price">description</p><p ><a href="#" class="add_to_cart">link</a></div>
+
+<div class="poloroid_frame right"><img src="images/Screen%20shot%202011-01-04%20at%207.30.45%20PM.png" alt="Screen%20shot%202011-01-04%20at%207.30.45%20PM" width="393" height="380" /> <h2 class="handwrite">Image Title</h2><p class="price">description</p><p ><a href="#" class="add_to_cart">link</a></div></div></div>
+</body>
