@@ -73,14 +73,16 @@
 		<!--<div id="portfolio-title" > <span class="hh_text">One Hat One Hand</span> <span class="fredericka" >Portfolio</span></div>
 	
 		<div id="slider"></div>-->
-		<h4 class="instructions" ><a data-target="<?php 
+		<div id="hand-navigation">
+			<div id="next-hand" class="arrow"></div>
+			<div id="prev-hand" class="arrow"></div>
+		</div>
+		<div class="instructions" ><?php 
 		$page = get_page_by_path( 'instructions' );
-		echo get_permalink($page->ID); 
-		?>" class="modal-link parisienne">Instructions</a></h4>
+		$content = $page->post_content;
+		echo $content; 
+		?></div>
 	</div>
-	<div id="hand-navigation">
-		<div id="next-hand" class="hand"></div>
-		<div id="prev-hand" class="hand"></div>
-	</div>
+	
 	
 </div>

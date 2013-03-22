@@ -427,16 +427,35 @@ float: left;
 	-o-backface-visibility: hidden;
 	backface-visibility: hidden;
 }
-.instructions a{
-	font-size: 2em;
-	color: #ddd;
-	text-shadow:  0 0 8px rgba(0,0,0,.7);
-	-webkit-transition: all .1s;
-	
+/* hide instructions */
+.instructions .keyboard, .instructions .touch {
+	display:  none;
 }
-.instructions a:hover {
-	color:  #000;
-	text-shadow:  0 0 8px rgba(255,255,255,.7);
+.no-touch .instructions .keyboard{
+	display: block;
+}
+.touch .instructions .touch{
+	display: block;
+}
+
+.instructions {
+	font-size: 1.2em;
+	line-height: 1.4em;
+	text-transform: uppercase;
+	color: #333;
+	-webkit-transition: all .1s;
+	background-color: #fff;
+	background-color: rgba(255, 255, 255, 0.8);
+	padding: 14px 5px;
+	border-top-left-radius: 3px;
+	border-top-right-radius: 5px;
+	border-bottom-right-radius: 5px;
+	border-bottom-left-radius: 5px;
+	box-shadow: 0 1px 3px rgba(0,0,0,.5);
+	-webkit-box-sizing: border-box; -moz-box-sizing: border-box; box-sizing: border-box;
+}
+.instructions:hover {
+	
 }
 .modal-link {
 cursor: pointer;
@@ -614,13 +633,30 @@ cursor: pointer;
 	position: absolute;
 	
 }
-#next-hand.hand {
+#hand-navigation .arrow {
+	display: block;
+	width:  34px;
+	height: 66px;
+	background-image: url(images/arrows-big.png);
+	background-repeat: no-repeat;
+	position: absolute;
+	
+}
+#next-hand.hand{
 	right:  10px;
 	top: 200px;
 	background-position-y: 0;
 	background-position-x: -110px;
 	
 }
+#next-hand.arrow {
+	right:  -50%;
+	top: 0px;
+	background-position-y: 0;
+	background-position-x: -34px;
+	
+}
+
 #prev-hand.hand {
 	left:  10px;
 	top:  200px;
@@ -628,12 +664,27 @@ cursor: pointer;
 	background-position-x: 0;
 	
 }
+#prev-hand.arrow {
+	left:  -50%;
+	top:  0px;
+	background-position-y: 0;
+	background-position-x: 0;
+	
+}
+
 #prev-hand.hand:hover, #next-hand.hand:hover{
 	background-position-y: -80px;
 }
 #prev-hand.hand:active, #next-hand.hand:active{
 	background-position-y: 0;
 }
+#prev-hand.arrow:hover, #next-hand.arrow:hover{
+	background-position-y: -66px;
+}
+#prev-hand.arrow:active, #next-hand.arrow:active{
+	background-position-y: 0;
+}
+
 /*lines and rules */
 .line {
 	display: block;

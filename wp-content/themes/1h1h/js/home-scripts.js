@@ -64,7 +64,7 @@ function resizeSections(){
 	jQuery('#fixed_bg').css({'height':windowHeight});
 	jQuery('#portfolio-wrapper').css({"width": windowWidth, "height": windowHeight + 100});
 	jQuery('.section').css({"width": windowWidth, "min-height": windowHeight + 100});
-	jQuery('#hand-navigation .hand, #portfolio-control').animate({'top': windowHeight/2}, 500);
+	jQuery('#hand-navigation .hand, #portfolio-control').animate({'top': windowHeight/8}, 500);
 	centerElement(jQuery('#portfolio-control'));
 	//jQuery('body').css({'height':windowHeight, 'overflow':'hidden'});
 	//jQuery('.menu-main-menu-container').css({"width": windowWidth});
@@ -92,12 +92,12 @@ function imageTexturizer(){//puts a texture over all the images
 
 //Hide the Instructions
 function hideInstructions(){
-jQuery('.instructions a').fadeOut(200);
+jQuery('.instructions').fadeOut(200);
 jQuery('#hand-navigation').fadeOut(200);
 }//end hide instructions
 //Show the Instructions
 function showInstructions(){
-jQuery('.instructions a').fadeIn(200);
+jQuery('.instructions').fadeIn(200);
 jQuery('#hand-navigation').fadeIn(200);
 }//end show instructions
 
@@ -982,6 +982,7 @@ jQuery(window).resize(function() {
 var showThem;
 var hideThem;
 jQuery(window).mousemove(function(event) {
+	if(currentSection != null){
 	if(currentSection.attr('id') == 'portfolio'){
 		
 		clearTimeout(showThem); 
@@ -1001,4 +1002,5 @@ jQuery(window).mousemove(function(event) {
 	
 		
 			}
+		}
 });
