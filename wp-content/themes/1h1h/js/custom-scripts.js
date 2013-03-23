@@ -93,14 +93,20 @@ function resizeSections(){
 	var windowWidth = jQuery(window).width();
 	var windowHeight = jQuery(window).height();
 	jQuery('#fixed_bg').css({'height':windowHeight});
+	if(jQuery('#portfolio-wrapper').length > 0){
 	jQuery('#portfolio-wrapper').css({"width": windowWidth, "height": windowHeight + 100});
+	}
 	jQuery('.section').css({"width": windowWidth, "min-height": windowHeight + 100});
-	jQuery('#hand-navigation .hand, #portfolio-control').animate({'top': windowHeight/8}, 500);
+	jQuery('#hand-navigation .hand, #portfolio-control').css({'top': windowHeight/3});
+	if(jQuery('#portfolio-control').length > 0){
 	centerElement(jQuery('#portfolio-control'));
+	}
 	//jQuery('body').css({'height':windowHeight, 'overflow':'hidden'});
 	//jQuery('.menu-main-menu-container').css({"width": windowWidth});
-	var menuPos =  jQuery('#menu-main-menu').offset();
+	var menuPos =  jQuery('#menu-global-menu').offset();
+	if(jQuery('#portfolio-nav').length > 0){ 
 	jQuery('#portfolio-nav').css({"paddingLeft": menuPos.left});
+	}
 }
 //End resizeSections
 
@@ -121,6 +127,19 @@ function imageTexturizer(){//puts a texture over all the images
 	});
 	
 }//end imageTexturizer
+
+
+//Hide the Instructions
+function hideInstructions(){
+jQuery('.instructions').fadeOut(200);
+jQuery('#hand-navigation').fadeOut(200);
+}//end hide instructions
+//Show the Instructions
+function showInstructions(){
+jQuery('.instructions').fadeIn(200);
+jQuery('#hand-navigation').fadeIn(200);
+}//end show instructions
+
 
 //TOUCHWIPE EVENT HANDLER
 function makeSwipes(targetElement){
@@ -322,7 +341,7 @@ jQuery(window).load(function(){
 	
 	
 	makeCycles();
-	imageTexturizer();
+	//imageTexturizer();
 	resizeSections();
 	
 	centerElement(jQuery('#portfolio-control'));
@@ -334,10 +353,72 @@ jQuery(window).load(function(){
 
 jQuery(document).ready(function($){
 
+//KEYBOARD EVENTS
+
+$('body').keydown(function(e){
+	//console.log('keycode: ',e.keyCode); //uncomment to see keycodes
+	
+
+		if(e.keyCode == 37){//left(37) arrow is pressed
+		if(jQuery('#portfolio').length > 0){
+			//modal changes too
+			if(jQuery('#modal').hasClass('open')){
+				jQuery('#modal').find('.modal-link a[rel="next"]').click();
+			}//end open modal	
+			
+			else {
+				jQuery('#portfolio-wrapper').cycle('prev'); //this is reversed to match wp post order
+			} 
+		}
+		
+		else if(jQuery('#case_studies').length > 0){
+			jQuery('.post-box .content').cycle('prev'); //this is reversed to match wp post order
+		}
+		else if(jQuery('#services').length > 0){
+			jQuery('.post-box .content').cycle('prev'); //this is reversed to match wp post order
+		}
+		else if(jQuery('#artists').length > 0){
+			if(jQuery('#modal').hasClass('open')){
+				jQuery('#modal').find('.modal-link a[rel="next"]').click();
+			}//end open modal	
+		}
+		e.preventDefault();
+	}
+	else if(e.keyCode == 39){//right(39) arrow is pressed
+		if(jQuery('.page-template-page-showcase-php').length > 0){
+			
+			//modal changes too
+			if(jQuery('#modal').hasClass('open')){
+				jQuery('#modal').find('.modal-link a[rel="prev"]').click();
+			}//end open modal	
+			else {
+				jQuery('#portfolio-wrapper').cycle('next'); //this is reversed to match wp post order
+			}
+			
+		}
+		else if(jQuery('.page-template-page-category-php').length > 0){
+			jQuery('.post-box .content').cycle('next'); //this is reversed to match wp post order
+		}
+		else if(jQuery('.page-template-page-grid-php').length > 0){
+			if(jQuery('#modal').hasClass('open')){
+				jQuery('#modal').find('.modal-link a[rel="prev"]').click();
+			}//end open modal	
+		}
+		e.preventDefault();
+	}
+else if (e.keyCode == 13) {//return(13) key was pressed
+	if(jQuery('#portfolio').length > 0 && !jQuery('#modal').hasClass('open')){ 
+		jQuery('#portfolio-wrapper').click();
+	}
+}
+});//end keydown events
+//end KEYBOARD EVENTS
+
 jQuery(window).load(function(){
 	moveMenuIndicator();
 	makeSwipes('.wrapper');
-		hhAccordion('#contact-accordion');//the contact form accordion
+	navTabActivate('#portfolio .nav-tab', '#portfolio-nav');
+	hhAccordion('#contact-accordion');//the contact form accordion
 	var $container = jQuery('.filter-target');
 		$('.artist').animate({'opacity':1, 'margin':'5px'}, 500);
 
@@ -458,6 +539,31 @@ function stopVideo(container){
    	     
    	   	  }); 
     });
+    //casestudy modal
+    jQuery('.hh_case_study_post .modal-link').click(function(e) {
+    e.preventDefault();
+     var target = jQuery(this);
+     var targetID = target.attr('href');
+     console.log(targetID);
+     var modal = jQuery('#modal');
+    //load modal template into modal content with ajax
+    	var modalContent =  $.ajax({
+    	    url: targetID,
+    	    context: document.body
+    	  }).done(function() { 
+    	   
+    	   modal.find('#modal-content').html(modalContent.responseText);
+    	   
+    	    modal.reveal({
+    	    dismissModalClass: 'close-btn',
+    	    close: function(){stopVideo(modal);}
+    	    }).fitVids();
+    	     
+    	    activateLinks();
+    	     
+    	   	  }); 
+    	   	  
+     });//end case study modal
    
   var modalPosition = 0;
  function activateLinks(){
@@ -550,9 +656,8 @@ function stopVideo(container){
 var showThem;
 var hideThem;
 jQuery(window).mousemove(function(event) {
-if(currentSection != null){
-	if(currentSection.attr('id') == 'portfolio'){
-		
+if(jQuery('#portfolio').length > 0){
+
 		clearTimeout(showThem); 
 		clearTimeout(hideThem); 
 		
@@ -567,8 +672,6 @@ if(currentSection != null){
 		hideInstructions();  
 		clearTimeout(hideThem); 
 		},2000); 
-	
-		
-			}
+
 	}
 });

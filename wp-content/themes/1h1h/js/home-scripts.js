@@ -880,6 +880,30 @@ function stopVideo(container){
     	     
     	   	  }); 
      });
+    //casestudy modal
+    jQuery('#case_studies .modal-link').click(function(e) {
+     var target = jQuery(this);
+     var targetID = target.attr('href');
+     console.log(targetID);
+     var modal = jQuery('#modal');
+    //load modal template into modal content with ajax
+    	var modalContent =  $.ajax({
+    	    url: targetID,
+    	    context: document.body
+    	  }).done(function() { 
+    	   
+    	   modal.find('#modal-content').html(modalContent.responseText);
+    	   
+    	    modal.reveal({
+    	    dismissModalClass: 'close-btn',
+    	    close: function(){stopVideo(modal);}
+    	    }).fitVids();
+    	     
+    	    activateLinks();
+    	     
+    	   	  }); 
+    	   	  e.preventDefault();
+     });//end case study modal
     
    
   var modalPosition = 0;

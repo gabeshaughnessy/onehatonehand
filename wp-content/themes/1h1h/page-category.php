@@ -43,7 +43,7 @@ $filter_tax = get_post_meta($post->ID, 'hh_filter_taxonomy', true);
 											echo apply_filters('the_content', $meta_values['youtube_id']); 
 											}
 											else {
-											 hh_get_the_thumbnails('feature_slide');
+											 hh_get_the_thumbnails('feature_slide', true);
 											}
 											?></div>
 											<!--<h2 class="post-title"><?php the_title(); ?></h2>-->

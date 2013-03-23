@@ -230,7 +230,46 @@ function main_loop(){ ?>
 	hh_testimonials
 */
 
+function modal_more_link( $more_link, $more_link_text ) {
+	return str_replace( 'more-link','more-link modal-link', $more_link );
+}
+
+/* +++++ T H E   P O R T F O L I O   L O O P ++++++ */
+//////////////////////////////////////////////////////
+function hh_portfolio_loop($hhpost_type, $hhcount){ 
+$portfolio_list = get_transient('portfolio_items');
+if($portfolio_list == ''){
+
+$args = array(
+	
+			'post_type' => $hhpost_type,
+			'post_count' => $hhcount
+		
+);
+$custom_query = new WP_Query( $args );
+if ( $custom_query->have_posts() ) : while ( $custom_query->have_posts() ) : $custom_query->the_post(); 
+
+$portfolio_list .='<div class="portfolio-entry post" data-target="'.get_permalink().'" id="portfolio_post_'.get_the_ID().'">'.hh_get_portfolio_backgrounds("full-bg", false).'</div>';
+				endwhile; 
+				else : 
+				$portfolio_list .='<p> No Items to display </p>';
+				endif; 
+			// Reset Post Data
+			wp_reset_postdata();
+			
+
+set_transient('portfolio_items', $portfolio_list, 60*60*24*7);
+}
+echo $portfolio_list;
+		
+							
+}
+//End Portfolio_Loop()
+
 function hh_post_type_loop($hhpost_type, $hhcount){ 
+
+add_filter( 'the_content_more_link', 'modal_more_link', 10, 2 );//filter the more link to have a modal class
+
 $post_list = get_transient('post-list-'.$hhpost_type);
 if($post_list == ''){
 $args = array(
