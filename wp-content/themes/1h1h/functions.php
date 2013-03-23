@@ -117,38 +117,62 @@ wp_deregister_script('jquery');
 }    
  
 add_action('wp_enqueue_scripts', 'my_scripts_method'); // For use on the Front end (ie. Theme)
+//___________________ CACHING _______________
+//Clear Transients 
+add_action('save_post', 'clear_transients');
+function clear_transients(){
+delete_transient('filter_menu_classification');
+delete_transient('artist_list');
+delete_transient('section-items-'.of_get_option('case_studies_intro_page', ''));
+delete_transient('section-items-'.of_get_option('services_intro_page', ''));
+delete_transient('section-items-'.of_get_option('clients_intro_page', ''));
+delete_transient('section-items-'.of_get_option('artists_intro_page', ''));
+delete_transient('post-list-hh_service');
+delete_transient('post-list-hh_case_study');
 
 
+
+}
 // ------------------ GET THUMBNAILS --------------------------- 
 // this function will return a thumbnail image from a the current post (it must be used inside the loop)
 //the image size is set in the file image_support.php
 //the width and height are pulled from the array $img_src, which gets the src and dimensions from an attachment image.
 
-	function hh_get_the_thumbnails($thumbnail_size){
+	function hh_get_the_thumbnails($thumbnail_size, $echo){
+			$thumbnail = '';
 			if (has_post_thumbnail()) { 
 							
 				$img = get_the_post_thumbnail();
 				$img_id = get_post_thumbnail_id();
 				$img_src = wp_get_attachment_image_src($img_id, $thumbnail_size );
-							?>
-			<div class="feature_postimage">
+			$thumbnail .= '<div class="feature_postimage">';
 			
-			<img src="<?php echo($img_src[0]);?>" width="<?php echo($img_src[1]);?>" height="<?php echo($img_src[2]);?>" alt=" <?php the_title();?>"/>
-							</div>
-							<?php }
+			$thumbnail .=  '<img src="'.$img_src[0].'" width="'.$img_src[1].'" height="'.$img_src[2].'" alt="'.get_the_title().'"/></div>';
+							}
+					if($echo == 'true'){
+					echo $thumbnail;
+					}	
+					else{
+					return $thumbnail;
+					}
 							} //end of post thumbnail function
-	function hh_get_portfolio_backgrounds($thumbnail_size){
+	function hh_get_portfolio_backgrounds($thumbnail_size, $echo){
+			$thumbnail = '';
 			if (has_post_thumbnail()) { 
 							
 				$img = get_the_post_thumbnail();
 				$img_id = get_post_thumbnail_id();
 				$img_src = wp_get_attachment_image_src($img_id, $thumbnail_size );
-							?>
-			<div class="portfolio_bg">
-			
-			<img src="<?php echo($img_src[0]);?>" width="100%" height="auto" alt=" <?php the_title();?>"/>
-							</div>
-							<?php }
+				$thumbnail .= '<div class="portfolio_bg"><img src="'.$img_src[0].'" width="100%" height="auto" alt=" '.get_the_title().'"/>
+							</div>';
+							
+							 }
+					 if($echo == 'true'){
+					 echo $thumbnail;
+					 }	
+					 else{
+					 return $thumbnail;
+					 }
 							} //end of portfolio background function
 
 
@@ -206,106 +230,91 @@ function main_loop(){ ?>
 	hh_testimonials
 */
 
-function hh_post_type_loop($hhpost_type, $hhcount){ ?>
-
-			<?php 
-			$args = array(
+function hh_post_type_loop($hhpost_type, $hhcount){ 
+$post_list = get_transient('post-list-'.$hhpost_type);
+if($post_list == ''){
+$args = array(
 				
 						'post_type' => $hhpost_type,
 						'post_count' => $hhcount
 					
 			);
 			$custom_query = new WP_Query( $args );
-			if ( $custom_query->have_posts() ) : ?>
-
-			
-
-				<?php /* Start the Loop */ ?>
-				
-				<?php while ( $custom_query->have_posts() ) : $custom_query->the_post(); 
+			if ( $custom_query->have_posts() ) : while ( $custom_query->have_posts() ) : $custom_query->the_post(); 
 				
 				$meta_values = hh_get_meta_values(get_the_ID());
-				?>
-				<div id="post_<?php echo get_the_ID(); ?>" class="post <?php $hhpost_type ?>_post">
-				<?php 
+				
+				$post_list .= '<div id="post_'.get_the_ID().'" class="post '.$hhpost_type.'_post">';
+				
 				if($meta_values['vimeo_link']){
-				echo apply_filters('the_content', $meta_values['vimeo_link']); 
+				$post_list .=  apply_filters('the_content', $meta_values['vimeo_link']); 
 				}
 				else if($meta_values['youtube_link']){
-				echo apply_filters('the_content', $meta_values['youtube_link']); 
+				$post_list .= apply_filters('the_content', $meta_values['youtube_link']); 
 				}
 				else {
-				 hh_get_the_thumbnails('feature_slide');
+				 $post_list .= hh_get_the_thumbnails('feature_slide', false);
 				}
-				?>
-				<h2 class="post-title"><?php the_title(); ?></h2>
-				<?php the_content(); ?>
-				<?php get_template_part('post_footer'); ?>
-				</div><!--end of the post -->
-				<?php endwhile; ?>
+				$post_list.= '<h2 class="post-title">'.get_the_title().'</h2>'.get_the_content().'</div>';
+				endwhile; 		
+				else : 
 
-				
+				$post_list .= '<p> nothing for you here</p>';
 
-			<?php else : ?>
-
-				<p> nothing for you here</p>
-
-			<?php endif; 
+			endif; 
 			// Reset Post Data
 			wp_reset_postdata();
-			?>
-	
-<?php }
 
-function hh_section_page_loop($hh_pageID){ ?>
+	set_transient('post-list-'.$hhpost_type, $post_list, 60*60*24*7);
+}
+echo $post_list;
+}
 
+function hh_section_page_loop($hh_pageID){ 
 
-			<?php 
-			$args = array(
+	$section = get_transient('section-items-'.$hh_pageID);
+	if($section == ''){
+	$section_items = '';
+	$args = array(
+		
+				'page_id' => $hh_pageID
 				
-						'page_id' => $hh_pageID
-						
-					
-			);
-			$custom_query = new WP_Query( $args );
-			if ( $custom_query->have_posts() ) : ?>
-
 			
-
-				<?php /* Start the Loop */ ?>
-				
-				<?php while ( $custom_query->have_posts() ) : $custom_query->the_post(); 
-				
-				$meta_values = hh_get_meta_values(get_the_ID());
-				?>
-				<div id="post_<?php echo get_the_ID(); ?>" class="post section_page">
-				<div class="post-intro">
-				<?php 
-				if($meta_values['vimeo_id']){
-				echo apply_filters('the_content', $meta_values['vimeo_id']); 
-				}
-				else if($meta_values['youtube_id']){
-				echo apply_filters('the_content', $meta_values['youtube_id']); 
-				}
-				else {
-				 hh_get_the_thumbnails('feature_slide');
-				}
-				?></div>
-				<!--<h2 class="post-title"><?php the_title(); ?></h2>-->
-				<?php the_content(); ?>
-				<?php get_template_part('post_footer'); ?>
-				</div><!--end of the post -->
-				<?php endwhile; ?>
-
-				
-
-			<?php else : ?>
-
-				<p> nothing for you here</p>
-
-			<?php endif; 
-			// Reset Post Data
-			wp_reset_postdata();
+	);
+	$custom_query = new WP_Query( $args );
+	if ( $custom_query->have_posts() ) :
+	
+	while ( $custom_query->have_posts() ) : $custom_query->the_post(); 
+	
+	$meta_values = hh_get_meta_values(get_the_ID());
+	
+	$section_items .= '<div id="post_'.get_the_ID().'" class="post section_page"><div class="post-intro">';
+	if($meta_values['vimeo_id']){
+	$section_items .= apply_filters('the_content', $meta_values['vimeo_id']); 
+	}
+	else if($meta_values['youtube_id']){
+	$section_items .= apply_filters('the_content', $meta_values['youtube_id']); 
+	}
+	else {
+	$section_items .= hh_get_the_thumbnails('feature_slide', false);
+	}
+	
+	$section_items .= '</div>';
+	
+	$section_items .= get_the_content();
+	$section_items .= get_template_part('post_footer'); 
+	$section_items .= '</div>';
+	endwhile;
+	else : 
+	$section_items .= '<p> nothing for you here</p>';
+	endif;
+	wp_reset_postdata();
+	
+	set_transient('section-items-'.$hh_pageID, $section_items, 60*60*24*7);
+	}
+	echo $section;
+			 
+		
 			?>
 		
 <?php }

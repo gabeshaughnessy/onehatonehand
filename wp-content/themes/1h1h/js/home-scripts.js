@@ -64,7 +64,7 @@ function resizeSections(){
 	jQuery('#fixed_bg').css({'height':windowHeight});
 	jQuery('#portfolio-wrapper').css({"width": windowWidth, "height": windowHeight + 100});
 	jQuery('.section').css({"width": windowWidth, "min-height": windowHeight + 100});
-	jQuery('#hand-navigation .hand, #portfolio-control').animate({'top': windowHeight/8}, 500);
+	jQuery('#hand-navigation .hand, #portfolio-control').animate({'top': windowHeight/3}, 500);
 	centerElement(jQuery('#portfolio-control'));
 	//jQuery('body').css({'height':windowHeight, 'overflow':'hidden'});
 	//jQuery('.menu-main-menu-container').css({"width": windowWidth});
@@ -412,7 +412,7 @@ jQuery(window).load(function(){
 	makeCycles();
 	navTabActivate('#portfolio .nav-tab', '#portfolio-nav');
 	hhAccordion('#contact-accordion');//the contact form accordion
-	imageTexturizer();
+	//imageTexturizer();
 	whichSectionIsActive();
 	
 	centerElement(jQuery('#portfolio-control'));

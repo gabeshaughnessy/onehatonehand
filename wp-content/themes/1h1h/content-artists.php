@@ -8,7 +8,15 @@
 				<p class="section-logo">One Hat One Hand</p>
 				<p>filter by:
 				<ul id="profile-filter" class="filter-menu button-group nine columns">
-				<?php echo isotope_filter_menu('hh_classification'); ?>
+				<?php 
+				$filter_menu = get_transient('filter_menu_classification');
+				if($filter_menu == ''){
+				$filter_menu_items = isotope_filter_menu('hh_classification');
+				set_transient('filter_menu_classification', $filter_menu_items, 60*60*24*7);//one week
+				}
+				
+				echo $filter_menu; 
+				?>
 				</ul>
 				</div>	
 			<div id="artists-posts" class="post-box">
@@ -16,44 +24,50 @@
 						<div class="content" role="main">
 				<?php
 				//need to do the first page loop here, getting the content from a page called by id
-				//hh_section_page_loop(of_get_option('artists_intro_page', 'no artists page selected'));
+				
+				 $artist_list = get_transient('artist_list');
+				 if($artist_list == ''){
+					$args = array(
+								
+										'post_type' => 'hh_artist',
+										'posts_per_page' => '-1',
+										'orderbyZ' => 'rand'
+									
+							);
 				
 				 
 				 
-				 			$args = array(
-				 				
-				 						'post_type' => 'hh_artist',
-				 						'posts_per_page' => '-1',
-				 						'orderbyZ' => 'rand'
-				 					
-				 			);
-				 			$custom_query = new WP_Query( $args );
-				 			if ( $custom_query->have_posts() ) : ?>
+				 	$custom_query = new WP_Query( $args );
+				 			if ( $custom_query->have_posts() ) :
+							$artist_list_items = '';
+				 			$artist_list_items .= '<div class="filter-target row">';
 				 
-				 			<div class="filter-target row">
-				 
-				 				<?php /* Start the Loop */ ?>
+				 				/* Start the Loop */ 
 				 				
-				 				<?php while ( $custom_query->have_posts() ) : $custom_query->the_post(); 
+				 				while ( $custom_query->have_posts() ) : $custom_query->the_post(); 
 				 				$id = get_the_ID();
 				 				
-				 				?>
-				 				<div id="post_<?php echo $id ?>" class="artist profile listing <?php echo print_the_terms('hh_classification', ' '); ?>" data-target="<?php echo the_permalink(); ?>">
+				 				$artist_list_items .= '<div id="post_'. $id .'" class="artist profile listing'.print_the_terms('hh_classification', ' ').'" data-target="'.get_permalink().'">';
 				 			
-				 				<?php echo get_the_post_thumbnail($id, 'isotope-grid', array('class' => 'no-texture')); ?>
-				 					</div><!--end of the post -->
-				 				<?php endwhile; ?>
-				 </div><!-- end filter-target -->
+				 				$artist_list_items .= get_the_post_thumbnail($id, 'isotope-grid', array('class' => 'no-texture')).'</div>';
+				 				
+				 				endwhile;
+								
+								$artist_list_items .= '</div>';
 				 				
 				 
-				 			<?php else : ?>
+				 			 else : 
 				 
-				 				<p> nothing for you here</p>
+				 				$artist_list_items .= '<p> nothing for you here</p>';
 				 
-				 			<?php endif; 
+				 			endif; 
 				 			// Reset Post Data
 				 			wp_reset_postdata();
-				 			
+				 $artist_list = $artist_list_items;
+				 set_transient('artist_list', $artist_list, 60*60*24*7);//one week
+				 }
+				 
+				 echo $artist_list;				 			
 				 
 				 				?>
 				 				<?php get_template_part('post_footer'); ?>
