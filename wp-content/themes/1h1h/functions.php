@@ -292,7 +292,7 @@ $args = array(
 				$post_list .= apply_filters('the_content', $meta_values['youtube_link']); 
 				}
 				else {
-				 $post_list .= hh_get_the_thumbnails('feature_slide', false);
+				 $post_list .= '<a href="'.get_permalink().'" class="modal-link">'.hh_get_the_thumbnails('feature_slide', false).'</a>';
 				}
 				$post_list.= '<h2 class="post-title">'.get_the_title().'</h2>'.get_the_content().'</div>';
 				endwhile; 		
