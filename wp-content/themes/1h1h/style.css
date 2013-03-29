@@ -64,6 +64,9 @@ body{
 	opacity: 0;
 
 }
+#wrapper.no-fade {
+	opacity: 1;
+}
 #fixed_bg {
 	display: block;
 	width:  100%;
@@ -161,7 +164,7 @@ body{
 .cta p {
 	float:  left;
 }
-#scroll-cta {
+#scroll-cta, #construction-cta{
 	font-size: 22px;
 	width:  500px;
 	text-align: center;
@@ -171,7 +174,7 @@ body{
 #scroll-cta p{
 	padding: 0px 26px;
 }
-#keys-cta {
+#keys-cta,  #checkback-cta{
 	font-size: 22px;
 	width: 500px;
 	text-align: center;
@@ -180,6 +183,12 @@ body{
 }
 #keys-cta p {
 	margin-right: 10px;
+}
+#checkback-cta p{
+	margin:  0 45px;
+}
+#construction-cta p{
+	padding: 0 30px  ;
 }
 #call-cta {
 	font-size: 21px;
@@ -698,12 +707,12 @@ cursor: pointer;
 .thin-line{
 	border-bottom: 1px solid #333;
 }
-#scroll-cta .line {
+#scroll-cta .line, #construction-cta .line {
 	top: 15px;
 	width: 60px;
 	margin: 0 ;
 }
-#keys-cta .line {
+#keys-cta .line, #checkback-cta .line {
 	top: 15px;
 	width: 111px;
 	margin: 0 ;
