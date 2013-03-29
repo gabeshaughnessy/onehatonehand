@@ -39,7 +39,7 @@ var templateDir = "http://imagination-station.local/1h1h/wp-content/themes/1h1h"
 			
 			<div id="checkback-cta" class="cta muli"><div class="thick-line line"></div><p>Check Back Soon!</p><div class="thick-line line"></div></div>
 			<div id="login-link">
-				<span class="thin-line line"></span><a href="login" title="login to the site" class="parisienne">login</a><span class="thin-line line"></span>
+				<span class="thin-line line"></span><a href="wp-admin" title="login to the site" class="parisienne">login</a><span class="thin-line line"></span>
 			</div>
 			<div id="intro-description">
 				<p class="muli">One Hat One Hand is a set design and fabrication shop owned and operated in San Francisco, CA. We specialize in building the impossible and we are confident if you can imagine it, we can build it.
