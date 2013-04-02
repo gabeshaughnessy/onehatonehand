@@ -118,7 +118,7 @@ jQuery(targetElement).touchwipe({//touch settings
 }
 
 function whichSectionIsActive(){
-
+	
 	if(jQuery('#landing').hasClass('active') ){
 		jQuery('.menu-main-menu-container').slideUp('slow');
 		jQuery('#portfolio-nav').slideUp('fast');
@@ -128,6 +128,7 @@ function whichSectionIsActive(){
 	else if (jQuery('#services').hasClass('active')) {
 	jQuery('#portfolio-nav').slideUp('fast');
 	jQuery('#portfolio .nav-tab').hide();
+	
 	
 		
 	}
@@ -162,8 +163,6 @@ function whichSectionIsActive(){
 			jQuery('.menu-main-menu-container').slideDown('slow');
 }
 
-
-moveMenuIndicator();
 
 }// end of whichSectionIsActive function
 
@@ -242,13 +241,17 @@ else {
 
 
 function moveMenuIndicator(){
+
 	jQuery('#menu-main-menu .menu-item a').each(function(){
 		var sectionID = jQuery(this).attr('href');
 		var sectionOffset = jQuery(sectionID).offset();
 		menuLeftPos = jQuery(this).parent().parent().offset().left;
 		sectionOffset.bottom = sectionOffset.top + jQuery(sectionID).height();
 	
-	
+	if(jQuery(this).attr('href') == currentSection.selector){//give the active menu item its own class
+	jQuery('#menu-main-menu .menu-item a').removeClass('active-item');
+	jQuery(this).addClass('active-item');
+	}
 	});//end each for menu item links
 	
 	//menu for touch devices
@@ -262,7 +265,6 @@ function moveMenuIndicator(){
 	
 	
 	var tabPosition = itemOffset + itemWidth/2; 
-	
 	jQuery('.menu-main-menu-container').css({'backgroundPosition': tabPosition});
 
 	
@@ -440,7 +442,6 @@ jQuery(window).load(function(){
 	
 	jQuery('#portfolio').bind('inview', function (event, visible) {
 	  if (visible == true) {
-	//  alert('active portfolio'); //for debugging
 		 jQuery('.section').removeClass('active');
 	currentSection = jQuery('#portfolio');
 	  jQuery('#portfolio').addClass('active');
@@ -463,8 +464,7 @@ jQuery(window).load(function(){
 	
 	jQuery('#services').bind('inview', function (event, visible) {
 	  if (visible == true) {
-	  //alert('active services'); //for debugging
-	  	 jQuery('.section').removeClass('active');
+	   jQuery('.section').removeClass('active');
 	  currentSection = jQuery('#services');
 	  jQuery('#services').addClass('active');
 	    // element is now visible in the viewport
@@ -760,14 +760,12 @@ jQuery(window).load(function(){
 	$container.find('.isotope-item').animate(500);
 
  jQuery(window).scroll();
- moveMenuIndicator();
  //currentSection = jQuery('.section.active');
-
-
 		
 var scrollOffset;
+
 $.localScroll({ 'offset': scrollOffset, 'onAfter' : function(){
-moveMenuIndicator();
+//moveMenuIndicator();
 }, 'onBefore': function(e){
 clickTarget = e.toElement;
 if(jQuery(clickTarget).attr('href') != '#landing'){
