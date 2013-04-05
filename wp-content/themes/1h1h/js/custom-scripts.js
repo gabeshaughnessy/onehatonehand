@@ -23,17 +23,6 @@ return jQuery.uaMatch(navigator.userAgent).browser;
 }
 /* end browser test */
 
-//Hide the Instructions
-function hideInstructions(){
-jQuery('.instructions').fadeOut(200);
-jQuery('#hand-navigation').fadeOut(200);
-}//end hide instructions
-//Show the Instructions
-function showInstructions(){
-jQuery('.instructions').fadeIn(200);
-jQuery('#hand-navigation').fadeIn(200);
-}//end show instructions
-
 
 
 /* no link - void clicks */
@@ -55,7 +44,7 @@ function centerElement(element){
 	var elementHeight = element.height();
 	var elementOffset = new Object();
 	elementOffset.x = windowWidth/2 - elementWidth/2;
-	elementOffset.y = windowHeight/2;
+	elementOffset.y = windowHeight/6;
 	element.css({
 	'left' : elementOffset.x,
 	'top' : elementOffset.y
@@ -97,16 +86,26 @@ function resizeSections(){
 	jQuery('#portfolio-wrapper').css({"width": windowWidth, "height": windowHeight + 100});
 	}
 	jQuery('.section').css({"width": windowWidth, "min-height": windowHeight + 100});
-	jQuery('#hand-navigation .hand, #portfolio-control').css({'top': windowHeight/3});
-	if(jQuery('#portfolio-control').length > 0){
-	centerElement(jQuery('#portfolio-control'));
-	}
-	//jQuery('body').css({'height':windowHeight, 'overflow':'hidden'});
+	jQuery('#hand-navigation .hand').css({'top': windowHeight/3});
+	
+	jQuery('.tour-entry .post-content, .instructions-modal'  ).each(function(index){
+		jQuery(this).css({'top': 100});
+		centerElement(jQuery(this));
+	});
+	
+	
+		//jQuery('body').css({'height':windowHeight, 'overflow':'hidden'});
 	//jQuery('.menu-main-menu-container').css({"width": windowWidth});
 	var menuPos =  jQuery('#menu-global-menu').offset();
 	if(jQuery('#portfolio-nav').length > 0){ 
 	jQuery('#portfolio-nav').css({"paddingLeft": menuPos.left});
 	}
+	
+	jQuery('.filter-target').isotope({
+	// options... http://isotope.metafizzy.co/docs/options.html
+	filter: '.artist' 
+		});
+	
 }
 //End resizeSections
 
@@ -146,9 +145,11 @@ function makeSwipes(targetElement){
 jQuery(targetElement).touchwipe({//touch settings
      wipeLeft: function() { 
      jQuery(targetElement).cycle('next'); 
+     resizeSections();
       },
      wipeRight: function() {
       jQuery(targetElement).cycle('prev'); 
+      resizeSections();
        },
      min_move_x: 30,
      min_move_y: 30,
@@ -201,7 +202,6 @@ function makeCycles(){
 		    pager:  '#portfolio-nav', 
 		    next: '#next-hand',
 		    prev: '#prev-hand',
-		     
 		    // callback fn that creates a thumbnail to use as pager anchor 
 		    pagerAnchorBuilder: function(idx, slide) { 
 		    var bgSource = jQuery(slide).find('.portfolio_bg img').attr('src');
@@ -209,7 +209,9 @@ function makeCycles(){
 		    } 
 		}
 		);
-		
+		jQuery('#next-hand, #prev-hand').click(function(){
+			resizeSections();
+		});
 		//Build the portfolio slider 
 		jQuery(function() {
 		
@@ -276,6 +278,7 @@ function buildPageAnchors(slide){
 function moveMenuIndicator(){
 
 	var currentItem = jQuery('.current-menu-item');
+	if(currentItem.length > 0){
 	var itemOffset = currentItem.offset().left;
 	var itemWidth = currentItem.width();
 	var menuOffset = currentItem.parent().offset().left;
@@ -287,54 +290,14 @@ function moveMenuIndicator(){
 
 	var tabPosition = itemOffset + itemWidth/2; 
 	
-	console.log('item offset: ',itemOffset);
-	console.log('body width: ', windowWidth);
-	console.log('menu width: ', menuWidth);
-	console.log('menu offset: ', menuOffset);
-	console.log('item width: ',itemWidth);
-	console.log('tab position: ',tabPosition);
-	
 	jQuery('.menu-global-menu-container').css({'background-position-x': tabPosition });
-	/*jQuery('#menu-main-menu .menu-item a').each(function(){
-		var sectionID = jQuery(this).attr('href');
-		var sectionOffset = jQuery(sectionID).offset();
-		menuLeftPos = jQuery(this).parent().parent().offset().left;
-		sectionOffset.bottom = sectionOffset.top + jQuery(sectionID).height();
-	
-	});//end each for menu item links
-	
-	//menu for touch devices
-	activeSection = jQuery('.active').first();
-	
-	if(activeSection.attr('id') == "landing"){	
-		jQuery('.menu-main-menu-container').css({"background-position": menuLeftPos - 50 + "px 0" });
-	}
-	else if(activeSection.attr('id') == "portfolio"){
-	
-		jQuery('.menu-main-menu-container').css({"background-position": menuLeftPos - 500 + "px 0" });
-	}
-	else if(activeSection.attr('id') == "services"){
-		jQuery('.menu-main-menu-container').css({"background-position": menuLeftPos - 360 + "px 0" });
-	}
-	else if(activeSection.attr('id') == "case_studies"){
-		jQuery('.menu-main-menu-container').css({"background-position":  menuLeftPos - 220 +"px 0" });
-	}	
-	else if(activeSection.attr('id') == "artists"){
-		jQuery('.menu-main-menu-container').css({"background-position": menuLeftPos + 60 + "px 0" });
-	}
-	else if(activeSection.attr('id') == "clients"){
-		jQuery('.menu-main-menu-container').css({"background-position": menuLeftPos + 170 + "px 0" });
-	}
-	else if(activeSection.attr('id') == "contact"){
-		jQuery('.menu-main-menu-container').css({"background-position": menuLeftPos + 290 + "px 0" });
-		//jQuery('.sidebar').slideDown();
-	}*/
-	
-	
+			}
 }//end moveMenuIndicator function
 /* ============= Global Scripts ========*/
 jQuery(window).load(function(){
-
+	jQuery('#hand-navigation .arrow').click(function(e){
+				
+	});
 	activeSection = jQuery('.active');
 	//fade the wrapper in after it loads
 	jQuery('#wrapper').animate({'opacity':1},1400);
@@ -344,7 +307,6 @@ jQuery(window).load(function(){
 	//imageTexturizer();
 	resizeSections();
 	
-	centerElement(jQuery('#portfolio-control'));
 		
 			});
 
@@ -368,6 +330,7 @@ $('body').keydown(function(e){
 			
 			else {
 				jQuery('#portfolio-wrapper').cycle('prev'); //this is reversed to match wp post order
+				resizeSections();
 			} 
 		}
 		
@@ -385,15 +348,17 @@ $('body').keydown(function(e){
 		e.preventDefault();
 	}
 	else if(e.keyCode == 39){//right(39) arrow is pressed
-		if(jQuery('.page-template-page-showcase-php').length > 0){
+		if(jQuery('.page-template-page-showcase-php').length > 0 || jQuery('.page-template-page-tour-php').length > 0){
 			
 			//modal changes too
 			if(jQuery('#modal').hasClass('open')){
 				jQuery('#modal').find('.modal-link a[rel="prev"]').click();
 			}//end open modal	
+			
 			else {
 				jQuery('#portfolio-wrapper').cycle('next'); //this is reversed to match wp post order
-			}
+				resizeSections();
+							}
 			
 		}
 		else if(jQuery('.page-template-page-category-php').length > 0){
@@ -498,6 +463,7 @@ function stopVideo(container){
    jQuery('#portfolio-wrapper').click(function() {
     var target = jQuery(this).find('.portfolio-entry:visible');
     var targetID = target.attr('data-target');
+   if(targetID != null){
     var modal = jQuery('#modal');
    //load modal template into modal content with ajax
 	var modalContent =  $.ajax({
@@ -514,6 +480,7 @@ function stopVideo(container){
 	    activateLinks();
 	     
 	   	  }); 
+	   	  }
     });
    
    //instructions modal
@@ -612,10 +579,10 @@ function stopVideo(container){
 		     	    
 		     	    });
 		     	    if(jQuery(target).attr('rel') == 'prev'){
-		     	    jQuery('#portfolio-wrapper').cycle('next'); //this is reversed to match wp post order
+		     	    jQuery('.page-template-page-showcase-php #portfolio-wrapper').cycle('next'); //this is reversed to match wp post order
 		     	    }
 		     	   else if(jQuery(target).attr('rel') == 'next'){
-		     	    jQuery('#portfolio-wrapper').cycle('prev');//this is reversed to match wp post order
+		     	    jQuery('.page-template-page-showcase-php #portfolio-wrapper').cycle('prev');//this is reversed to match wp post order
 		     	    }
 		     	    activateLinks();
 		     	    

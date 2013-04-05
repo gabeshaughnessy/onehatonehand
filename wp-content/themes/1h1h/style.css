@@ -303,11 +303,14 @@ body{
 	background-position: bottom center;
 }
 
+.home .section {
+	top: -300px;
+	margin-top: 300px;
+}
 .section {
 padding-top: 150px;
 padding-bottom: 150px;
-top: -300px;
-margin-top: 300px;
+
 /*background-image: url(images/section_bg.jpg);*/
 background-size: cover;
 clear: both;
@@ -418,7 +421,7 @@ float: left;
 .logged-in .nav-tab {
 	top: 77px;
 }
-#portfolio-control {
+#portfolio-control, .instructions-modal {
 	position: absolute;
 	text-align: center;
 	width:  40%;
@@ -431,13 +434,13 @@ float: left;
 	backface-visibility: hidden;
 }
 /* hide instructions */
-.instructions .keyboard, .instructions .touch {
+.no-touch-device, .touch-device {
 	display:  none;
 }
-.no-touch .instructions .keyboard{
+.no-touch .no-touch-device{
 	display: block;
 }
-.touch .instructions .touch{
+.touch .touch-device{
 	display: block;
 }
 
@@ -485,16 +488,40 @@ cursor: pointer;
 	height:  4px;
 	margin: 0 auto;
 }
-.portfolio-entry {
+.portfolio-entry, .tour-entry {
 	width: 100%;
 	float: left;
 	clear: both;
+}
+.tour-entry .post-content {
+	background: #fff;
+	display: block;
+	clear:  both;
+	width: 50%;
+	position: absolute;
+	overflow: scroll;
+	max-height: 60%;
+	color: #333;
+	-webkit-transition: all .1s;
+	background-color: #fff;
+	background-color: rgba(255, 255, 255, 0.8);
+	border-top-left-radius: 3px;
+	border-top-right-radius: 5px;
+	border-bottom-right-radius: 5px;
+	border-bottom-left-radius: 5px;
+	box-shadow: 0 1px 3px rgba(0,0,0,.5);
+	-webkit-box-sizing: border-box; -moz-box-sizing: border-box; box-sizing: border-box;
+
+	padding:  2%;
 }
 .post-type-wrapper, #landing .wrapper, #contact .wrapper{
 	width: 960px;
 	height: 100%;
 	margin:  0 auto;
 	overflow: hidden;
+}
+#wrapper .tour-entry .wrapper {
+	margin-top:  50px;
 }
 .sidebar {
 	width: 30%;

@@ -10,7 +10,7 @@
 				
 				 ?>
 	</div>
-	<div id="portfolio-control">
+	<div id="portfolio-control" class="instructions-modal">
 		<!--<div id="portfolio-title" > <span class="hh_text">One Hat One Hand</span> <span class="fredericka" >Portfolio</span></div>
 	
 		<div id="slider"></div>-->
