@@ -1,0 +1,3 @@
+[submodule "1h1h-post-types"]
+      path = wp-content/plugins/1h1h-custom-post-types
+      url = git@github.com:gabeshaughnessy/1h1h-custom-post-types.git
