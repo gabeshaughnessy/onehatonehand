@@ -115,12 +115,7 @@ body{
 	padding: 3px;
 	
 }
-#menu-main-menu .menu-item.active, 
-#menu-global-menu .menu-item.active,
-#menu-main-menu .menu-item a.active-item
- {	
-	color: #666;
-}
+
 #menu-main-menu .menu-item a,
 #menu-global-menu .menu-item a{
 		font-family: 'Muli', arial, sans-serif;
@@ -129,6 +124,13 @@ body{
 		color:  #333;
 		text-shadow: 0 1px 1px rgba(255,255,255,.7);
 		font-weight: bold;
+}
+#menu-global-menu .menu-item.current-menu-item a,
+#menu-main-menu .menu-item a.active-item
+
+ {	
+	color: #ccc;
+	text-shadow: 0 -1px 1px rgba(0,0,0,.3);
 }
 #menu-main-menu .menu-item a:hover,
 #menu-global-menu .menu-item a:hover{
