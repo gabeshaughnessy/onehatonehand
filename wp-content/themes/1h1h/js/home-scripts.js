@@ -62,14 +62,22 @@ function resizeSections(){
 	var windowWidth = jQuery(window).width();
 	var windowHeight = jQuery(window).height();
 	jQuery('#fixed_bg').css({'height':windowHeight});
-	jQuery('#portfolio-wrapper').css({"width": windowWidth, "height": windowHeight + 100});
+	jQuery('.portfolio-wrapper').css({"width": windowWidth, "height": windowHeight + 100});
 	jQuery('.section').css({"width": windowWidth, "min-height": windowHeight + 100});
 	jQuery('#hand-navigation .hand, #portfolio-control').animate({'top': windowHeight/3}, 500);
 	centerElement(jQuery('#portfolio-control'));
-	//jQuery('body').css({'height':windowHeight, 'overflow':'hidden'});
-	//jQuery('.menu-main-menu-container').css({"width": windowWidth});
-	var menuPos =  jQuery('#menu-main-menu').offset();
+	
+	jQuery('.tour-entry .post-content, .instructions-modal'  ).each(function(index){
+		jQuery(this).css({'top': 100});
+		centerElement(jQuery(this));
+	});
+		var menuPos =  jQuery('#menu-main-menu').offset();
 	jQuery('#portfolio-nav').css({"paddingLeft": menuPos.left});
+	jQuery('.filter-target').isotope({
+	// options... http://isotope.metafizzy.co/docs/options.html
+	filter: '.artist' 
+		});
+	
 }
 //End resizeSections
 
@@ -107,12 +115,14 @@ function makeSwipes(targetElement){
 jQuery(targetElement).touchwipe({//touch settings
      wipeLeft: function() { 
      jQuery(targetElement).cycle('next'); 
+     resizeSections();
       },
      wipeRight: function() {
-      jQuery(targetElement).cycle('prev'); 
+      jQuery(targetElement).cycle('prev');
+      resizeSections(); 
        },
-     min_move_x: 30,
-     min_move_y: 30,
+     min_move_x: 50,
+     min_move_y: 50,
      preventDefaultEvents: false
 });
 }
@@ -143,7 +153,7 @@ function whichSectionIsActive(){
 		jQuery('.menu-main-menu-container').slideDown('slow');
 		jQuery('#portfolio-nav').slideUp('fast');
 	}
-	else if (jQuery('#artists').hasClass('active')) {
+	else if (jQuery('#tour').hasClass('active')) {
 		jQuery('#portfolio .nav-tab').hide();
 		jQuery('.menu-main-menu-container').slideDown('slow');
 		jQuery('#portfolio-nav').slideUp('fast');
@@ -266,7 +276,11 @@ function moveMenuIndicator(){
 	
 	var tabPosition = itemOffset + itemWidth/2; 
 	jQuery('.menu-main-menu-container').css({'backgroundPosition': tabPosition});
-
+	
+	jQuery('.filter-target').isotope({
+	// options... http://isotope.metafizzy.co/docs/options.html
+	filter: '.artist' 
+		});
 	
 	
 }//end moveMenuIndicator function
@@ -309,13 +323,13 @@ document.body.addEventListener("gesturechange", gestureChange, false);
 }
 
 function makeCycles(){
-		jQuery('#portfolio-wrapper').before('<ul id="portfolio-nav">').cycle({ 
+		jQuery('#portfolio .portfolio-wrapper').before('<ul id="portfolio-nav">').cycle({ 
 		    fx:     'fade', 
 		    speed:  'slow', 
 		    timeout: 0, 
 		    pager:  '#portfolio-nav', 
-		    next: '#next-hand',
-		    prev: '#prev-hand',
+		    next: '#portfolio .next',
+		    prev: '#portfolio .prev',
 		     
 		    // callback fn that creates a thumbnail to use as pager anchor 
 		    pagerAnchorBuilder: function(idx, slide) { 
@@ -324,13 +338,29 @@ function makeCycles(){
 		    } 
 		}
 		);
+		jQuery('#portfolio .next, #portfolio .prev').click(function(){
+			resizeSections();
+		});
+		
+		jQuery('#tour .portfolio-wrapper').cycle({ 
+		    fx:     'fade', 
+		    speed:  'slow', 
+		    timeout: 0,  
+		    next: '#tour .next',
+		    prev: '#tour .prev',
+		   
+		}
+		);
+		jQuery('#tour .next, #tour .prev').click(function(){
+			resizeSections();
+		});
 		
 		//Build the portfolio slider 
 		jQuery(function() {
 		
 		var oldAmount = 0;
 		var sliderLength = 100;
-		var numberOfSlides = jQuery('#portfolio-wrapper').children().length;
+		var numberOfSlides = jQuery('#portfolio .portfolio-wrapper').children().length;
 		sliderStep = sliderLength/numberOfSlides;
 				jQuery( "#slider" ).slider({
 					value:0,
@@ -339,10 +369,10 @@ function makeCycles(){
 					step: sliderStep,
 					slide: function( event, ui ) {
 					if (ui.value > oldAmount){
-						jQuery('#portfolio-wrapper').cycle('next');
+						jQuery('.portfolio-wrapper').cycle('next');
 					}
 					else if(ui.value < oldAmount){
-						jQuery('#portfolio-wrapper').cycle('prev');
+						jQuery('.portfolio-wrapper').cycle('prev');
 					}
 					oldAmount = ui.value;
 						
@@ -410,8 +440,9 @@ jQuery(window).load(function(){
 	//fade the wrapper in after it loads
 	jQuery('#wrapper').animate({'opacity':1},1400);
 	
-	resizeSections();
+	
 	makeCycles();
+	resizeSections();
 	navTabActivate('#portfolio .nav-tab', '#portfolio-nav');
 	hhAccordion('#contact-accordion');//the contact form accordion
 	//imageTexturizer();
@@ -500,13 +531,13 @@ jQuery(window).load(function(){
 	  moveMenuIndicator();
 	});
 	
-	jQuery('#artists').bind('inview', function (event, visible) {
+	jQuery('#tour').bind('inview', function (event, visible) {
 	  if (visible == true) {
-	  //alert('active artists'); //for debugging
+	  //alert('active tour'); //for debugging
 	  	 jQuery('.section').removeClass('active');
 	  
-	  currentSection = jQuery('#artists');
-		  jQuery('#artists').addClass('active');
+	  currentSection = jQuery('#tour');
+		  jQuery('#tour').addClass('active');
 		    // element is now visible in the viewport
 		    jQuery('.menu-main-menu-container').slideDown('fast');
 		    jQuery('#portfolio-nav').slideUp('fast');
@@ -522,7 +553,7 @@ jQuery(window).load(function(){
 	  	 } //end in view
 	  	  
   	  else {
-	  jQuery('#artists').removeClass('active');
+	  jQuery('#tour').removeClass('active');
 	    // element has gone out of viewport
 	  } 
 	  moveMenuIndicator();
@@ -644,8 +675,13 @@ $('body').keydown(function(e){
 			}//end open modal	
 			
 			else {
-				jQuery('#portfolio-wrapper').cycle('prev'); //this is reversed to match wp post order
+				jQuery('#portfolio .portfolio-wrapper').cycle('prev'); //this is reversed to match wp post order
+				resizeSections();
 			} 
+		}
+		else if(currentSection.attr('id') == 'tour'){
+			jQuery('#tour .portfolio-wrapper').cycle('prev'); //this is reversed to match wp post order
+			resizeSections();
 		}
 		
 		else if(currentSection.attr('id') == 'case_studies'){
@@ -669,9 +705,14 @@ $('body').keydown(function(e){
 				jQuery('#modal').find('.modal-link a[rel="prev"]').click();
 			}//end open modal	
 			else {
-				jQuery('#portfolio-wrapper').cycle('next'); //this is reversed to match wp post order
+				jQuery('.portfolio-wrapper').cycle('next'); //this is reversed to match wp post order
+				resizeSections();
 			}
 			
+		}
+		else if(currentSection.attr('id') == 'tour'){
+			jQuery('#tour .portfolio-wrapper').cycle('next'); //this is reversed to match wp post order
+			resizeSections();
 		}
 		else if(currentSection.attr('id') == 'case_studies'){
 			jQuery('#case_studies-posts .content').cycle('next'); //this is reversed to match wp post order
@@ -688,7 +729,7 @@ $('body').keydown(function(e){
 	}
 else if (e.keyCode == 13) {//return(13) key was pressed
 	if(currentSection.attr('id') == 'portfolio' && !jQuery('#modal').hasClass('open')){ 
-		jQuery('#portfolio-wrapper').click();
+		jQuery('.portfolio-wrapper').click();
 	}
 }
 });//end keydown events
@@ -709,7 +750,7 @@ if(jQuery('html').hasClass('touch')){//Scripts for touch-enabled devices
 
 makeSwipes('#case_studies-posts .content');
 makeSwipes('#services-posts .content');
-makeSwipes('#portfolio-wrapper');
+makeSwipes('.portfolio-wrapper');
 	//++++ Change Orientation ++++++
 	window.addEventListener('orientationchange', handleOrientation, false);
 	function handleOrientation() {
@@ -835,7 +876,7 @@ function stopVideo(container){
 
     });
 
-   jQuery('#portfolio-wrapper').click(function() {
+   jQuery('.portfolio-wrapper').click(function() {
     var target = jQuery(this).find('.portfolio-entry:visible');
     var targetID = target.attr('data-target');
     var modal = jQuery('#modal');
@@ -951,10 +992,10 @@ function stopVideo(container){
 		     	    
 		     	    });
 		     	    if(jQuery(target).attr('rel') == 'prev'){
-		     	    jQuery('#portfolio-wrapper').cycle('next'); //this is reversed to match wp post order
+		     	    jQuery('.portfolio-wrapper').cycle('next'); //this is reversed to match wp post order
 		     	    }
 		     	   else if(jQuery(target).attr('rel') == 'next'){
-		     	    jQuery('#portfolio-wrapper').cycle('prev');//this is reversed to match wp post order
+		     	    jQuery('.portfolio-wrapper').cycle('prev');//this is reversed to match wp post order
 		     	    }
 		     	    activateLinks();
 		     	    
@@ -975,10 +1016,10 @@ function stopVideo(container){
      	    }).fitVids();
      	    
      	    if(jQuery(target).attr('rel') == 'prev'){
-     	    jQuery('#portfolio-wrapper').cycle('next'); //this is reversed to match wp post order
+     	    jQuery('.portfolio-wrapper').cycle('next'); //this is reversed to match wp post order
      	    }
      	   else if(jQuery(target).attr('rel') == 'next'){
-     	    jQuery('#portfolio-wrapper').cycle('prev');//this is reversed to match wp post order
+     	    jQuery('.portfolio-wrapper').cycle('prev');//this is reversed to match wp post order
      	    }
      	    activateLinks();
      	  }); 

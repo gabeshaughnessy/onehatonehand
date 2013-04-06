@@ -151,8 +151,8 @@ jQuery(targetElement).touchwipe({//touch settings
       jQuery(targetElement).cycle('prev'); 
       resizeSections();
        },
-     min_move_x: 30,
-     min_move_y: 30,
+     min_move_x: 50,
+     min_move_y: 50,
      preventDefaultEvents: false
 });
 }

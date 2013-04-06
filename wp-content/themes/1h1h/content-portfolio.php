@@ -2,7 +2,7 @@
 //The portfolio page content
 ?>
 <div id="portfolio" class="section">
-		<div id="portfolio-wrapper" class="wrapper">
+		<div class="portfolio-wrapper wrapper">
 		
 		
 		<?php //Portfolio Loop Goes Here
@@ -14,9 +14,9 @@
 		<!--<div id="portfolio-title" > <span class="hh_text">One Hat One Hand</span> <span class="fredericka" >Portfolio</span></div>
 	
 		<div id="slider"></div>-->
-		<div id="hand-navigation">
-			<div id="next-hand" class="arrow"></div>
-			<div id="prev-hand" class="arrow"></div>
+		<div class="hand-navigation">
+			<div class="next arrow"></div>
+			<div class="prev arrow"></div>
 		</div>
 		<div class="instructions" ><?php 
 		$page = get_page_by_path( 'instructions' );

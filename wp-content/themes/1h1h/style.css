@@ -324,7 +324,7 @@ clear: both;
 
 
 
-#portfolio.section{
+#portfolio.section, #tour.section{
 	overflow:  hidden;
 	padding: 0;
 }
@@ -360,7 +360,7 @@ clear: both;
 	z-index: 700;
 	padding-top:  0px;
 }
-#portfolio {
+#portfolio, #tour {
 	z-index: 499;
 	box-shadow: none;
 }
@@ -386,7 +386,7 @@ clear: both;
 	padding:  4px;
 }
 
-#portfolio-wrapper{
+.portfolio-wrapper{
 float: left;
 
 }
@@ -423,7 +423,7 @@ float: left;
 .logged-in .nav-tab {
 	top: 77px;
 }
-#portfolio-control, .instructions-modal {
+#portfolio-control, .instructions-modal, #tour-control, .instructions-modal {
 	position: absolute;
 	text-align: center;
 	width:  40%;
@@ -651,12 +651,12 @@ cursor: pointer;
 .hathand.hand a{
 	background-image: url(images/small_hand.png);
 }
-#hand-navigation{
+.hand-navigation{
 	position: absolute;
 	z-index: 10000;
 	width: 100%;
 }
-#hand-navigation .hand {
+.hand-navigation .hand {
 	display: block;
 	width:  110px;
 	height: 80px;
@@ -665,7 +665,7 @@ cursor: pointer;
 	position: absolute;
 	
 }
-#hand-navigation .arrow {
+.hand-navigation .arrow {
 	display: block;
 	width:  34px;
 	height: 66px;
@@ -674,14 +674,14 @@ cursor: pointer;
 	position: absolute;
 	
 }
-#next-hand.hand{
+.next.hand{
 	right:  10px;
 	top: 200px;
 	background-position-y: 0;
 	background-position-x: -110px;
 	
 }
-#next-hand.arrow {
+.next.arrow {
 	right:  -50%;
 	top: 20px;
 	background-position-y: 0;
@@ -689,14 +689,14 @@ cursor: pointer;
 	
 }
 
-#prev-hand.hand {
+.prev.hand {
 	left:  10px;
 	top:  200px;
 	background-position-y: 0;
 	background-position-x: 0;
 	
 }
-#prev-hand.arrow {
+.prev.arrow {
 	left:  -50%;
 	top:  20px;
 	background-position-y: 0;
@@ -704,16 +704,16 @@ cursor: pointer;
 	
 }
 
-#prev-hand.hand:hover, #next-hand.hand:hover{
+.prev.hand:hover, .next.hand:hover{
 	background-position-y: -80px;
 }
-#prev-hand.hand:active, #next-hand.hand:active{
+.prev.hand:active, .next.hand:active{
 	background-position-y: 0;
 }
-#prev-hand.arrow:hover, #next-hand.arrow:hover{
+.prev.arrow:hover, .next.arrow:hover{
 	background-position-y: -66px;
 }
-#prev-hand.arrow:active, #next-hand.arrow:active{
+.prev.arrow:active, .next.arrow:active{
 	background-position-y: 0;
 }
 

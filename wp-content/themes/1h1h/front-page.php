@@ -19,7 +19,7 @@ get_template_part('content', 'landing');
 get_template_part('content', 'portfolio');
 get_template_part('content', 'services');
 get_template_part('content', 'case_studies');
-get_template_part('content', 'artists');
+get_template_part('content', 'tour');
 get_template_part('content', 'clients');
 get_template_part('content', 'contact');
  get_footer(); ?>

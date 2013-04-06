@@ -20,9 +20,11 @@ wp_nav_menu( array('menu' => 'Global Menu' ));
 
 				<?php /* Start the Loop */ ?>
 				<?php while ( have_posts() ) : the_post(); ?>
-
+		
+									<div class="sidebar">
 									<h2 class="section-title"><?php the_title(); ?></h2>
 									<p class="section-logo">One Hat One Hand</p>
+									</div>
 								<div  class="post-box">
 									<div class="primary">
 											<div class="content" role="main">
