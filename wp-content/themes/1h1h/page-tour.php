@@ -28,7 +28,7 @@ $tour = get_post_meta($post->ID, 'hh_tour', true);
 								'post_type' => array('hh_project', 'page', 'hh_service', 'hh_casestudy', 'hh_artist', 'hh_client', 'post'),
 								'post_count' => 20,
 								  'orderby' => 'modified',
-								  'order' => 'ASC',
+								  'order' => 'DESC',
 							
 					);
 					$custom_query = new WP_Query( $args );
