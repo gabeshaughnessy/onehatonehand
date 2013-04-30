@@ -117,14 +117,15 @@ $tour = get_post_meta($post->ID, 'hh_tour', true);
 					<!--<div id="portfolio-title" > <span class="hh_text">One Hat One Hand</span> <span class="fredericka" >Portfolio</span></div>
 				
 					<div id="slider"></div>-->
-					<div id="hand-navigation">
-						<div id="next-hand" class="arrow"></div>
-						<div id="prev-hand" class="arrow"></div>
+					<div class="hand-navigation">
+						<div class="next arrow"></div>
+						<div class="prev arrow"></div>
 					</div>
 					
 				</div>
 				
 			</div>
+
 
 
 
