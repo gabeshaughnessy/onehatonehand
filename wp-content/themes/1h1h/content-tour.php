@@ -11,7 +11,10 @@
 						'meta_key' => 'hh_tour',
 						'meta_value' => $tour,
 						'post_type' => array('hh_project', 'page', 'hh_service', 'hh_casestudy', 'hh_artist', 'hh_client', 'post'),
-						'post_count' => 20
+						'post_count' => 20,
+						'orderby' => 'modified',
+						'order' => 'DESC',
+						
 					
 			);
 			$custom_query = new WP_Query( $args );
