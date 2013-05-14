@@ -636,10 +636,11 @@ $('body').keydown(function(e){
 			targetSection = currentSection;
 		}
 		if(targetSection.attr('id') != 'landing'){
-		var scrollOffset = 75;
-		}
-		else {
 		var scrollOffset = 0;
+		
+		}
+		else if(targetSection.attr('id') == 'landing') {
+		var scrollOffset = -50;
 		}
 		$.scrollTo(targetSection, 500, {'offset': scrollOffset});
 		targetSection.addClass('active');
@@ -657,7 +658,7 @@ $('body').keydown(function(e){
 			targetSection = currentSection;
 		}
 		if(targetSection.attr('id') != 'contact'){
-		var scrollOffset = 75;
+		var scrollOffset = 0;
 		}
 		else {
 		var scrollOffset = 0;
@@ -810,7 +811,7 @@ $.localScroll({ 'offset': scrollOffset, 'onAfter' : function(){
 }, 'onBefore': function(e){
 clickTarget = e.toElement;
 if(jQuery(clickTarget).attr('href') != '#landing'){
-scrollOffset = 100;
+scrollOffset = -100;
 }
 else {
 scrollOffset = 0;
