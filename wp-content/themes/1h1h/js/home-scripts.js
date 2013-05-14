@@ -636,7 +636,7 @@ $('body').keydown(function(e){
 			targetSection = currentSection;
 		}
 		if(targetSection.attr('id') != 'landing'){
-		var scrollOffset = 0;
+		var scrollOffset = 40;
 		
 		}
 		else if(targetSection.attr('id') == 'landing') {
@@ -658,7 +658,7 @@ $('body').keydown(function(e){
 			targetSection = currentSection;
 		}
 		if(targetSection.attr('id') != 'contact'){
-		var scrollOffset = 0;
+		var scrollOffset = 40;
 		}
 		else {
 		var scrollOffset = 0;
