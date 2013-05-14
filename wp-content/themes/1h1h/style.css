@@ -121,16 +121,16 @@ body{
 		font-family: 'Muli', arial, sans-serif;
 		text-transform: uppercase;
 		text-decoration: none;
-		color:  #333;
-		text-shadow: 0 1px 1px rgba(255,255,255,.7);
+		color:  #ccc;
+		text-shadow: 0 1px 1px rgba(0,0,0,.3);
 		font-weight: bold;
 }
 #menu-global-menu .menu-item.current-menu-item a,
 #menu-main-menu .menu-item a.active-item
 
  {	
-	color: #ccc;
-	text-shadow: 0 -1px 1px rgba(0,0,0,.3);
+	color: #333;
+	text-shadow: 0 -1px 1px rgba(255,255,255,.7);
 }
 #menu-main-menu .menu-item a:hover,
 #menu-global-menu .menu-item a:hover{
