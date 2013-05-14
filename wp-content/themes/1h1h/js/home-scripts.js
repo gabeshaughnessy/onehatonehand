@@ -811,10 +811,10 @@ $.localScroll({ 'offset': scrollOffset, 'onAfter' : function(){
 }, 'onBefore': function(e){
 clickTarget = e.toElement;
 if(jQuery(clickTarget).attr('href') != '#landing'){
-scrollOffset = -100;
+scrollOffset = 40;
 }
 else {
-scrollOffset = 0;
+scrollOffset = -50;
 }
 this.offset = scrollOffset;
 
