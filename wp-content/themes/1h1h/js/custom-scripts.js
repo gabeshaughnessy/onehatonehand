@@ -86,7 +86,7 @@ function resizeSections(){
 	jQuery('#portfolio-wrapper').css({"width": windowWidth, "height": windowHeight + 100});
 	}
 	jQuery('.section').css({"width": windowWidth, "min-height": windowHeight + 100});
-	jQuery('#hand-navigation .hand').css({'top': windowHeight/3});
+	jQuery('.hand-navigation .hand').css({'top': windowHeight/3});
 	
 	jQuery('.tour-entry .post-content, .instructions-modal'  ).each(function(index){
 		jQuery(this).css({'top': 100});
@@ -131,12 +131,12 @@ function imageTexturizer(){//puts a texture over all the images
 //Hide the Instructions
 function hideInstructions(){
 jQuery('.instructions').fadeOut(200);
-jQuery('#hand-navigation').fadeOut(200);
+//jQuery('.hand-navigation').fadeOut(200);
 }//end hide instructions
 //Show the Instructions
 function showInstructions(){
 jQuery('.instructions').fadeIn(200);
-jQuery('#hand-navigation').fadeIn(200);
+//jQuery('.hand-navigation').fadeIn(200);
 }//end show instructions
 
 
@@ -196,12 +196,12 @@ document.body.addEventListener("gesturechange", gestureChange, false);
 
 function makeCycles(){
 		jQuery('#portfolio-wrapper').before('<ul id="portfolio-nav">').cycle({ 
-		    fx:     'fade', 
-		    speed:  'slow', 
+		    fx:     'scrollHorz', 
+		    speed:  500, 
 		    timeout: 0, 
 		    pager:  '#portfolio-nav', 
-		    next: '#next-hand',
-		    prev: '#prev-hand',
+		    next: '.next.arrow',
+		    prev: '.prev.arrow',
 		    // callback fn that creates a thumbnail to use as pager anchor 
 		    pagerAnchorBuilder: function(idx, slide) { 
 		    var bgSource = jQuery(slide).find('.portfolio_bg img').attr('src');
@@ -209,7 +209,7 @@ function makeCycles(){
 		    } 
 		}
 		);
-		jQuery('#next-hand, #prev-hand').click(function(){
+		jQuery('.next.arrow, .prev.arrow').click(function(){
 			resizeSections();
 		});
 		//Build the portfolio slider 
@@ -295,8 +295,13 @@ function moveMenuIndicator(){
 }//end moveMenuIndicator function
 /* ============= Global Scripts ========*/
 jQuery(window).load(function(){
-	jQuery('#hand-navigation .arrow').click(function(e){
-				
+	jQuery('.hand-navigation .arrow').click(function(e){
+			if(jQuery(this).hasClass('next')){
+				jQuery('#portfolio-wrapper').cycle('next');
+			}
+			else if(jQuery(this).hasClass('prev')){
+				jQuery('#portfolio-wrapper').cycle('prev');
+			}
 	});
 	activeSection = jQuery('.active');
 	//fade the wrapper in after it loads

@@ -42,7 +42,7 @@ function centerElement(element){
 	var elementHeight = element.height();
 	var elementOffset = new Object();
 	elementOffset.x = windowWidth/2 - elementWidth/2;
-	elementOffset.y = windowHeight/2;
+	elementOffset.y = windowHeight/4;
 	element.css({
 	'left' : elementOffset.x,
 	'top' : elementOffset.y
