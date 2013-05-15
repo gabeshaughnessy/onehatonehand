@@ -322,7 +322,9 @@ clear: both;
 
 }
 
-
+.page-template-page-full-width-php .section, .tour-entry.section {
+	padding-top:  48px;
+}
 
 #portfolio.section, #tour.section{
 	overflow:  hidden;

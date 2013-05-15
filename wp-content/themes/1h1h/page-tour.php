@@ -36,7 +36,6 @@ $tour = get_post_meta($post->ID, 'hh_tour', true);
 					if ( $custom_query->have_posts() ) : while ( $custom_query->have_posts() ) : $custom_query->the_post(); 
 					
 					if(get_the_title() == 'Artists'){
-					
 					$tour_items .= '<div class="tour-entry post" id="tour_post_'.get_the_ID().'"><div id="artists-wrapper" class="wrapper post-type-wrapper"><div id="artists-sidebar" class="sidebar"><h2 class="section-title" id="artists-title">artists</h2><p class="section-logo">One Hat One Hand</p><p>filter by:<ul id="profile-filter" class="filter-menu button-group nine columns">';
 									
 					 $filter_menu = get_transient('filter_menu_classification');
@@ -97,10 +96,16 @@ $tour = get_post_meta($post->ID, 'hh_tour', true);
 						$tour_items .=	'</div></div></div></div></div>';
 					
 				}
+					else if(get_post_meta( $post->ID, '_wp_page_template', true )=='page-full-width.php'){
+						$tour_items .='
+							<div class="tour-entry section full-width" data-target="'.get_permalink().'" id="tour_post_'.get_the_ID().'"><div class=" ">'.get_the_content().'</div></div>';
+					}
+					
 					else{
 					
 					$tour_items .='<div class="tour-entry post" data-target="'.get_permalink().'" id="tour_post_'.get_the_ID().'"><div class="post-content ">'.get_the_content().'</div>'.hh_get_portfolio_backgrounds("full-bg", false).'</div>';
 					}
+					
 									endwhile; 
 									else : 
 									$tour_items .='<p> No Items to display </p>';
