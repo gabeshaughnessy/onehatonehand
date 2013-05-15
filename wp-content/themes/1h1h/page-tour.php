@@ -105,7 +105,7 @@ $tour = get_post_meta($post->ID, 'hh_tour', true);
 					
 					$tour_items .='<div class="tour-entry post" data-target="'.get_permalink().'" id="tour_post_'.get_the_ID().'">';
 					if(get_the_content() != ''){//only show the content box if the post has content in the editor
-						$tour_items .= '<div class="post-content ">'.get_the_content().'</div>';
+						$tour_items .= '<div class="post-content ">'.get_the_content().'</div><div class="edit-post"><a href="'.get_edit_post_link( get_the_ID() ).'">Edit This Item</a></div>';
 					}
 					$tour_items .= hh_get_portfolio_backgrounds("full-bg", false).'</div>';
 					}
