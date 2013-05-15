@@ -325,6 +325,9 @@ clear: both;
 .page-template-page-full-width-php .section, .tour-entry.section {
 	padding-top:  48px;
 }
+.page-template-page-full-width-php.section {
+	margin-top: 66px;
+}
 
 #portfolio.section, #tour.section{
 	overflow:  hidden;
@@ -775,9 +778,11 @@ cursor: pointer;
 /* Edit Post Link */
 #wrapper .edit-post {
 	position: absolute;
-	top: 48px;
-	left: 48px;
+	top: 52px;
+	left: 52px;
+	
 }
+
 
 #wrapper .edit-post a {
 	color:  #bbb;

@@ -83,6 +83,10 @@
 				$tour_items .=	'</div></div></div></div></div>';
 			
 		}
+			else if(get_post_meta( $post->ID, '_wp_page_template', true )=='page-full-width.php'){//if the page uses the full-width template:
+				$tour_items .='
+					<div class="tour-entry section full-width" data-target="'.get_permalink().'" id="tour_post_'.get_the_ID().'"><div class=" ">'.get_the_content().'</div></div>';
+			}
 			else{
 			
 			$tour_items .='<div class="tour-entry post" data-target="'.get_permalink().'" id="tour_post_'.get_the_ID().'"><div class="post-content ">'.get_the_content().'</div>'.hh_get_portfolio_backgrounds("full-bg", false).'</div>';

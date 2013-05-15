@@ -33,6 +33,7 @@ $tour = get_post_meta($post->ID, 'hh_tour', true);
 					);
 					$custom_query = new WP_Query( $args );
 					$tour_items= '';
+					
 					if ( $custom_query->have_posts() ) : while ( $custom_query->have_posts() ) : $custom_query->the_post(); 
 					
 					if(get_the_title() == 'Artists'){ //if it is the artists page we treat it differently. this could be done better.
@@ -46,7 +47,7 @@ $tour = get_post_meta($post->ID, 'hh_tour', true);
 									
 					$tour_items .= $filter_menu; 
 					
-					$tour_items .= '</ul></div><div id="artists-posts" class="post-box"><div class="primary"><div class="content" role="main">';
+					$tour_items .= '</ul></div><div class="edit-post"><a href="'.get_edit_post_link( get_the_ID() ).'">Edit This Item</a></div><div id="artists-posts" class="post-box"><div class="primary"><div class="content" role="main">';
 									
 					$artist_list = get_transient('artist_list');
 									 if($artist_list == ''){
@@ -98,16 +99,17 @@ $tour = get_post_meta($post->ID, 'hh_tour', true);
 				}
 					else if(get_post_meta( $post->ID, '_wp_page_template', true )=='page-full-width.php'){//if the page uses the full-width template:
 						$tour_items .='
-							<div class="tour-entry section full-width" data-target="'.get_permalink().'" id="tour_post_'.get_the_ID().'"><div class=" ">'.get_the_content().'</div></div>';
+							<div class="tour-entry section full-width" data-target="'.get_permalink().'" id="tour_post_'.get_the_ID().'"><div class=" ">'.get_the_content().'</div><div class="edit-post"><a href="'.get_edit_post_link( get_the_ID() ).'">Edit This Item</a></div></div>';
 					}
 					
 					else{//all other posts/pages/projects/etc use this output:
 					
 					$tour_items .='<div class="tour-entry post" data-target="'.get_permalink().'" id="tour_post_'.get_the_ID().'">';
 					if(get_the_content() != ''){//only show the content box if the post has content in the editor
-						$tour_items .= '<div class="post-content ">'.get_the_content().'</div><div class="edit-post"><a href="'.get_edit_post_link( get_the_ID() ).'">Edit This Item</a></div>';
+						$tour_items .= '<div class="post-content ">'.get_the_content().'</div>';
 					}
-					$tour_items .= hh_get_portfolio_backgrounds("full-bg", false).'</div>';
+					
+					$tour_items .= '<div class="edit-post"><a href="'.get_edit_post_link( get_the_ID() ).'">Edit This Item</a></div>'.hh_get_portfolio_backgrounds("full-bg", false).'</div>';
 					}
 					
 									endwhile; 

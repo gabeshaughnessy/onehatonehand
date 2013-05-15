@@ -32,6 +32,8 @@ return false;
 function navTabActivate(tab, target){ //displays the portfolio navigation tab
 	jQuery(tab).click(function(e){
 	jQuery(target).slideDown('slow');
+	jQuery(target).toggleClass('active');
+	jQuery('.edit-post').animate({'top' : 120}, 'slow');
 	jQuery(this).slideUp('fast');
 	e.preventDefault();
 	});
