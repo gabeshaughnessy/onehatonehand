@@ -276,7 +276,7 @@ $args = array(
 				
 						'post_type' => $hhpost_type,
 						'post_count' => $hhcount,
-						'orderby' => 'parent',
+						'orderby' => 'menu_order  parent',
 						'order' => 'ASC'
 					
 			);
