@@ -47,7 +47,11 @@ $tour = get_post_meta($post->ID, 'hh_tour', true);
 									
 					$tour_items .= $filter_menu; 
 					
-					$tour_items .= '</ul></div><div class="edit-post"><a href="'.get_edit_post_link( get_the_ID() ).'">Edit This Item</a></div><div id="artists-posts" class="post-box"><div class="primary"><div class="content" role="main">';
+					$tour_items .= '</ul></div>';
+					if ( is_user_logged_in() && current_user_can('edit_post', $post->ID) ) {
+						$tour_items .='<div class="edit-post"><a href="'.get_edit_post_link( get_the_ID() ).'">Edit This Item</a></div>';
+					}
+					$tour_items .= '<div id="artists-posts" class="post-box"><div class="primary"><div class="content" role="main">';
 									
 					$artist_list = get_transient('artist_list');
 									 if($artist_list == ''){
@@ -99,11 +103,19 @@ $tour = get_post_meta($post->ID, 'hh_tour', true);
 				}
 					else if(get_post_meta( $post->ID, '_wp_page_template', true )=='page-full-width.php'){//if the page uses the full-width template:
 						$tour_items .='
-							<div class="tour-entry section full-width" data-target="'.get_permalink().'" id="tour_post_'.get_the_ID().'"><div class=" ">'.get_the_content().'</div><div class="edit-post"><a href="'.get_edit_post_link( get_the_ID() ).'">Edit This Item</a></div></div>';
+							<div class="tour-entry section full-width" data-target="'.get_permalink().'" id="tour_post_'.get_the_ID().'"><div class=" ">'.get_the_content().'</div>';
+							if ( is_user_logged_in() && current_user_can('edit_post', $post->ID) ) {
+								$tour_items .= '<div class="edit-post"><a href="'.get_edit_post_link( get_the_ID() ).'">Edit This Item</a></div>';
+							}
+							$tour_items .= '</div>';
 					}
 					else if(get_post_meta( $post->ID, '_wp_page_template', true )=='page-full-width-title.php'){//if the page uses the full-width with title template:
 						$tour_items .='
-							<div class="tour-entry full-width wrapper" data-target="'.get_permalink().'" id="tour_post_'.get_the_ID().'"><h2 class="section-title">'.get_the_title().'</h2><div class=" primary"><div class="content">'.get_the_content().'</div></div><div class="edit-post"><a href="'.get_edit_post_link( get_the_ID() ).'">Edit This Item</a></div></div>';
+							<div class="tour-entry full-width wrapper" data-target="'.get_permalink().'" id="tour_post_'.get_the_ID().'"><h2 class="section-title">'.get_the_title().'</h2><div class=" primary"><div class="content">'.get_the_content().'</div></div>';
+							if ( is_user_logged_in() && current_user_can('edit_post', $post->ID) ) {
+								$tour_items .= '<div class="edit-post"><a href="'.get_edit_post_link( get_the_ID() ).'">Edit This Item</a></div>';
+							}
+							$tour_items .= '</div>';
 					}
 					
 					else{//all other posts/pages/projects/etc use this output:
@@ -113,7 +125,10 @@ $tour = get_post_meta($post->ID, 'hh_tour', true);
 						$tour_items .= '<div class="post-content ">'.get_the_content().'</div>';
 					}
 					
-					$tour_items .= '<div class="edit-post"><a href="'.get_edit_post_link( get_the_ID() ).'">Edit This Item</a></div>'.hh_get_portfolio_backgrounds("full-bg", false).'</div>';
+					if ( is_user_logged_in() && current_user_can('edit_post', $post->ID) ) {
+						$tour_items .='<div class="edit-post"><a href="'.get_edit_post_link( get_the_ID() ).'">Edit This Item</a></div>';
+					}
+					$tour_items .= hh_get_portfolio_backgrounds("full-bg", false).'</div>';
 					}
 					
 									endwhile; 

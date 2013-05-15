@@ -270,12 +270,14 @@ function hh_post_type_loop($hhpost_type, $hhcount){
 
 add_filter( 'the_content_more_link', 'modal_more_link', 10, 2 );//filter the more link to have a modal class
 
-$post_list = get_transient('post-list-'.$hhpost_type);
+$post_list = ''; //get_transient('post-list-'.$hhpost_type);
 if($post_list == ''){
 $args = array(
 				
 						'post_type' => $hhpost_type,
-						'post_count' => $hhcount
+						'post_count' => $hhcount,
+						'orderby' => 'parent',
+						'order' => 'ASC'
 					
 			);
 			$custom_query = new WP_Query( $args );
@@ -294,7 +296,10 @@ $args = array(
 				else {
 				 $post_list .= '<a href="'.get_permalink().'" class="modal-link">'.hh_get_the_thumbnails('feature_slide', false).'</a>';
 				}
-				$post_list.= '<h2 class="post-title">'.get_the_title().'</h2>'.get_the_content().'</div>';
+				global $post;
+				$post->post_parent ? $has_parent = 'has-parent' : $has_parent = '';
+				
+				$post_list.= '<h2 class="post-title '.$has_parent.'">'.get_the_title().'</h2>'.get_the_content().'</div>';
 				endwhile; 		
 				else : 
 
