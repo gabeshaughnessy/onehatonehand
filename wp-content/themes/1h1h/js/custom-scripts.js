@@ -295,14 +295,7 @@ function moveMenuIndicator(){
 }//end moveMenuIndicator function
 /* ============= Global Scripts ========*/
 jQuery(window).load(function(){
-	jQuery('.hand-navigation .arrow').click(function(e){
-			if(jQuery(this).hasClass('next')){
-				jQuery('#portfolio-wrapper').cycle('next');
-			}
-			else if(jQuery(this).hasClass('prev')){
-				jQuery('#portfolio-wrapper').cycle('prev');
-			}
-	});
+
 	activeSection = jQuery('.active');
 	//fade the wrapper in after it loads
 	jQuery('#wrapper').animate({'opacity':1},1400);
