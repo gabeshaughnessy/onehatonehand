@@ -527,6 +527,9 @@ cursor: pointer;
 #wrapper .tour-entry .wrapper {
 	margin-top:  150px;
 }
+#wrapper .tour-entry #artists-wrapper.wrapper{
+	margin-top:  100px;
+}
 .sidebar {
 	width: 30%;
 	height: 100%;
