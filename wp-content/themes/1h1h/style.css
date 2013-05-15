@@ -611,6 +611,26 @@ cursor: pointer;
 	float: left;
 	width:  100%;
 }
+.full-width.wrapper .section-title {
+	margin-top: 48px;
+	width:  100%;
+	text-align: center;
+	line-height: 64px;
+}
+.full-width.wrapper .page-content {
+	width:  100%;
+}
+.tour-entry.full-width.wrapper .content {
+	width:  70%;
+	margin:  0 auto;
+}
+.tour-entry.full-width.wrapper .section-title {
+	width:  70%;
+	text-align: center;
+	line-height: 64px;
+	margin: 48px auto;
+}
+
 .post-title {
 	font-family: 'ArialBlack';
 }

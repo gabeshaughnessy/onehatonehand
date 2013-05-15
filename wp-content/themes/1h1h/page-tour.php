@@ -101,6 +101,10 @@ $tour = get_post_meta($post->ID, 'hh_tour', true);
 						$tour_items .='
 							<div class="tour-entry section full-width" data-target="'.get_permalink().'" id="tour_post_'.get_the_ID().'"><div class=" ">'.get_the_content().'</div><div class="edit-post"><a href="'.get_edit_post_link( get_the_ID() ).'">Edit This Item</a></div></div>';
 					}
+					else if(get_post_meta( $post->ID, '_wp_page_template', true )=='page-full-width-title.php'){//if the page uses the full-width with title template:
+						$tour_items .='
+							<div class="tour-entry full-width wrapper" data-target="'.get_permalink().'" id="tour_post_'.get_the_ID().'"><h2 class="section-title">'.get_the_title().'</h2><div class=" primary"><div class="content">'.get_the_content().'</div></div><div class="edit-post"><a href="'.get_edit_post_link( get_the_ID() ).'">Edit This Item</a></div></div>';
+					}
 					
 					else{//all other posts/pages/projects/etc use this output:
 					
