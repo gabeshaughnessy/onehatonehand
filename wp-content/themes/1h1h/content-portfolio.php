@@ -29,11 +29,11 @@
 			<div class="next arrow"></div>
 			<div class="prev arrow"></div>
 		</div>
-		<div class="instructions" ><?php 
-		$page = get_page_by_path( 'instructions' );
-		$content = $page->post_content;
-		echo $content; 
-		?></div>
+		<!--<div class="instructions" ><?php 
+		//$page = get_page_by_path( 'instructions' );
+		//$content = $page->post_content;
+		//echo $content; 
+		?></div>-->
 	</div>
 	
 	

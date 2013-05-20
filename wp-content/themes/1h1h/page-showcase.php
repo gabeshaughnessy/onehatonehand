@@ -42,11 +42,7 @@ $filter_tax = get_post_meta($post->ID, 'hh_filter_taxonomy', true);
 						<div class="next arrow"></div>
 						<div class="prev arrow"></div>
 					</div>
-					<div class="instructions" ><?php 
-					$page = get_page_by_path( 'instructions' );
-					$content = $page->post_content;
-					echo $content; 
-					?></div>
+					
 				</div>
 				
 			</div>
