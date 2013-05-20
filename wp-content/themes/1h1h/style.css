@@ -584,10 +584,10 @@ cursor: pointer;
 }
 .section-menu li.has-parent a{
 	font-size: .9em;
-	line-height: 28px;
+	line-height: 24px;
 }
 .section-menu li.parent {
-	margin-top: 12px;
+	margin-top: 4px;
 }
 .section-menu li.has-parent a:before {
 	content:  '- ';
