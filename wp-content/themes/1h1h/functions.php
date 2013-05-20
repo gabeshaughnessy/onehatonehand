@@ -299,7 +299,13 @@ $args = array(
 				global $post;
 				$post->post_parent ? $has_parent = 'has-parent' : $has_parent = '';
 				
-				$post_list.= '<h2 class="post-title '.$has_parent.'">'.get_the_title().'</h2>'.get_the_content().'</div>';
+				$post_list.= '<h2 class="post-title '.$has_parent.'">'.get_the_title().'</h2>'.wpautop(get_the_content());
+				if(is_user_logged_in() && current_user_can('edit_post', $post->ID)){
+					$post_list .= '<p class=""><a href="'.get_edit_post_link($post->ID).'" title="edit post">Edit Post</a></div>';
+				}
+				else{
+					$post_list .= '</div>';
+				}
 				endwhile; 		
 				else : 
 
