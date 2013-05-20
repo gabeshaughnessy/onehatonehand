@@ -583,7 +583,7 @@ cursor: pointer;
 	font-weight: 500;
 }
 .section-menu li.has-parent a{
-	font-size: .9em;
+	font-size: .8em;
 	line-height: 24px;
 }
 .section-menu li.parent {
