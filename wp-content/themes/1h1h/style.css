@@ -582,6 +582,13 @@ cursor: pointer;
 	color: #000;
 	font-weight: 500;
 }
+.section-menu li.has-parent a{
+	font-size: .9em;
+	line-height: 28px;
+}
+.section-menu li.parent {
+	margin-top: 12px;
+}
 .section-menu li.has-parent a:before {
 	content:  '- ';
 }

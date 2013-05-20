@@ -19,6 +19,7 @@ $filter_tax = get_post_meta($post->ID, 'hh_filter_taxonomy', true);
 			<div id="portfolio" class="section">
 					<div id="portfolio-wrapper" class="wrapper">
 					
+			
 					<?php
 					
 					if (have_posts() ) : while ( have_posts() ) : the_post(); 
