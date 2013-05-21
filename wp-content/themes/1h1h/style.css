@@ -644,7 +644,9 @@ cursor: pointer;
 .page-template-page-tour-php .tour-entry.full-width {
 		margin-top: 0px;
 	}
-
+.page-template-page-category-php .section {
+	padding-top:  68px;
+}
 .tour-entry.full-width.wrapper .content {
 	width:  70%;
 	margin:  0 auto;

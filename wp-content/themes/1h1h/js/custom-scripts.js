@@ -242,16 +242,23 @@ function makeCycles(){
 		jQuery('#portfolio-nav').after('<a class="nav-tab">+</a>');
 		
 			
-function buildPageAnchors(slide){
-		if(jQuery(slide).find('.post-title').html()){
-		var linkTitle = jQuery(slide).find('.post-title').html();
-		var postId = jQuery(slide).attr('id');
-		    return '<li><a href="#">'+linkTitle+'</a></li>'; 
-		    }
-		    else {
-		    	return '<li class="hidden"><a href="#"></a></li>';
-		    }
-	} 
+
+	function buildPageAnchors(slide){
+			if(jQuery(slide).find('.post-title').html()){
+			var linkTitle = jQuery(slide).find('.post-title').html();
+			var postId = jQuery(slide).attr('id');
+				if(jQuery(slide).find('.post-title').hasClass('has-parent')){
+					hasParent = 'has-parent';
+				}
+				else {
+					hasParent = 'parent';
+				}
+			    return '<li class="'+hasParent+'"><a href="#">'+linkTitle+'</a></li>'; 
+			    }
+			    else {
+			    	return '<li class="hidden"><a href="#"></a></li>';
+			    }
+		} 
 	
 	
 		jQuery('.slider.content').cycle({ 
