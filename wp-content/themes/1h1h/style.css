@@ -470,6 +470,10 @@ float: left;
 .instructions:hover {
 	
 }
+.modal-inner {
+	overflow: scroll;
+	max-height:  400px;
+}
 .modal-link {
 cursor: pointer;
 
