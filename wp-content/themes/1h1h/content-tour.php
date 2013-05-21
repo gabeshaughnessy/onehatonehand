@@ -21,7 +21,7 @@
 			$tour_items= '';
 			if ( $custom_query->have_posts() ) : while ( $custom_query->have_posts() ) : $custom_query->the_post(); 
 			
-			if(get_the_title() == 'Artists'){
+			if(get_post_meta( $post->ID, '_wp_page_template', true )=='page-grid.php'){
 			
 			$tour_items .= '<div class="tour-entry post" id="tour_post_'.get_the_ID().'"><div id="artists-wrapper" class="wrapper post-type-wrapper"><div id="artists-sidebar" class="sidebar"><h2 class="section-title" id="artists-title">artists</h2><p class="section-logo">One Hat One Hand</p><p>filter by:<ul id="profile-filter" class="filter-menu button-group nine columns">';
 							
