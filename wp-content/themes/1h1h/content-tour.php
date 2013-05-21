@@ -29,6 +29,7 @@
 							if($filter_menu == ''){
 							$filter_menu_items = isotope_filter_menu('hh_classification');
 							set_transient('filter_menu_classification', $filter_menu_items, 60*60*24*7);//one week
+							$filter_menu = $filter_menu_items;
 							}
 							
 			$tour_items .= $filter_menu; 

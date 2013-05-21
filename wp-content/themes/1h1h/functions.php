@@ -362,6 +362,7 @@ function hh_section_page_loop($hh_pageID){
 	wp_reset_postdata();
 	
 	set_transient('section-items-'.$hh_pageID, $section_items, 60*60*24*7);
+	$section = $section_items;
 	}
 	echo $section;
 			 
