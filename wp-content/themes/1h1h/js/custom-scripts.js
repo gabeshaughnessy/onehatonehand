@@ -326,6 +326,7 @@ $('body').keydown(function(e){
 			//modal changes too
 			if(jQuery('#modal').hasClass('open')){
 				jQuery('#modal').find('.modal-link a[rel="next"]').click();
+				//jQuery('#portfolio-wrapper').cycle('prev'); //this is reversed to match wp post order
 			}//end open modal	
 			
 			else {
@@ -353,6 +354,7 @@ $('body').keydown(function(e){
 			//modal changes too
 			if(jQuery('#modal').hasClass('open')){
 				jQuery('#modal').find('.modal-link a[rel="prev"]').click();
+				//jQuery('#portfolio-wrapper').cycle('next'); //this is reversed to match wp post order
 			}//end open modal	
 			
 			else {
@@ -460,10 +462,11 @@ function stopVideo(container){
 
     });
 
-   jQuery('#portfolio-wrapper').click(function() {
+   jQuery('.page-template-page-showcase-php #portfolio-wrapper').click(function() {
+   
     var target = jQuery(this).find('.portfolio-entry:visible');
     var targetID = target.attr('data-target');
-   if(targetID != null){
+   if(targetID != null ){
     var modal = jQuery('#modal');
    //load modal template into modal content with ajax
 	var modalContent =  $.ajax({

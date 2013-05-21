@@ -634,8 +634,8 @@ cursor: pointer;
 .full-width.wrapper .page-content {
 	width:  100%;
 }
-.tour-entry.full-width.section {
-	margin-top: 68px;
+.tour-entry.full-width {
+	margin-top: 115px;
 }
 .tour-entry.full-width.wrapper .content {
 	width:  70%;

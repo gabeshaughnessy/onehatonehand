@@ -33,7 +33,11 @@
 							
 			$tour_items .= $filter_menu; 
 			
-			$tour_items .= '</ul></div><div id="artists-posts" class="post-box"><div class="primary"><div class="content" role="main">';
+			$tour_items .= '</ul></div>';
+			if ( is_user_logged_in() && current_user_can('edit_post', $post->ID) ) {
+				$tour_items .='<div class="edit-post"><a href="'.get_edit_post_link( $post->ID ).'">Edit This Item</a></div>';
+			}
+			$tour_items .= '<div id="artists-posts" class="post-box"><div class="primary"><div class="content" role="main">';
 							
 			$artist_list = get_transient('artist_list');
 							 if($artist_list == ''){
@@ -85,12 +89,34 @@
 		}
 			else if(get_post_meta( $post->ID, '_wp_page_template', true )=='page-full-width.php'){//if the page uses the full-width template:
 				$tour_items .='
-					<div class="tour-entry section full-width" data-target="'.get_permalink().'" id="tour_post_'.get_the_ID().'"><div class=" ">'.get_the_content().'</div></div>';
+					<div class="tour-entry post full-width" data-target="'.get_permalink().'" id="tour_post_'.get_the_ID().'"><div class=" ">'.get_the_content().'</div>';
+					if ( is_user_logged_in() && current_user_can('edit_post', $post->ID) ) {
+						$tour_items .= '<div class="edit-post"><a href="'.get_edit_post_link( get_the_ID() ).'">Edit This Item</a></div>';
+					}
+					$tour_items .= '</div>';
 			}
-			else{
+			else if(get_post_meta( $post->ID, '_wp_page_template', true )=='page-full-width-title.php'){//if the page uses the full-width with title template:
+				$tour_items .='
+					<div class="tour-entry full-width wrapper" data-target="'.get_permalink().'" id="tour_post_'.get_the_ID().'"><h2 class="section-title">'.get_the_title().'</h2><div class=" primary"><div class="content">'.get_the_content().'</div></div>';
+					if ( is_user_logged_in() && current_user_can('edit_post', $post->ID) ) {
+						$tour_items .= '<div class="edit-post"><a href="'.get_edit_post_link( get_the_ID() ).'">Edit This Item</a></div>';
+					}
+					$tour_items .= '</div>';
+			}
 			
-			$tour_items .='<div class="tour-entry post" data-target="'.get_permalink().'" id="tour_post_'.get_the_ID().'"><div class="post-content ">'.get_the_content().'</div>'.hh_get_portfolio_backgrounds("full-bg", false).'</div>';
+			else{//all other posts/pages/projects/etc use this output:
+			
+			$tour_items .='<div class="tour-entry post" data-target="'.get_permalink().'" id="tour_post_'.get_the_ID().'">';
+			if(get_the_content() != ''){//only show the content box if the post has content in the editor
+				$tour_items .= '<div class="post-content ">'.get_the_content().'</div>';
 			}
+			
+			if ( is_user_logged_in() && current_user_can('edit_post', $post->ID) ) {
+				$tour_items .='<div class="edit-post"><a href="'.get_edit_post_link( get_the_ID() ).'">Edit This Item</a></div>';
+			}
+			$tour_items .= hh_get_portfolio_backgrounds("full-bg", false).'</div>';
+			}
+			
 							endwhile; 
 							else : 
 							$tour_items .='<p> No Items to display </p>';

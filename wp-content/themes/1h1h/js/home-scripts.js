@@ -883,7 +883,7 @@ function stopVideo(container){
 
     });
 
-   jQuery('.portfolio-wrapper').click(function() {
+   jQuery('#portfolio .portfolio-wrapper').click(function() {
     var target = jQuery(this).find('.portfolio-entry:visible');
     var targetID = target.attr('data-target');
     var modal = jQuery('#modal');
