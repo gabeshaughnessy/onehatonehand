@@ -4,7 +4,7 @@
 <div id="artists" class="section">
 	<div id="artists-wrapper" class="wrapper post-type-wrapper">
 			<div id="artists-sidebar" class="sidebar">
-				<h2 class="section-title" id="artists-title">artists</h2>
+				<h2 class="section-title" id="artists-title"><?php the_title(); ?></h2>
 				<p class="section-logo">One Hat One Hand</p>
 				<p>filter by:
 				<ul id="profile-filter" class="filter-menu button-group nine columns">
