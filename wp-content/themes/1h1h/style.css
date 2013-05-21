@@ -637,6 +637,10 @@ cursor: pointer;
 .tour-entry.full-width {
 	margin-top: 115px;
 }
+.page-template-page-tour-php .tour-entry.full-width {
+		margin-top: 0px;
+	}
+
 .tour-entry.full-width.wrapper .content {
 	width:  70%;
 	margin:  0 auto;
