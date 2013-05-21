@@ -61,7 +61,7 @@
 							 				while ( $artist_query->have_posts() ) : $artist_query->the_post(); 
 							 				$id = get_the_ID();
 							 				
-							 				$artist_list_items .= '<div id="post_'. $id .'" class="artist profile listing'.print_the_terms('hh_classification', ' ').'" data-target="'.get_permalink().'">';
+							 				$artist_list_items .= '<div id="post_'. $id .'" class="artist profile listing '.print_the_terms('hh_classification', ' ').'" data-target="'.get_permalink().'">';
 							 			
 							 				$artist_list_items .= get_the_post_thumbnail($id, 'isotope-grid', array('class' => 'no-texture')).'</div>';
 							 				
