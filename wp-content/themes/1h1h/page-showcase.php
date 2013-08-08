@@ -24,7 +24,7 @@ $filter_tax = get_post_meta($post->ID, 'hh_filter_taxonomy', true);
 					
 					if (have_posts() ) : while ( have_posts() ) : the_post(); 
 					
-					echo '<div class="portfolio-entry post" data-target="'.get_permalink().'" id="portfolio_post_'.get_the_ID().'">'.hh_get_portfolio_backgrounds("full-bg", false).'</div>';
+					echo '<div class="portfolio-entry post" data-target="/instructions" id="portfolio_post_'.get_the_ID().'">'.hh_get_portfolio_backgrounds("full-bg", false).'</div>';
 									endwhile; 
 									endif;
 					?>

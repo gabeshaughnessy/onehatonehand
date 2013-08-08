@@ -470,7 +470,7 @@ function stopVideo(container){
     });
 
    jQuery('.page-template-page-showcase-php #portfolio-wrapper').click(function() {
-   
+
     var target = jQuery(this).find('.portfolio-entry:visible');
     var targetID = target.attr('data-target');
    if(targetID != null ){

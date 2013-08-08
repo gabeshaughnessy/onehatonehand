@@ -272,7 +272,7 @@ function hh_post_type_loop($hhpost_type, $hhcount){
 add_filter( 'the_content_more_link', 'modal_more_link', 10, 2 );//filter the more link to have a modal class
 
 $post_list = get_transient('post-list-'.$hhpost_type);
-if($post_list == ''){
+if($post_list == false){
 $args = array(
 				
 						'post_type' => $hhpost_type,
