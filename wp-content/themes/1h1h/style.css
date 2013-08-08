@@ -891,3 +891,8 @@ background:  transparent url(images/hatches50px.png) repeat; }
 	-o-transition: all .5s ease-in;
 	transition: all .5s ease-in;
 }
+
+.hh_case_study_post {
+	height: 500px !important;
+	overflow:  scroll;
+}
