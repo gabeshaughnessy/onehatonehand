@@ -91,11 +91,7 @@ function resizeAllSections(){
 	
 		var menuPos =  jQuery('#menu-main-menu').offset();
 	jQuery('#portfolio-nav').css({"paddingLeft": menuPos.left});
-	jQuery('.filter-target').isotope({
-	// options... http://isotope.metafizzy.co/docs/options.html
-	filter: '.artist' 
-		});
-	
+		
 }
 //End resizeSections
 function resizePortfolioSections(){
@@ -122,11 +118,6 @@ function resizeTourSections(){
 		jQuery(this).css({'top': 100});
 		centerElement(jQuery(this));
 	});
-	
-	jQuery('.filter-target').isotope({
-	// options... http://isotope.metafizzy.co/docs/options.html
-	filter: '.artist' 
-		});
 	
 }//end resize tour sections
 
@@ -326,10 +317,7 @@ function moveMenuIndicator(){
 	var tabPosition = itemOffset + itemWidth/2; 
 	jQuery('.menu-main-menu-container').css({'backgroundPosition': tabPosition});
 	
-	jQuery('.filter-target').isotope({
-	// options... http://isotope.metafizzy.co/docs/options.html
-	filter: '.artist' 
-		});
+
 	
 	
 }//end moveMenuIndicator function
@@ -395,6 +383,18 @@ function makeCycles(){
 		jQuery('#portfolio .next, #portfolio .prev').click(function(){
 			resizePortfolioSections();
 		});
+		function afterCycle(currSlideElement, nextSlideElement, options, forwardFlag){
+			if(jQuery(nextSlideElement).hasClass('isotope-grid')){
+				var $container = jQuery('.filter-target');
+				if($container.length > 0){
+					$container.isotope({
+					  filter: '.artist'
+					});
+					$container.find('.isotope-item').animate({'opacity':1}, 500);	
+				}
+				
+			}
+		}
 		
 		jQuery('#tour .portfolio-wrapper').cycle({ 
 		    fx:     'scrollHorz', 
@@ -402,7 +402,7 @@ function makeCycles(){
 		    timeout: 0,  
 		    next: '#tour .next',
 		    prev: '#tour .prev',
-		   
+		   after: afterCycle,
 		}
 		);
 		jQuery('#tour .next, #tour .prev').click(function(){
@@ -411,31 +411,7 @@ function makeCycles(){
 			
 		});
 		
-		//Build the portfolio slider 
-		jQuery(function() {
-		
-		var oldAmount = 0;
-		var sliderLength = 100;
-		var numberOfSlides = jQuery('#portfolio .portfolio-wrapper').children().length;
-		sliderStep = sliderLength/numberOfSlides;
-				jQuery( "#slider" ).slider({
-					value:0,
-					min: 0,
-					max: sliderLength,
-					step: sliderStep,
-					slide: function( event, ui ) {
-					if (ui.value > oldAmount){
-						jQuery('.portfolio-wrapper').cycle('next');
-					}
-					else if(ui.value < oldAmount){
-						jQuery('.portfolio-wrapper').cycle('prev');
-					}
-					oldAmount = ui.value;
-						
-					}
-				});
-			});
-		
+				
 		jQuery('#portfolio-nav').after('<a class="nav-tab">+</a>');
 		
 			
@@ -606,14 +582,7 @@ jQuery(window).load(function(){
 		    jQuery('#portfolio-nav').slideUp('fast');
 		    jQuery('#portfolio .nav-tab').hide();
 		  
-		   var $container = jQuery('.filter-target');
-		   if($container.length > 0){
-		   	$container.isotope({
-		   	  filter: '.artist'
-		   	});
-		   	$container.find('.isotope-item').animate({'opacity':1}, 500);	
-		   }
-	  	 } //end in view
+		  	  	 } //end in view
 	  	  
   	  else {
 	  jQuery('#tour').removeClass('active');
@@ -621,6 +590,7 @@ jQuery(window).load(function(){
 	  } 
 	  moveMenuIndicator();
 	});
+	
 	
 	jQuery('#clients').bind('inview', function (event, visible) {
 	  if (visible == true) {
@@ -854,15 +824,7 @@ makeSwipes('.portfolio-wrapper');
 	
 jQuery(window).load(function(){
 	
-	var $container = jQuery('.filter-target');
-	// initialize isotope
-	if($container.length > 0){
-	$container.isotope({
-	  // options... http://isotope.metafizzy.co/docs/options.html
-	  filter: '.artist' 
-	});
-	}
-	$container.find('.isotope-item').animate(500);
+	
 
  jQuery(window).scroll();
  //currentSection = jQuery('.section.active');
