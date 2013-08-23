@@ -333,7 +333,36 @@ clear: both;
 	overflow:  hidden;
 	padding: 0;
 }
+.portfolio_bg.no-image{
 
+}
+
+.portfolio-content.centered {
+	position: absolute;
+	top: 0;
+	bottom: 0;
+	left: 0;
+	right: 0;
+	max-height: 600px;
+	padding-top: 180px;
+}
+.nav-spacer {
+	height: 25px;
+	width: 100%;
+	display: block;
+	float: left;
+	clear: both;
+}
+.nav-target{
+	height: 100px;
+	width: 100%;
+	display: block;
+	float: left;
+	clear: both;
+}
+.nav-spacer hr {
+	display: none;
+}
 .row {
 	width:  100%;
 	clear:  both;
@@ -449,6 +478,9 @@ float: left;
 }
 .touch .touch-device{
 	display: block;
+}
+.no-touch .hide-for-touch {
+	display: none;
 }
 
 .instructions {
@@ -722,12 +754,23 @@ cursor: pointer;
 }
 .hand-navigation .arrow {
 	display: block;
-	width:  34px;
-	height: 66px;
+	width:  53px;
+	height: 53px;
 	background-image: url(images/arrows-big.png);
 	background-repeat: no-repeat;
 	position: absolute;
 	
+}
+.hand-navigation h2 {
+	font-size: 4em;
+	position: absolute;
+	top: 0;
+	bottom: 0;
+	left:  0;
+	right:  0;
+	float:  left;
+	width:  100%;
+	text-shadow: 0 0 5px #fff;
 }
 .next.hand{
 	right:  10px;
@@ -740,7 +783,7 @@ cursor: pointer;
 	right:  -70%;
 	top: 20px;
 	background-position-y: 0;
-	background-position-x: -34px;
+	background-position-x: -53px;
 	
 }
 
@@ -766,10 +809,10 @@ cursor: pointer;
 	background-position-y: 0;
 }
 .prev.arrow:hover, .next.arrow:hover{
-	background-position-y: -66px;
+	background-position-y: -53px;
 }
 .prev.arrow:active, .next.arrow:active{
-	background-position-y: 0;
+	background-position-y: -53px;
 }
 
 /*lines and rules */
@@ -854,6 +897,10 @@ cursor: pointer;
 	float:  left;
 	margin:  10px 0;
 	}
+.centered {
+	margin:  0 auto;
+	text-align: center;
+}
 /* --- Jquery UI Slider overrides -- */
 .ui-widget-content {
 	background: #333;

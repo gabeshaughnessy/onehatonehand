@@ -237,7 +237,7 @@ function modal_more_link( $more_link, $more_link_text ) {
 /* +++++ T H E   P O R T F O L I O   L O O P ++++++ */
 //////////////////////////////////////////////////////
 function hh_portfolio_loop($hhpost_type, $hhcount){ 
-$portfolio_list = get_transient('portfolio_items');
+$portfolio_list = false;//get_transient('portfolio_items');
 if($portfolio_list == ''){
 
 $args = array(
@@ -248,9 +248,15 @@ $args = array(
 );
 $custom_query = new WP_Query( $args );
 if ( $custom_query->have_posts() ) : while ( $custom_query->have_posts() ) : $custom_query->the_post(); 
+
+
 if (has_post_thumbnail()) {
 $portfolio_list .='<div class="portfolio-entry post" data-target="'.get_permalink(get_the_ID()).'" id="portfolio_post_'.get_the_ID().'">'.hh_get_portfolio_backgrounds("full-bg", false).'</div>';
 }
+elseif(!has_post_thumbnail()){
+$portfolio_list .='<div class="portfolio-entry post" data-target="'.get_permalink(get_the_ID()).'" id="portfolio_post_'.get_the_ID().'"><div class="portfolio_bg"><img src="'.get_bloginfo('stylesheet_directory').'/images/paper_bg2.png" width="100%" height="auto" alt=" '.get_the_title().'"/><div class="portfolio-content centered">'.wpautop(get_the_content()).'</div></div></div>';
+}
+
 				endwhile; 
 				else : 
 				$portfolio_list .='<p> No Items to display </p>';

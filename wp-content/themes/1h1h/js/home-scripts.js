@@ -48,6 +48,15 @@ function centerElement(element){
 	'top' : elementOffset.y
 	});
 }
+function centerElementX(element){
+	var windowWidth = jQuery(window).width();
+	var elementWidth = element.width();
+	var elementOffset = new Object();
+	elementOffset.x = windowWidth/2 - elementWidth/2;
+	element.css({
+	'left' : elementOffset.x,
+	});
+}
 function falsePageHeight(){ //make the page the total height of all the sections with fixed positions
 	pageHeight = 0;
 	
@@ -58,19 +67,28 @@ function falsePageHeight(){ //make the page the total height of all the sections
 	jQuery('body').css('height',pageHeight);
 }//end falsePageHeight
 
-function resizeSections(){
+function resizeAllSections(){
 	var windowWidth = jQuery(window).width();
 	var windowHeight = jQuery(window).height();
 	jQuery('#fixed_bg').css({'height':windowHeight});
 	jQuery('.portfolio-wrapper').css({"width": windowWidth, "height": windowHeight + 100});
 	jQuery('.section').css({"width": windowWidth, "min-height": windowHeight + 100});
-	jQuery('#hand-navigation .hand, #portfolio-control').animate({'top': windowHeight/3}, 500);
-	centerElement(jQuery('#portfolio-control'));
+	jQuery('#hand-navigation .hand').animate({'top': windowHeight/3}, 500);
+	//centerElement(jQuery('#portfolio-control'));
+	//match the nav-spacer position instead
+
+	navPos = jQuery('.nav-target').position();
+	jQuery('#portfolio-control').css({'top': navPos.top});
 	
-	jQuery('.tour-entry .post-content, .instructions-modal'  ).each(function(index){
+	
+	jQuery('.tour-entry .post-content, .instructions-modal'  ).not('#portfolio-control').each(function(index){
 		jQuery(this).css({'top': 100});
 		centerElement(jQuery(this));
 	});
+	jQuery('#portfolio-control').each(function(index){
+		centerElementX(jQuery(this));
+	});
+	
 		var menuPos =  jQuery('#menu-main-menu').offset();
 	jQuery('#portfolio-nav').css({"paddingLeft": menuPos.left});
 	jQuery('.filter-target').isotope({
@@ -80,6 +98,39 @@ function resizeSections(){
 	
 }
 //End resizeSections
+function resizePortfolioSections(){
+	var windowWidth = jQuery(window).width();
+	var windowHeight = jQuery(window).height();
+
+	navPos = jQuery('.nav-target').position();
+	jQuery('#portfolio-control').css({'top': navPos.top});
+	
+	jQuery('#portfolio-control').each(function(index){
+		centerElementX(jQuery(this));
+	});
+	
+		var menuPos =  jQuery('#menu-main-menu').offset();
+	jQuery('#portfolio-nav').css({"paddingLeft": menuPos.left});
+	
+}
+//End resizeSections
+function resizeTourSections(){
+	var windowWidth = jQuery(window).width();
+	var windowHeight = jQuery(window).height();
+
+	jQuery('#hand-navigation .hand').animate({'top': windowHeight/3}, 500);
+
+	jQuery('.tour-entry .post-content'  ).each(function(index){
+		jQuery(this).css({'top': 100});
+		centerElement(jQuery(this));
+	});
+	
+	jQuery('.filter-target').isotope({
+	// options... http://isotope.metafizzy.co/docs/options.html
+	filter: '.artist' 
+		});
+	
+}//end resize tour sections
 
 function imageTexturizer(){//puts a texture over all the images
 
@@ -115,11 +166,11 @@ function makeSwipes(targetElement){
 jQuery(targetElement).touchwipe({//touch settings
      wipeLeft: function() { 
      jQuery(targetElement).cycle('next'); 
-     resizeSections();
+     resizePortfolioSections();
       },
      wipeRight: function() {
       jQuery(targetElement).cycle('prev');
-      resizeSections(); 
+      resizePortfolioSections(); 
        },
      min_move_x: 50,
      min_move_y: 50,
@@ -145,7 +196,7 @@ function whichSectionIsActive(){
 	else if(jQuery('#portfolio').hasClass('active')){
 		jQuery('.menu-main-menu-container').slideDown('slow');
 		jQuery('#portfolio .nav-tab').show('slow');
-		resizeSections();
+		resizePortfolioSections();
 	
 	}
 	else if (jQuery('#case_studies').hasClass('active')) {
@@ -334,12 +385,17 @@ function makeCycles(){
 		    // callback fn that creates a thumbnail to use as pager anchor 
 		    pagerAnchorBuilder: function(idx, slide) { 
 		    var bgSource = jQuery(slide).find('.portfolio_bg img').attr('src');
-		        return '<li><a href="#"><img src="' + bgSource + '" width="50" height="auto" /></a></li>'; 
+			    if(bgSource){
+			        return '<li><a href="#"><img src="' + bgSource + '" width="50" height="auto" /></a></li>'; 
+			        }
+		        else {
+			        return '';
+		        }
 		    } 
 		}
 		);
 		jQuery('#portfolio .next, #portfolio .prev').click(function(){
-			resizeSections();
+			resizePortfolioSections();
 		});
 		
 		jQuery('#tour .portfolio-wrapper').cycle({ 
@@ -352,7 +408,9 @@ function makeCycles(){
 		}
 		);
 		jQuery('#tour .next, #tour .prev').click(function(){
-			resizeSections();
+		
+			resizeTourSections();
+			
 		});
 		
 		//Build the portfolio slider 
@@ -448,13 +506,14 @@ jQuery(window).load(function(){
 	
 	
 	makeCycles();
-	resizeSections();
+	resizeAllSections();
 	navTabActivate('#portfolio .nav-tab', '#portfolio-nav');
 	hhAccordion('#contact-accordion');//the contact form accordion
 	//imageTexturizer();
 	whichSectionIsActive();
 	
-	centerElement(jQuery('#portfolio-control'));
+	//centerElement(jQuery('#portfolio-control')); 
+	
 	
 	jQuery('.menu-main-menu-container').slideUp();
 	
@@ -683,12 +742,12 @@ $('body').keydown(function(e){
 			
 			else {
 				jQuery('#portfolio .portfolio-wrapper').cycle('prev'); //this is reversed to match wp post order
-				resizeSections();
+				resizePortfolioSections();
 			} 
 		}
 		else if(currentSection.attr('id') == 'tour'){
 			jQuery('#tour .portfolio-wrapper').cycle('prev'); //this is reversed to match wp post order
-			resizeSections();
+			resizeTourSections();
 		}
 		
 		else if(currentSection.attr('id') == 'case_studies'){
@@ -713,13 +772,13 @@ $('body').keydown(function(e){
 			}//end open modal	
 			else {
 				jQuery('.portfolio-wrapper').cycle('next'); //this is reversed to match wp post order
-				resizeSections();
+				resizePortfolioSections();
 			}
 			
 		}
 		else if(currentSection.attr('id') == 'tour'){
 			jQuery('#tour .portfolio-wrapper').cycle('next'); //this is reversed to match wp post order
-			resizeSections();
+			resizePortfolioSections();
 		}
 		else if(currentSection.attr('id') == 'case_studies'){
 			jQuery('#case_studies-posts .content').cycle('next'); //this is reversed to match wp post order
@@ -1042,7 +1101,7 @@ function stopVideo(container){
 }); //end document ready
 jQuery(window).resize(function() {
   moveMenuIndicator();
-  resizeSections();
+  resizeAllSections();
   showInstructions(); 
   
   var hideThem=setTimeout(function(){hideInstructions()},3000);

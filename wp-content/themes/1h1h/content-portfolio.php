@@ -15,6 +15,7 @@
 		<div id="slider"></div>-->
 		<div class="hand-navigation">
 			<div class="next arrow"></div>
+			<h2 class="fredericka">Portfolio</h2>
 			<div class="prev arrow"></div>
 		</div>
 		<!--<div class="instructions" ><?php 
