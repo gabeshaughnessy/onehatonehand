@@ -483,10 +483,8 @@ jQuery(window).load(function(){
 	resizeAllSections();
 	navTabActivate('#portfolio .nav-tab', '#portfolio-nav');
 	hhAccordion('#contact-accordion');//the contact form accordion
-	//imageTexturizer();
 	whichSectionIsActive();
 	
-	//centerElement(jQuery('#portfolio-control')); 
 	
 	
 	jQuery('.menu-main-menu-container').slideUp();
@@ -714,8 +712,13 @@ $('body').keydown(function(e){
 			} 
 		}
 		else if(currentSection.attr('id') == 'tour'){
+		if(jQuery('#modal').hasClass('open')){
+			jQuery('#modal').find('.modal-link a[rel="next"]').click();
+		}//end open modal	
+		else{
 			jQuery('#tour .portfolio-wrapper').cycle('prev'); //this is reversed to match wp post order
-			resizeTourSections();
+			//resizeTourSections();
+			}
 		}
 		
 		else if(currentSection.attr('id') == 'case_studies'){
@@ -745,8 +748,13 @@ $('body').keydown(function(e){
 			
 		}
 		else if(currentSection.attr('id') == 'tour'){
+		if(jQuery('#modal').hasClass('open')){
+			jQuery('#modal').find('.modal-link a[rel="prev"]').click();
+		}//end open modal	
+		else{
 			jQuery('#tour .portfolio-wrapper').cycle('next'); //this is reversed to match wp post order
 			resizePortfolioSections();
+		}
 		}
 		else if(currentSection.attr('id') == 'case_studies'){
 			jQuery('#case_studies-posts .content').cycle('next'); //this is reversed to match wp post order
@@ -874,7 +882,7 @@ $('.filter-menu li').removeClass('activeSlide');
 function stopVideo(container){
 
 
-    container.find('#modal-content').empty();
+container.find('#modal-content').empty();
 
 }
 /* Modal Activations */
@@ -901,27 +909,7 @@ function stopVideo(container){
 	  }); 
 
     });
-
-   jQuery('#portfolio .portfolio-wrapper').click(function() {
-    var target = jQuery(this).find('.portfolio-entry:visible');
-    var targetID = target.attr('data-target');
-    var modal = jQuery('#modal');
-   //load modal template into modal content with ajax
-	var modalContent =  $.ajax({
-	    url: targetID,
-	    context: document.body
-	  }).done(function() { 
-	   
-	   modal.find('#modal-content').html(modalContent.responseText);
-	   
-	    modal.reveal({
-	    close: function(){stopVideo(modal);}
-	    }).fitVids();
-	     
-	    activateLinks();
-	     
-	   	  }); 
-    });
+    
     //instructions modal
     jQuery('.instructions .modal-link').click(function() {
      var target = jQuery(this);
@@ -1018,10 +1006,10 @@ function stopVideo(container){
 		     	    
 		     	    });
 		     	    if(jQuery(target).attr('rel') == 'prev'){
-		     	    jQuery('.portfolio-wrapper').cycle('next'); //this is reversed to match wp post order
+		     	    //jQuery('.portfolio-wrapper').cycle('next'); //this is reversed to match wp post order
 		     	    }
 		     	   else if(jQuery(target).attr('rel') == 'next'){
-		     	    jQuery('.portfolio-wrapper').cycle('prev');//this is reversed to match wp post order
+		     	    //jQuery('.portfolio-wrapper').cycle('prev');//this is reversed to match wp post order
 		     	    }
 		     	    activateLinks();
 		     	    
