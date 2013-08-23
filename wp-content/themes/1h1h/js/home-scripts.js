@@ -102,8 +102,6 @@ function resizePortfolioSections(){
 	var windowWidth = jQuery(window).width();
 	var windowHeight = jQuery(window).height();
 
-	navPos = jQuery('.nav-target').position();
-	jQuery('#portfolio-control').css({'top': navPos.top});
 	
 	jQuery('#portfolio-control').each(function(index){
 		centerElementX(jQuery(this));
