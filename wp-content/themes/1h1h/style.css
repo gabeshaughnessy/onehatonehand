@@ -479,7 +479,7 @@ float: left;
 .touch .touch-device{
 	display: block;
 }
-.no-touch .hide-for-touch {
+.touch .hide-for-touch {
 	display: none;
 }
 
