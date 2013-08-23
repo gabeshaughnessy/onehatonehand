@@ -237,7 +237,7 @@ function modal_more_link( $more_link, $more_link_text ) {
 /* +++++ T H E   P O R T F O L I O   L O O P ++++++ */
 //////////////////////////////////////////////////////
 function hh_portfolio_loop($hhpost_type, $hhcount){ 
-$portfolio_list = false;//get_transient('portfolio_items');
+$portfolio_list = get_transient('portfolio_items');
 if($portfolio_list == ''){
 
 $args = array(
