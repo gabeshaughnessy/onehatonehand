@@ -419,4 +419,13 @@ return "no terms";
 
 }
 
- ?>
+/** CACHE BUSTER **/
+add_action( 'save_post', 'bust_the_transients' );
+function bust_the_transients(){
+   global $wpdb;
+   $wpdb->query( 
+       "DELETE FROM `wp_options` WHERE `option_name` LIKE ('_transient_%')"
+       );
+}
+
+?>
