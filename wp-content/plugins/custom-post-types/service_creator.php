@@ -28,7 +28,7 @@ $labels = array(
     'capability_type' => 'post',
     'hierarchical' => true,
     'menu_position' => 20,
-	'taxonomies' => array( 'post_tag', 'category '),
+	'taxonomies' => array( 'category '),
     'supports' => array('title','tags','thumbnail','editor','revisions','excerpt', 'page-attributes')
   ); 
   register_post_type('hh_service',$args);//this is where the post type is created

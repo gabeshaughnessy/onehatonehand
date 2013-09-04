@@ -6,7 +6,7 @@ function build_taxonomies() {
 	
 	'query_var' => true, 'rewrite' => true)); 
 	
-	register_taxonomy('hh_size', array('hh_project'), array(
+	/*register_taxonomy('hh_size', array('hh_project'), array(
 	  
 	  'hierarchical' => false,  'label' => 'Size',
 	  
@@ -36,7 +36,7 @@ function build_taxonomies() {
 	  
 	  'query_var' => true, 'rewrite' => true)); 
 	  
-	
+	*/
 	
   }
   add_action( 'init', 'build_taxonomies', 0 );

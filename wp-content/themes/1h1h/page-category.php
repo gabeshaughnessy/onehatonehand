@@ -14,7 +14,7 @@ global $post;
 $content_type = get_post_meta($post->ID, 'hh_content_post_type', true);
 $filter_tax = get_post_meta($post->ID, 'hh_filter_taxonomy', true);
 ?>
-			<div class="section">
+			<div class="section" id="<?php echo $post->post_name; ?>">
 				<div class="wrapper post-type-wrapper">
 						<div  class="sidebar">
 							<h2 class="section-title fredericka"><?php the_title(); ?></h2>

@@ -14,7 +14,7 @@ wp_nav_menu( array('menu' => 'Global Menu' ));
 <?php 
 //The contact page content
 ?>
-<div  class="section">
+<div  class="section" id="<?php echo $post->post_name; ?>">
 	<div  class="wrapper">
 	
 		<?php 

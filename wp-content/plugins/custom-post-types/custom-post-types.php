@@ -18,7 +18,7 @@ global $meta_boxes;
 //artists
 require_once('artist_creator.php');
 //proposals
-require_once('proposal_creator.php');
+//require_once('proposal_creator.php');
 
 //projects
 require_once('project_creator.php');
@@ -30,7 +30,7 @@ require_once('case_study_creator.php');
 //clients
 require_once('client_creator.php');
 //press
-require_once('hhpress_creator.php');
+//require_once('hhpress_creator.php');
 //testimonials
 //require_once('testimonial_creator.php');
 //events

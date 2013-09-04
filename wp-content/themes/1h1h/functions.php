@@ -99,7 +99,7 @@ wp_deregister_script('jquery');
 	}
 	else{
 	wp_enqueue_script('custom_scripts',
-		get_template_directory_uri() . '/js/custom-scripts.js',
+		get_template_directory_uri() . '/js/home-scripts.js',
 		array('jquery', 'mousewheel') );
 	}
 

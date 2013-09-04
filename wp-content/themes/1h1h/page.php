@@ -12,7 +12,7 @@ get_header();
 wp_nav_menu( array('menu' => 'Global Menu' ));
 ?>
 
-			<div class="section">
+			<div class="section" id="<?php echo $post->post_name; ?>">
 		<div class="wrapper post-type-wrapper">
 			<?php if ( have_posts() ) : ?>
 

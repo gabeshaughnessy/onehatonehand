@@ -27,7 +27,7 @@ $labels = array(
     'capability_type' => 'post',
     'hierarchical' => false,
     'menu_position' => 17,
-	'taxonomies' => array( 'post_tag', 'category '),
+	'taxonomies' => array( 'category '),
     'supports' => array('title','tags','thumbnail','editor','revisions','excerpt')
   ); 
   register_post_type('hh_project',$args);//this is where the post type is created
