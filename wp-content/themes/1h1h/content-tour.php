@@ -1,5 +1,5 @@
 <div id="tour" class="section">
-			<div class="portfolio-wrapper wrapper">
+			<div class="portfolio-wrapper cycle">
 			
 			
 			<?php //Portfolio Loop Goes Here

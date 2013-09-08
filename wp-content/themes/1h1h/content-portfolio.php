@@ -2,7 +2,7 @@
 //The portfolio page content
 ?>
 <div id="portfolio" class="section">
-		<div class="portfolio-wrapper wrapper">
+		<div class="portfolio-wrapper cycle">
 		
 				<?php //Portfolio Loop Goes Here
 		hh_portfolio_loop('hh_project', 10);

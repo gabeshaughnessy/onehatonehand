@@ -394,7 +394,7 @@ document.body.addEventListener("gesturechange", gestureChange, false);
 }
 
 function makePortfolioCycles(){
-		jQuery('#portfolio .wrapper').before('<ul id="portfolio-nav">').cycle({ 
+		jQuery('#portfolio .cycle').before('<ul id="portfolio-nav">').cycle({ 
 		    fx:     'scrollHorz', 
 		    speed:  500, 
 		    timeout: 0, 
@@ -430,7 +430,7 @@ function makePortfolioCycles(){
 			}
 		}
 		
-		jQuery('#tour .wrapper').cycle({ 
+		jQuery('#tour .cycle').cycle({ 
 		    fx:     'scrollHorz', 
 		    speed:  500, 
 		    timeout: 0,  
