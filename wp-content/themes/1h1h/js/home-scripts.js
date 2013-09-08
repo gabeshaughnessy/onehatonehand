@@ -110,8 +110,10 @@ function resizePortfolioSections(){
 		centerElementX(jQuery(this));
 	});
 	
-		var menuPos =  jQuery('#menu-main-menu').offset();
-	jQuery('#portfolio-nav').css({"paddingLeft": menuPos.left});
+	var menuPos =  jQuery('#menu-main-menu').offset();
+	if(menuPos){
+	jQuery('#portfolio-nav, ').css({"paddingLeft": menuPos.left});
+	}
 	
 }
 //End resizeSections
@@ -324,7 +326,7 @@ function moveMenuIndicator(){
 			menuLeftPos = jQuery(this).parent().parent().offset().left;
 			sectionOffset.bottom = sectionOffset.top + jQuery(sectionID).height();
 			if(jQuery(this).attr('href') == currentSection.selector){//give the active menu item its own class
-			console.log('current section ', currentSection);
+			//console.log('current section ', currentSection);
 			jQuery('#'+$menu+' .menu-item a').removeClass('active-item');
 			jQuery(this).addClass('active-item');
 			}
@@ -343,7 +345,7 @@ function moveMenuIndicator(){
 	else{
 	currentItem = jQuery('#'+$menu+' .current-menu-item a');
 	}
-	console.log('current item', currentItem);
+	//console.log('current item', currentItem);
 	var itemOffset = currentItem.offset().left;
 	var itemWidth = currentItem.width();
 	
@@ -492,8 +494,88 @@ function buildPageAnchors(slide){
 			    return false; 
 			}); 
 		});
-	}//End make cycles
+	}//End make portfolio cycles
 
+function makeCaseStudyCycles(){
+		jQuery('#case-study-wrapper.cycle').before('<div id="case-study-nav-container"><ul id="case-study-nav">').cycle({ 
+		    fx:     'scrollHorz', 
+		    speed:  500, 
+		    timeout: 0, 
+		    pager:  '#case-study-nav', 
+		    next: '#case-studies .next',
+		    prev: '#case-studies .prev',
+		     
+		    // callback fn that creates a thumbnail to use as pager anchor 
+		    pagerAnchorBuilder: function(idx, slide) { 
+		    var bgSource = jQuery(slide).find('.portfolio_bg img').attr('alt');
+		    var firstSlide = jQuery(slide).hasClass('first-slide');
+			   if(firstSlide){
+			        return '<li class="first"><a href="#">.</a></li>';
+			   }
+			   else if(bgSource){
+			        return '<li><a href="#">'+bgSource+'</a></li>'; 
+			        }
+			    
+		        else {
+			        return '<li class="sub"><a href="#">.</a></li>';
+		        }
+		    } 
+		}
+		);
+		jQuery('#case-studies .next, #case-studies .prev').click(function(){
+			resizePortfolioSections();
+		});
+		function afterCycle(currSlideElement, nextSlideElement, options, forwardFlag){
+			if(jQuery(nextSlideElement).hasClass('isotope-grid')){
+				var $container = jQuery('.filter-target');
+				if($container.length > 0){
+					$container.isotope({
+					  filter: '.artist'
+					});
+					$container.find('.isotope-item').animate({'opacity':1}, 500);	
+				}
+				
+			}
+		}
+			
+				
+		//jQuery('#case-study-nav').after('<a class="nav-tab">+</a>');
+		
+			
+function buildPageAnchors(slide){
+		if(jQuery(slide).find('.post-title').html()){
+		var linkTitle = jQuery(slide).find('.post-title').html();
+		var postId = jQuery(slide).attr('id');
+			if(jQuery(slide).find('.post-title').hasClass('has-parent')){
+				hasParent = 'has-parent';
+			}
+			else {
+				hasParent = 'parent';
+			}
+		    return '<li class="'+hasParent+'"><a href="#">'+linkTitle+'</a></li>'; 
+		    }
+		    else {
+		    	return '<li class="hidden"><a href="#"></a></li>';
+		    }
+	} 
+	
+	
+			
+		
+				
+		
+		//jQuery('.menu-main-menu-container').hide();
+		//jQuery('#case-study-nav').hide();
+		
+	
+		jQuery('.section-title').each(function(){
+			jQuery(this).click(function() { 
+			    jQuery(this).parent().parent().parent().find('.content').cycle(0); 
+			    return false; 
+			}); 
+		});
+	}//End make case-study cycles
+	
 /* ============= Global Scripts ========*/
 jQuery(window).load(function(){
 	/* Psuedo Hover Events for touch devices */
@@ -507,6 +589,12 @@ jQuery(window).load(function(){
 	
 	
 	makePortfolioCycles();
+	
+	if(jQuery('. page-template-page-case_studies-php')){//only do case studies on the case study page.
+		makeCaseStudyCycles();
+		//navTabActivate('#case-studies .nav-tab', '#case-study-nav');
+	}
+	
 	resizeAllSections();
 	if(jQuery('#portfolio')){
 		navTabActivate('#portfolio .nav-tab', '#portfolio-nav');
@@ -750,7 +838,7 @@ $('body').keydown(function(e){
 		}
 		
 		else if(currentSection.attr('id') == 'case-studies'){
-			jQuery('#case_studies-posts .content').cycle('prev'); //this is reversed to match wp post order
+			jQuery('#case-studies #case-study-wrapper').cycle('prev'); //this is reversed to match wp post order
 		}
 		else if(currentSection.attr('id') == 'services'){
 			jQuery('#services-posts .content').cycle('prev'); //this is reversed to match wp post order
@@ -785,7 +873,7 @@ $('body').keydown(function(e){
 		}
 		}
 		else if(currentSection.attr('id') == 'case-studies'){
-			jQuery('#case_studies-posts .content').cycle('next'); //this is reversed to match wp post order
+			jQuery('#case-studies #case-study-wrapper').cycle('next'); //this is reversed to match wp post order
 		}
 		else if(currentSection.attr('id') == 'services'){
 			jQuery('#services-posts .content').cycle('next'); //this is reversed to match wp post order
@@ -942,7 +1030,7 @@ container.find('#modal-content').empty();
     jQuery('.instructions .modal-link').click(function() {
      var target = jQuery(this);
      var targetID = target.attr('data-target');
-     console.log(targetID);
+     //console.log(targetID);
      var modal = jQuery('#modal-small');
     //load modal template into modal content with ajax
     	var modalContent =  $.ajax({
@@ -965,7 +1053,7 @@ container.find('#modal-content').empty();
     jQuery('#case-studies .modal-link').click(function(e) {
      var target = jQuery(this);
      var targetID = target.attr('href');
-     console.log(targetID);
+     //console.log(targetID);
      var modal = jQuery('#modal');
     //load modal template into modal content with ajax
     	var modalContent =  $.ajax({

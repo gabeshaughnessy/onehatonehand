@@ -104,6 +104,9 @@ body{
 	-o-transition: background-position .5s ease-in-out;
 	transition: background-position .5s ease-in-out;
 }
+.page-template-page-case_studies-php .menu-global-menu-container {
+	background-image: url(images/menu_bg_sub.png);
+}
 .logged-in .menu-main-menu-container, 
 .logged-in .menu-global-menu-container {
 	top: 27px;
@@ -325,6 +328,16 @@ padding-bottom: 150px;
 background-size: cover;
 clear: both;
 }
+.page-template-page-case_studies-php .section{
+	padding-top: 49px;
+	padding-bottom: 0;
+}
+.page-template-page-case_studies-php .first-slide .portfolio_bg {
+	position: absolute;
+}
+.page-template-page-case_studies-php .first-slide .centered{
+	padding: 100px 25%;
+}
 .section {
 	position: relative;
 
@@ -426,6 +439,59 @@ clear: both;
 .portfolio-wrapper{
 float: left;
 
+}
+#case-study-nav-container {
+	display: block;
+	overflow: hidden;
+	position: absolute;
+	top: 48px;
+	z-index: 100;
+	width: 100%;
+	box-sizing: border-box;
+	background: rgba(0,0,0,.5);;
+	padding: 12px 0;
+	
+}
+#case-study-nav {
+	width: 960px;
+	display: block;
+	margin:  0 auto;
+	text-align: left;
+}
+#case-study-nav li{
+	float:  left;
+	padding:  0 4px 0 20px;
+	text-align: left;
+	list-style: none;
+}
+#case-study-nav li.sub{
+	padding: 0 2px 0px 1px;
+	font-size: 32px;
+	line-height: 2px;
+}
+#case-study-nav li.first{
+	padding: 0;
+	line-height: 4px;
+	display: block;
+	width: 16px;
+	height: 16px;
+	background: #aaa;
+	text-indent: -9999%;
+	box-shadow: 0 0 2px rgba(0,0,0,.5);
+	border-radius: 2px;
+	-webkit-transition: all .5s ease-in-out;
+}
+#case-study-nav li.activeSlide a{
+	color: #ddd;
+	
+}
+#case-study-nav li.first.activeSlide{
+	background: #ddd;
+}
+#case-study-nav a{
+	color:  #aaa;
+	text-decoration: none;
+	-webkit-transition: color .5s ease-in-out;
 }
 #portfolio-nav{
 	width: 100%;
@@ -715,6 +781,11 @@ cursor: pointer;
 	color: #555;
 	text-decoration: none;
 }
+.page-template-page-case_studies-php .page{
+	padding:  100px 25%;
+	width:  100% !important;
+	box-sizing: border-box;
+}
 #landing .post-box, #contact .post-box {
 	width: 100%;
 	height:  auto;
@@ -861,6 +932,28 @@ cursor: pointer;
 	background-position-y: -53px;
 }
 
+#case-study-control {
+	width:  100%;
+	height:  100%;
+	z-index: 1000;
+	display: block;
+	float:  left;
+}
+#case-study-control .hand-navigation {
+	position: absolute;
+	z-index: 10000;
+	width: 100%;
+	height: 960px;
+	box-sizing: border-box;
+	margin: 0 auto;
+	padding: 0 20%;
+}
+#case-study-control .hand-navigation .prev.arrow{
+	left:  10%;
+}
+#case-study-control .hand-navigation .next.arrow{
+	right:  10%;
+}
 /*lines and rules */
 .line {
 	display: block;
