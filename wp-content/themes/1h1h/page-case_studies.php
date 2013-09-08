@@ -27,11 +27,12 @@ $args = array(
 		
 );
 $custom_query = new WP_Query( $args );
+global $post;
 if ( $custom_query->have_posts() ) : while ( $custom_query->have_posts() ) : $custom_query->the_post(); 
 
 
 if (has_post_thumbnail()) {
-$case_study_list .='<div class="portfolio-entry post" data-target="'.get_permalink(get_the_ID()).'" id="portfolio_post_'.get_the_ID().'">'.hh_get_portfolio_backgrounds("full-bg", false).'</div>'.wpautop(get_the_content());
+$case_study_list .='<div class="portfolio-entry post '.$post->post_name.'" data-target="'.get_permalink(get_the_ID()).'" id="portfolio_post_'.get_the_ID().'">'.hh_get_portfolio_backgrounds("full-bg", false).'</div>'.wpautop(get_the_content());
 }
 elseif(!has_post_thumbnail()){
 $case_study_list .='<div class="portfolio-entry post" data-target="'.get_permalink(get_the_ID()).'" id="portfolio_post_'.get_the_ID().'"><div class="portfolio_bg"><img src="'.get_bloginfo('stylesheet_directory').'/images/paper_bg2.png" width="100%" height="auto" alt=" '.get_the_title().'"/><div class="portfolio-content centered">'.wpautop(get_the_content()).'</div></div></div>';
@@ -68,7 +69,7 @@ echo $case_study_list;
 					echo '<div class="first-slide portfolio-entry post" data-target="'.get_permalink(get_the_ID()).'" id="portfolio_post_'.get_the_ID().'">'.hh_get_portfolio_backgrounds("full-bg", false).'</div>'.wpautop(get_the_content());
 					}
 					elseif(!has_post_thumbnail()){
-					echo '<div class="first-slide portfolio-entry post" data-target="'.get_permalink(get_the_ID()).'" id="portfolio_post_'.get_the_ID().'"><div class="portfolio_bg"><img src="'.get_bloginfo('stylesheet_directory').'/images/paper_bg2.png" width="100%" height="auto" alt=" '.get_the_title().'"/></div><div class="portoflio-content centered">'.wpautop(get_the_content()).'</div></div>';
+					echo '<div class="first-slide portfolio-entry post" data-target="'.get_permalink(get_the_ID()).'" id="portfolio_post_'.get_the_ID().'"><div class="portfolio_bg"><img src="'.get_bloginfo('stylesheet_directory').'/images/paper_bg2.png" width="100%" height="auto" alt=" '.$post->post_name.'"/></div><div class="portoflio-content centered">'.wpautop(get_the_content()).'</div></div>';
 					}
 					
 									endwhile; 

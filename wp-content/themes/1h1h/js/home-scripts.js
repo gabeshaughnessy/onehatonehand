@@ -495,12 +495,30 @@ function buildPageAnchors(slide){
 			}); 
 		});
 	}//End make portfolio cycles
+function getUrlVars() {
+    var vars = {};
+    var parts = window.location.href.replace(/[?&]+([^=&]+)=([^&]*)/gi, function(m,key,value) {
+        vars[key] = value;
+    });
+    return vars;
+}
 
 function makeCaseStudyCycles(){
+	var casestudy = '.'+getUrlVars()["case"];
+	var startID = 0;
+	var slidePos = jQuery(casestudy);
+	//get the slide with class that matches the casestudy value and get its count in line
+	if(slidePos.length > 0){
+		var listItems = jQuery('casestudy');
+		var startID = jQuery(casestudy).index('#case-study-wrapper .page, #case-study-wrapper .post');
+		console.log(startID,' ', casestudy);
+		console.log(jQuery(casestudy));
+	}
 		jQuery('#case-study-wrapper.cycle').before('<div id="case-study-nav-container"><ul id="case-study-nav">').cycle({ 
 		    fx:     'scrollHorz', 
 		    speed:  500, 
 		    timeout: 0, 
+		    startingSlide: startID,
 		    pager:  '#case-study-nav', 
 		    next: '#case-studies .next',
 		    prev: '#case-studies .prev',
