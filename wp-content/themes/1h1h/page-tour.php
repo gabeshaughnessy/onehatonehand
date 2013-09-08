@@ -17,7 +17,7 @@ $tour = get_post_meta($post->ID, 'hh_tour', true);
 ?>
 
 			<div id="portfolio" class="section">
-					<div id="portfolio-wrapper" class="wrapper">
+					<div id="portfolio-wrapper" class="cycle">
 					
 					
 					<?php //Portfolio Loop Goes Here
