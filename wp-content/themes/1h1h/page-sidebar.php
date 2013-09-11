@@ -23,6 +23,8 @@ wp_nav_menu( array('menu' => 'Global Menu' ));
 									<div class="sidebar">
 									<h2 class="section-title"><?php the_title(); ?></h2>
 									<p class="section-logo">One Hat One Hand</p>
+									
+									
 									</div>
 								<div  class="post-box">
 									<div class="primary">

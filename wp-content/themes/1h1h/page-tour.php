@@ -16,7 +16,7 @@ $filter_tax = get_post_meta($post->ID, 'hh_filter_taxonomy', true);
 $tour = get_post_meta($post->ID, 'hh_tour', true);
 ?>
 
-			<div id="portfolio" class="section">
+			<div id="portfolio" class="section tour">
 					<div id="portfolio-wrapper" class="cycle">
 					
 					
@@ -37,7 +37,7 @@ $tour = get_post_meta($post->ID, 'hh_tour', true);
 					if ( $custom_query->have_posts() ) : while ( $custom_query->have_posts() ) : $custom_query->the_post(); 
 					
 					if(get_post_meta( $post->ID, '_wp_page_template', true )=='page-grid.php'){ //if it is the artists page we treat it differently. this could be done better.
-					$tour_items .= '<div class="tour-entry post" id="tour_post_'.get_the_ID().'"><div id="artists-wrapper" class="wrapper post-type-wrapper"><div id="artists-sidebar" class="sidebar"><h2 class="section-title" id="artists-title">'.get_the_title(get_the_id()).'</h2><p class="section-logo">One Hat One Hand</p><p>filter by:<ul id="profile-filter" class="filter-menu button-group nine columns">';
+					$tour_items .= '<div class="tour-entry post isotope-grid" id="tour_post_'.get_the_ID().'"><div id="artists-wrapper" class="wrapper post-type-wrapper"><div id="artists-sidebar" class="sidebar"><h2 class="section-title" id="artists-title">'.get_the_title(get_the_id()).'</h2><p class="section-logo">One Hat One Hand</p><p>filter by:<ul id="profile-filter" class="filter-menu button-group nine columns">';
 									
 					 $filter_menu = get_transient('filter_menu_classification');
 									if($filter_menu == ''){

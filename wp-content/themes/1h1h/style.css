@@ -444,7 +444,7 @@ float: left;
 	display: block;
 	overflow: hidden;
 	position: absolute;
-	top: 48px;
+	top: 49px;
 	z-index: 100;
 	width: 100%;
 	box-sizing: border-box;
@@ -526,7 +526,7 @@ float: left;
 .logged-in .nav-tab {
 	top: 77px;
 }
-#portfolio-control, .instructions-modal, #tour-control, .instructions-modal {
+#portfolio-control, #case-study-control, #tour-control {
 	position: absolute;
 	text-align: center;
 	width:  40%;
@@ -932,28 +932,36 @@ cursor: pointer;
 	background-position-y: -53px;
 }
 
-#case-study-control {
+#case-study-control, #portfolio-control {
 	width:  100%;
-	height:  100%;
+	height:  0;
 	z-index: 1000;
 	display: block;
 	float:  left;
 }
-#case-study-control .hand-navigation {
+#case-study-control .hand-navigation, #portfolio-control .hand-navigation {
 	position: absolute;
 	z-index: 10000;
 	width: 100%;
-	height: 960px;
+	height: 0;
 	box-sizing: border-box;
 	margin: 0 auto;
 	padding: 0 20%;
 }
-#case-study-control .hand-navigation .prev.arrow{
+#case-study-control .hand-navigation .prev.arrow, #portfolio.tour .hand-navigation .prev.arrow{
+	left:  1%;
+}
+#portfolio-control .hand-navigation .prev.arrow{
 	left:  10%;
 }
-#case-study-control .hand-navigation .next.arrow{
+
+#case-study-control .hand-navigation .next.arrow, #portfolio.tour .hand-navigation .next.arrow{
+	right:  1%;
+}
+#portfolio-control .hand-navigation .next.arrow{
 	right:  10%;
 }
+
 /*lines and rules */
 .line {
 	display: block;

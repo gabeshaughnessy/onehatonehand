@@ -19,11 +19,11 @@ $filter_tax = get_post_meta($post->ID, 'hh_filter_taxonomy', true);
 						<div  class="sidebar">
 							<h2 class="section-title fredericka"><?php the_title(); ?></h2>
 							<p class="section-logo">One Hat One Hand</p>
-							<ul  class="section-menu">
+							<ul id="services-menu" class="section-menu">
 							<?php //Post title loop goes here, pulling in posts, their titles and linkign to that post in the section by #post-id 
 							//use javascript to do this
 							?>
-								<!-- <li class="menu-item"><a href="#posttitle"></a></li> -->
+								
 							</ul>
 						</div>	
 						<div class="post-box">

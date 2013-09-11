@@ -83,9 +83,11 @@ function resizeAllSections(){
 	//centerElement(jQuery('#portfolio-control'));
 	//match the nav-spacer position instead
 
-	navPos = jQuery('.nav-target').position();
-	if(jQuery('#portfolio-control').length > 0){
-			jQuery('#portfolio-control').css({'top': navPos.top});
+	if(jQuery('.nav-target').is(":visible")){
+		navPos = jQuery('.nav-target').position();
+		
+	if(jQuery('#portfolio-control').length > 0 ){
+			//jQuery('#portfolio-control').css({'top': navPos.top});
 				
 			jQuery('.tour-entry .post-content, .instructions-modal'  ).not('#portfolio-control').each(function(index){
 				jQuery(this).css({'top': 100});
@@ -94,6 +96,7 @@ function resizeAllSections(){
 			jQuery('#portfolio-control').each(function(index){
 				centerElementX(jQuery(this));
 			});
+			}
 			}
 				var menuPos =  jQuery('#menu-main-menu, #menu-global-menu').offset();
 			jQuery('#portfolio-nav').css({"paddingLeft": menuPos.left});
@@ -321,7 +324,7 @@ function moveMenuIndicator(){
 				sectionID = false;
 			}
 		}
-		if(sectionID){
+		if(sectionID.top){
 			var sectionOffset = jQuery(sectionID).offset();
 			menuLeftPos = jQuery(this).parent().parent().offset().left;
 			sectionOffset.bottom = sectionOffset.top + jQuery(sectionID).height();
@@ -396,13 +399,25 @@ document.body.addEventListener("gesturechange", gestureChange, false);
 }
 
 function makePortfolioCycles(){
-		jQuery('#portfolio .cycle').before('<ul id="portfolio-nav">').cycle({ 
+		var navID;
+		var navBar;
+		if(jQuery('#portflio.tour').length == 0){
+			
+			navID = '#portfolio-nav';
+			navBar = '<ul id="portflio-nav">';
+		}
+		else if(jQuery('#portflio.tour').length > 0){
+			navID = false;
+			navBar = '';
+		}
+		jQuery('#portfolio .cycle').before(navBar).cycle({ 
 		    fx:     'scrollHorz', 
 		    speed:  500, 
 		    timeout: 0, 
-		    pager:  '#portfolio-nav', 
+		    pager:  navID, 
 		    next: '#portfolio .next',
 		    prev: '#portfolio .prev',
+		    after: afterCycle,
 		     
 		    // callback fn that creates a thumbnail to use as pager anchor 
 		    pagerAnchorBuilder: function(idx, slide) { 

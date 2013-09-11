@@ -244,7 +244,6 @@ $args = array(
 	
 			'post_type' => $hhpost_type,
 			'post_count' => $hhcount
-		
 );
 $custom_query = new WP_Query( $args );
 if ( $custom_query->have_posts() ) : while ( $custom_query->have_posts() ) : $custom_query->the_post(); 
