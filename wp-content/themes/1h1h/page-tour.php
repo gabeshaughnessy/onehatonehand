@@ -17,7 +17,7 @@ $tour = get_post_meta($post->ID, 'hh_tour', true);
 ?>
 
 			<div id="portfolio" class="section tour">
-					<div id="portfolio-wrapper" class="cycle">
+					<div id="" class="cycle portfolio-wrapper">
 					
 					
 					<?php //Portfolio Loop Goes Here
@@ -117,7 +117,40 @@ $tour = get_post_meta($post->ID, 'hh_tour', true);
 							}
 							$tour_items .= '</div>';
 					}
+					//if the page uses the media-grid:
+			else if(get_post_meta( $post->ID, '_wp_page_template', true )=='page-media-grid.php'){
+				$tour_items .='<div class="tour-entry media full-width wrapper" data-target="'.get_permalink().'" id="tour_post_'.get_the_ID().'"><h2 class="section-title">'.get_the_title().'</h2><div class=" primary"><div class="content">';
+				
+				$photo_args = array(
+ 						//'post_type' => 'post',
+ 						//'category_name' => 'instagrams',
+ 						'posts_per_page' => 8,
+ 						//'orderby' => 'rand',			
+				 			);
+	 			$media_query = new WP_Query( $photo_args );
+					$tour_items .= '<ul class="block-grid four-up">';
+
+		 			if ( $media_query->have_posts() ) : while ( $media_query->have_posts() ) : $media_query->the_post(); 
+	 				$id = get_the_ID();
+					$tour_items .= '<li id="post_'.$id.'" class="instagram listing" data-target="'.get_permalink().'">';
+					$tour_items .= get_the_post_thumbnail($id,  array(200,200), array('class' => 'no-texture'));
+					$tour_items .= '</li>';
+					 endwhile;
+					 endif;
+					wp_reset_postdata();
+					$tour_itmes .= '</ul>';
+					$tour_items .= '<div class="row social-wrapper"><ul class="block-grid two-up">';
+					$tour_items .= '<li class="intro"><h4 class="Fredericka">Find many, many more photos on  Instagram & Facebook:</h4></li>';
+					$tour_items .= '<li class="social-link "><a class="instagram" href="http://instagram.com/onehatonehand" >Instagram</a><a class="facebook" href="https://www.facebook.com/pages/One-Hat-One-Hand/231016490378800" >Facebook</a></li>';
+					$tour_items .= '<li class="social-link facebook"></li>';
+					$tour_items .= '</ul></div>';
+					$tour_items .= '</div></div>';
+					if ( is_user_logged_in() && current_user_can('edit_post', $post->ID) ) {
+						$tour_items .= '<div class="edit-post"><a href="'.get_edit_post_link( get_the_ID() ).'">Edit This Item</a></div>';
+					}
 					
+					$tour_items .= '</div>';
+			}//end media-grid with title template
 					else{//all other posts/pages/projects/etc use this output:
 					
 					$tour_items .='<div class="tour-entry post" data-target="'.get_permalink().'" id="tour_post_'.get_the_ID().'">';

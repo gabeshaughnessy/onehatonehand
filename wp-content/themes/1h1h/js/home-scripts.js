@@ -415,8 +415,8 @@ function makePortfolioCycles(){
 		    speed:  500, 
 		    timeout: 0, 
 		    pager:  navID, 
-		    next: '#portfolio .next',
-		    prev: '#portfolio .prev',
+		    next: '#portfolio-control .next',
+		    prev: '#portfolio-control .prev',
 		    after: afterCycle,
 		     
 		    // callback fn that creates a thumbnail to use as pager anchor 
