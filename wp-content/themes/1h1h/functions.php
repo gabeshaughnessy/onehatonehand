@@ -36,6 +36,9 @@ require_once('thumb_column.php');
 //add support for featured images and set thumbnail sizes
 require_once('image_support.php');
 
+//add POST FORMAT SUPPORT
+add_theme_support( 'post-formats', array( 'image', 'link', 'video' ) );
+
 //add excerpts to the pages:
 add_action( 'init', 'add_excerpts_to_pages' );
 function add_excerpts_to_pages() {
