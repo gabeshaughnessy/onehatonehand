@@ -15,7 +15,7 @@ wp_nav_menu( array('menu' => 'Global Menu' ));
 if(have_posts()) : while(have_posts()) : the_post();
 $content_type = 'post';
 $category_name = 'instagrams';
-$post_count = 4;
+$post_count = 8;
 $paged = (get_query_var('paged')) ? get_query_var('paged') : 1;
 ?>
 				<div class="full-width wrapper post-type-wrapper" id="<?php echo $post->post_name; ?>">				
