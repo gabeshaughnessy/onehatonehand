@@ -12,6 +12,32 @@
 /* -----------------------------------------
    Shared Styles
 ----------------------------------------- */
+.loader { 
+	width: 100%;
+	height: 100%;
+	position: absolute;
+	z-index: 1000;
+	display: block;
+	text-align: center;
+}
+.loading-text {
+	width: 200px;
+	height: 200px;
+	margin: auto auto;
+	line-height: 2;
+}
+.loading-icon {
+	width: 15px;
+	height: 30px;
+	background-image: url(images/loading-watch.gif);
+	background-size: 100%;
+	background-repeat: no-repeat;
+	background-position: top;
+	display: inline-block;
+	margin-right:10px;
+	vertical-align: bottom;
+}
+
 .reveal-modal {
 	z-index:  1000;
 }

@@ -617,8 +617,10 @@ jQuery(window).load(function(){
 	});
 	
 	activeSection = jQuery('.active');
+	
 	//fade the wrapper in after it loads
 	jQuery('#wrapper').animate({'opacity':1},1400);
+	jQuery('.loader').animate({'opacity':0},400);
 	
 	
 	makePortfolioCycles();

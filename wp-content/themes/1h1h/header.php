@@ -36,9 +36,8 @@ var templateDir = "<?php bloginfo('template_directory') ?>";
 <?php wp_head(); ?>
 </head>
 <body <?php body_class(); ?> data-spy="scroll" >
-<div class="ipad-console"></div><!-- for logging javascript values on an ipad -->
+<div class="loader"><div class="loading-text"><span class="loading-icon"></span>Loading</div></div>
 <div id="header">
-
 </div>
 <div id="fixed_bg"></div>
 <div id="wrapper">

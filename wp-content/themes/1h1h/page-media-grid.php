@@ -57,15 +57,15 @@ $paged = (get_query_var('paged')) ? get_query_var('paged') : 1;
 								 	<div class="center post-nav"><span class="older"><?php next_posts_link( 'Older Photos', $custom_query->max_num_pages ); ?>
 									</span><span class="newer"><?php echo get_previous_posts_link( 'Newer Photos' ); ?></span></div>
 						 			
-						 			<div class="row social-wrapper">
-<ul class="block-grid two-up">
-	 <li class="intro">
-<h4 class="Fredericka">Find many, many more photos on  Instagram & Facebook:</h4>
-						 </li>
-<li class="social-link "><a class="instagram" href="http://instagram.com/onehatonehand" >Instagram</a><a class="facebook" href="https://www.facebook.com/pages/One-Hat-One-Hand/231016490378800" >Facebook</a></li>
-<li class="social-link facebook"></li>
-</ul>
-						 			</div>
+															 			<div class="row social-wrapper">
+									<ul class="block-grid two-up">
+										 <li class="intro">
+									<h4 class="Fredericka">Find many, many more photos on  Instagram & Facebook:</h4>
+															 </li>
+									<li class="social-link "><a class="instagram" href="http://instagram.com/onehatonehand" >Instagram</a><a class="facebook" href="https://www.facebook.com/pages/One-Hat-One-Hand/231016490378800" >Facebook</a></li>
+									<li class="social-link facebook"></li>
+									</ul>
+															 			</div>
 
 
 						 			<?php else : ?>
