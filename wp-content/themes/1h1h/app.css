@@ -167,6 +167,7 @@ ul.block-grid.five-up li{
 	margin-top: 24px;
 	padding-top: 24px;
 }
+.full-width.wrapper.media .social-wrapper { margin-top:0;}
 li.social-link a{
 width: 80px;
 height: 80px;
@@ -190,3 +191,5 @@ li.social-link a.instagram {
 	background-image: url(images/instagram-icon.png) ;
 
 }
+
+.full-width.wrapper.media .section-title {margin-bottom: 0;}

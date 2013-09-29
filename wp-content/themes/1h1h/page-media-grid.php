@@ -60,7 +60,7 @@ $paged = (get_query_var('paged')) ? get_query_var('paged') : 1;
 						 			<div class="row social-wrapper">
 <ul class="block-grid two-up">
 	 <li class="intro">
-<h4 class="Fredericka">Find Us on Instagram & Facebook:</h4>
+<h4 class="Fredericka">Find many, many more photos on  Instagram & Facebook:</h4>
 						 </li>
 <li class="social-link "><a class="instagram" href="http://instagram.com/onehatonehand" >Instagram</a><a class="facebook" href="https://www.facebook.com/pages/One-Hat-One-Hand/231016490378800" >Facebook</a></li>
 <li class="social-link facebook"></li>

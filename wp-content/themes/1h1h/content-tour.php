@@ -9,7 +9,7 @@
 			$args = array(
 						'meta_key' => 'hh_tour',
 						'meta_value' => $tour,
-						'post_type' => array('hh_project', 'page', 'hh_service', 'hh_casestudy', 'hh_artist', 'hh_client', 'post'),
+						'post_type' => array('hh_project', 'page', 'hh_service', 'hh_casestudy', 'hh_artist', 'hh_client'),
 						'post_count' => 20,
 						'orderby' => 'modified',
 						'order' => 'DESC',
@@ -110,11 +110,36 @@
 			
 			//if the page uses the media-grid:
 			else if(get_post_meta( $post->ID, '_wp_page_template', true )=='page-media-grid.php'){
-				$tour_items .='
-					<div class="tour-entry full-width wrapper" data-target="'.get_permalink().'" id="tour_post_'.get_the_ID().'"><h2 class="section-title">'.get_the_title().'</h2><div class=" primary"><div class="content">'.get_the_content().'</div></div>';
+				$tour_items .='<div class="tour-entry media full-width wrapper" data-target="'.get_permalink().'" id="tour_post_'.get_the_ID().'"><h2 class="section-title">'.get_the_title().'</h2><div class=" primary"><div class="content">';
+				
+				$photo_args = array(
+ 						//'post_type' => 'post',
+ 						//'category_name' => 'instagrams',
+ 						'posts_per_page' => 8,
+ 						//'orderby' => 'rand',			
+				 			);
+	 			$media_query = new WP_Query( $photo_args );
+					$tour_items .= '<ul class="block-grid four-up">';
+
+		 			if ( $media_query->have_posts() ) : while ( $media_query->have_posts() ) : $media_query->the_post(); 
+	 				$id = get_the_ID();
+					$tour_items .= '<li id="post_'.$id.'" class="instagram listing" data-target="'.get_permalink().'">';
+					$tour_items .= get_the_post_thumbnail($id,  array(200,200), array('class' => 'no-texture'));
+					$tour_items .= '</li>';
+					 endwhile;
+					 endif;
+					wp_reset_postdata();
+					$tour_itmes .= '</ul>';
+					$tour_items .= '<div class="row social-wrapper"><ul class="block-grid two-up">';
+					$tour_items .= '<li class="intro"><h4 class="Fredericka">Find many, many more photos on  Instagram & Facebook:</h4></li>';
+					$tour_items .= '<li class="social-link "><a class="instagram" href="http://instagram.com/onehatonehand" >Instagram</a><a class="facebook" href="https://www.facebook.com/pages/One-Hat-One-Hand/231016490378800" >Facebook</a></li>';
+					$tour_items .= '<li class="social-link facebook"></li>';
+					$tour_items .= '</ul></div>';
+					$tour_items .= '</div></div>';
 					if ( is_user_logged_in() && current_user_can('edit_post', $post->ID) ) {
 						$tour_items .= '<div class="edit-post"><a href="'.get_edit_post_link( get_the_ID() ).'">Edit This Item</a></div>';
 					}
+					
 					$tour_items .= '</div>';
 			}//end media-grid with title template
 
