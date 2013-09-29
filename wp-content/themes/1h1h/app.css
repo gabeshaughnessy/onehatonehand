@@ -148,6 +148,11 @@ ul.block-grid.five-up li{
 	width: 20%;
 }
 
+.block-grid img {
+	max-width: 100%;
+	height: auto;
+}
+
 .post-nav {
 
 }
