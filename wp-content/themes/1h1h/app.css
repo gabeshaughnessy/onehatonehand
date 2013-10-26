@@ -55,6 +55,9 @@
 	clear: both;
 }
 
+div, p, span, strong, b, section, article, h1,h2,h3,h4,h5,h6 {
+	line-height: 1.4;
+}
 h1,h2,h3,h4,h5,h6 {
 	font-family: 'Fredericka the Great' serif;
 	font-weight: 100;
@@ -70,7 +73,7 @@ h1,h2,h3,h4,h5,h6 {
 	float: right;
 }
 .aligncenter {
-	margin: 12px 12px;
+	margin: 12px auto;
 	text-align: center;
 	clear: both;
 }
@@ -78,10 +81,19 @@ h1,h2,h3,h4,h5,h6 {
 	margin: 12px 12px 12px 0;
 	float: left;
 }
+.alignnone{
+	margin: 12px auto;
+}
 
-
+iframe {
+	margin: 12px 0;
+}
+img {
+	max-width: 100%;
+}
 p {
 	font-family: 'Muli', arial, sans-serif;
+	margin-top: 12px;
 }
 
 .modal-header {

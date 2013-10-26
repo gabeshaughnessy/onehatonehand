@@ -104,9 +104,7 @@ body{
 	-o-transition: background-position .5s ease-in-out;
 	transition: background-position .5s ease-in-out;
 }
-.page-template-page-case_studies-php .menu-global-menu-container {
-	background-image: url(images/menu_bg_sub.png);
-}
+
 .logged-in .menu-main-menu-container, 
 .logged-in .menu-global-menu-container {
 	top: 27px;
@@ -443,8 +441,8 @@ float: left;
 #case-study-nav-container {
 	display: block;
 	overflow: hidden;
-	position: absolute;
-	top: 49px;
+	position: fixed;
+	bottom: 0px;
 	z-index: 100;
 	width: 100%;
 	box-sizing: border-box;
@@ -463,15 +461,22 @@ float: left;
 	padding:  0 4px 0 20px;
 	text-align: left;
 	list-style: none;
+	line-height: 2;
 }
 #case-study-nav li.sub{
 	padding: 0 2px 0px 1px;
 	font-size: 32px;
-	line-height: 2px;
+	line-height: .5;
 }
 #case-study-nav li.first{
 	padding: 0;
-	line-height: 4px;
+	line-height: 1.2;
+	top: 6px;
+	position: relative;
+	left: 17px;
+}
+#case-study-nav li.first a{
+	padding: 0;
 	display: block;
 	width: 16px;
 	height: 16px;
@@ -485,7 +490,7 @@ float: left;
 	color: #ddd;
 	
 }
-#case-study-nav li.first.activeSlide{
+#case-study-nav li.first.activeSlide a{
 	background: #ddd;
 }
 #case-study-nav a{
