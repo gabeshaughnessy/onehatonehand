@@ -8,7 +8,13 @@
 				<div class="primary">
 						<div class="content" role="main">
 				<?php
+				if(!is_user_logged_in()){
 				$post_list = get_transient('case-study-list');
+					}
+				elseif (is_user_logged_in()) {
+					$post_list = false;
+				}
+				
 				if($post_list == false){
 				$args = array(
 								
@@ -49,8 +55,9 @@
 							endif; 
 							// Reset Post Data
 							wp_reset_postdata();
-				
+				if(!is_user_logged_in()){
 					set_transient('case-study-list', $post_list, 60*60*24*7);
+				}
 				}
 				echo $post_list;
 				
