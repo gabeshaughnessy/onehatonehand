@@ -162,6 +162,7 @@ jQuery('#hand-navigation').fadeIn(200);
 }//end show instructions
 
 
+
 //TOUCHWIPE EVENT HANDLER
 function makeSwipes(targetElement){
 jQuery(targetElement).touchwipe({//touch settings
@@ -435,6 +436,20 @@ function makePortfolioCycles(){
 			resizePortfolioSections();
 		});
 		function afterCycle(currSlideElement, nextSlideElement, options, forwardFlag){
+
+			var nextslide = jQuery(nextSlideElement).attr('data-target');
+			var currslide = jQuery(currSlideElement).attr('data-target');
+			console.log('next slide: ', nextslide);
+			console.log('current slide: ', currslide);
+			
+			if(jQuery(nextSlideElement).parent().parent().attr('id') == 'portfolio'){
+				if(nextslide.indexOf('hh_project/portfolio-page') >= 0){
+					jQuery('#portfolio-control h2').fadeIn('slow');
+				}
+				else if(nextslide.indexOf('hh_project/portfolio-page') == -1){
+					jQuery('#portfolio-control h2').fadeOut('slow');
+				}
+			}
 			if(jQuery(nextSlideElement).hasClass('isotope-grid')){
 				var $container = jQuery('.filter-target');
 				if($container.length > 0){
@@ -615,7 +630,7 @@ jQuery(window).load(function(){
 	jQuery('.hover').click(function(e){
 	jQuery(this).toggleClass('hovered');
 	});
-	
+
 	activeSection = jQuery('.active');
 	
 	//fade the wrapper in after it loads
