@@ -4,8 +4,8 @@ Plugin URI: http://www.instagrate.co.uk/
 Author URI: http://www.polevaultweb.com/
 Tags: instagram, posts, integration, automatic, post, wordpress, posting, images
 Requires at least: 3.0
-Tested up to: 3.5.1
-Stable tag: 1.1.3
+Tested up to: 3.6
+Stable tag: 1.4
 
 The best plugin to automatically integrate Instagram images with WordPress.
 
@@ -30,6 +30,61 @@ To update the plugin either use the automatic updater or manually follow these s
 4. Activate the plugin through the 'Plugins' menu in WordPress.
 
 == Changelog ==
+
+= 1.4 =
+
+* Added - WordPress 3.6 compatibility.
+* New - Multi Map setting for grouped images and shortcode for same posts, showing all the locations of multiple media in a post.
+* New - Select multiple terms for a taxonomy.
+* New - The ability to add default tags to an account. They will be always added to the create post or page as the tag taxonomy you choose in the setting 'Convert Image Hashtags to'.
+* New - Media type filter for the Instagram stream in an account. Post images and videos, only images or only videos.
+* New - When saving the images to the media library the filename will be the caption. However, you can now choose to save the images with the Instagram image ID as the filename e.g. c6077c14fe0a11e2b55e22000a9f09fb_7.jpg. This avoids any issues with non standard characters in the filename which can lead to the images not being displayed.
+* New - Title length limit setting.
+* New - Added link to settings page in plugin page.
+* Improvement - References to Instagram images changed to Media as the plugin supports images and videos.
+* Improvement - Using wp-updates.com for plugin automatic updates.
+* Fix - Bug where manual button had to be pressed twice or didn't work.
+* Fix - Template tag for just Instagram URL. Instagram Image URL and Video URL are now corrected to the media url.
+* Fix - Conflict with settings of other plugins using the same settings framework.
+* Fix - PHP notices on first save of a scheduled account.
+
+= 1.3.2 =
+
+* New - Embed support of images and videos.
+* New - Media Id template tag.
+* Fix - Issues with the video player shortcode.
+
+= 1.3.1 =
+
+* Fix - Image missing when posting to same post or page.
+
+= 1.3 =
+
+* New - Instagrate Pro now supports videos from Instagram.
+* New - An option to set the amount of images to show when the account is edited. This helps performance for accounts with a large number of images.
+* New - Added a URL that can be used by UNIX Cron jobs to schedule the posting of pending images from accounts with the Posting Frequency of 'Cron Job'.
+
+= 1.2.2 =
+
+* Fix - Syncing for likes.
+
+= 1.2.1 =
+
+* Fix - Migration for likes and comments.
+
+= 1.2 =
+
+* Added - WordPress 3.6 compatibility
+* Added - Comments! The plugin now supports Instagram Comments as WordPress post comments. You can enable the import and control syncing of the comments from Instagram.
+* Added - Likes! The plugin now supports Instagram Likes and syncing of them. You can use the template tag %%likes%%, the shortcode [igp-likes], or the post meta 'ig_likes' to display the Like count from Instagram.
+* Added - Template Tag - Caption Tags No Hash
+* Added - Template Tag - First Tag
+* Improvement - Admin UI tweaks
+
+= 1.1.4 = 
+
+* Fix - Issues removing menu for non-admins
+* Fix - Issues with hashtag filtering
 
 = 1.1.3 =
 

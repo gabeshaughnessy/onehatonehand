@@ -89,20 +89,18 @@ jQuery(document).ready(function($){
 		else $('.manual').hide();
     });
 	
-	// Multiple Images
+	// Multiple Images - Single
 	if($('select[name="_instagrate_pro_settings[posting_multiple]"] option:selected').val() == 'single') $('.single_post').show();
-    
+   
+	// Multiple Images - Grouped
+	if($('select[name="_instagrate_pro_settings[posting_multiple]"] option:selected').val() == 'group') $('.grouped').show();
+	
 	$('select[name="_instagrate_pro_settings[posting_multiple]"]').change(function(){
+		$('.grouped').hide();
+		$('.single_post').hide();
+		if($('option:selected', this).val() == 'group') $('.grouped').show();
 		if($('option:selected', this).val() == 'single') $('.single_post').show();
-		else $('.single_post').hide();
-    });
-	
-	// Image Ordering
-	if($('select[name="_instagrate_pro_settings[posting_multiple]"] option:selected').val() != 'each') $('.not_each_image').show();
-	
-	$('select[name="_instagrate_pro_settings[posting_multiple]"]').change(function(){
-		if($('option:selected', this).val() != 'each') $('.not_each_image').show();
-		else $('.not_each_image').hide();
+		
     });
 	
 	// Change Post Type
@@ -148,19 +146,7 @@ jQuery(document).ready(function($){
         
 		taxonomy = $('select[name="_instagrate_pro_settings[post_taxonomy]"] option:selected').val();
 		// Reload Terms
-		$('select[name="_instagrate_pro_settings[post_term]"]').empty();
-		$('select[name="_instagrate_pro_settings[post_term]"]').append('<option value="">Loading...</option>');
-		$.post(ajaxurl, 
-            { 	action:'igp_terms', 
-				taxonomy:taxonomy,
-				nonce: instagrate_pro.nonce}, 
-            function(data){
-                $('select[name="_instagrate_pro_settings[post_term]"]').empty();
-				$.each(data.objects, function(key, val) {
-					$('select[name="_instagrate_pro_settings[post_term]"]').append('<option value="' + key +'">' + val + '</option>');
-				});
-            }
-        , 'json');
+		change_taxonomy_terms(taxonomy);
         // Reload Tag Taxonomies
 		$('select[name="_instagrate_pro_settings[post_tag_taxonomy]"]').empty();
 		$('select[name="_instagrate_pro_settings[post_tag_taxonomy]"]').append('<option value="">Loading...</option>');
@@ -181,21 +167,27 @@ jQuery(document).ready(function($){
 	// Change Taxonomy
 	$('select[name="_instagrate_pro_settings[post_taxonomy]"]').change(function(){
 		taxonomy = $('option:selected', this).val();
-		$('select[name="_instagrate_pro_settings[post_term]"]').empty();
-		$('select[name="_instagrate_pro_settings[post_term]"]').append('<option value="">Loading...</option>');
+		change_taxonomy_terms(taxonomy);
+		return false;
+	});
+	
+	function change_taxonomy_terms(taxonomy) {
+		$('#post_terms').empty();
+		$('#tax_plural_label').empty();
+		$('#post_terms').append('Loading...');
 		$.post(ajaxurl, 
             { 	action:'igp_terms', 
 				taxonomy:taxonomy,
 				nonce: instagrate_pro.nonce}, 
             function(data){
-                $('select[name="_instagrate_pro_settings[post_term]"]').empty();
+                $('#post_terms').empty();
+				$('#tax_plural_label').append(data.label);
 				$.each(data.objects, function(key, val) {
-					$('select[name="_instagrate_pro_settings[post_term]"]').append('<option value="' + key +'">' + val + '</option>');
+					$('#post_terms').append('<input type="checkbox" name="_instagrate_pro_settings[post_term][]" value="' + key +'"/> '+ val +'<br />');
 				});
             }
         , 'json');
-        return false;
-	});
+	}
 	 
 	//Logout from Instagram
 	 $('#igp-logout').live('click', function(){      
@@ -233,6 +225,42 @@ jQuery(document).ready(function($){
 		}
 	});
 	
+	// Sync Likes Account
+	$('.igp-sync-likes').live('click', function(){      
+        var r = confirm("Are you sure you want to sync likes for this account? This may take some time.");
+		if (r==true) {
+			$('#wpbody').addClass('processing');   
+			var post_id = $(this).attr('rel');     
+			$.post(ajaxurl, 
+				{ 	action:'igp_sync_likes',
+					post_id:post_id,
+					nonce: instagrate_pro.nonce
+				 }, 
+				function(data){
+					if (!data.error) window.location = data.redirect;
+				}
+			, 'json');
+		}
+	});
+	
+	// Sync Comments Account
+	$('.igp-sync-comments').live('click', function(){      
+        var r = confirm("Are you sure you want to sync comments for this account? This may take some time.");
+		if (r==true) {
+			$('#wpbody').addClass('processing');   
+			var post_id = $(this).attr('rel');     
+			$.post(ajaxurl, 
+				{ 	action:'igp_sync_comments',
+					post_id:post_id,
+					nonce: instagrate_pro.nonce
+				 }, 
+				function(data){
+					if (!data.error) window.location = data.redirect;
+				}
+			, 'json');
+		}
+	});
+	
 	// Apply Image Stats
 	function image_stats(stats) {
 		$('label.pending .stat').text('0');
@@ -248,23 +276,29 @@ jQuery(document).ready(function($){
 	 $('#igp-load-images').live('click', function(){      
         var post_id = $('#post_ID').val();
         $('#igp-images').addClass('processing');
+		var img_count = $('#igp-images li').length;
 		$('#igp-load-images').attr('disabled', 'disabled');	
 		$('#igp-load-images').val('Loading...');	
         $.post(ajaxurl, 
             { 	action:'igp_load_images',
             	post_id:post_id,
+            	img_count: img_count,
 				nonce: instagrate_pro.nonce
              }, 
             function(data){
 				$.each(data.images, function(key, val) {
-					$('#igp-images').append('<li><a class="edit-image" rel="' + val.id + '" href="#"><img class="pending" width="70" alt="" src="' + val.images.thumbnail.url +'"></a><input id="' + val.id + '" class="igp-bulk" type="checkbox"></li>');
+					$('#igp-images').append('<li><a class="edit-image ' + val.media_type + '" rel="' + val.id + '" href="#"><img class="' + ((data.load) ? 'pending' : val.status) + '" width="70" alt="" src="' + val.images.thumbnail.url +'"><span class="video-ind"></span></a><input id="' + val.id + '" class="igp-bulk" type="checkbox"></li>');
 				});
-				var new_next_url = '';
-				if (data.next_url == '' || data.next_url == null) {
-					$('#igp-load-images').hide();
-				} else new_next_url = data.next_url;
-				$('input[name="_instagrate_pro_settings[next_url]"]').val(new_next_url);
-				image_stats(data.stats);
+				
+				if (data.load) {
+					var new_next_url = '';
+					if (data.next_url == '' || data.next_url == null) {
+						$('#igp-load-images').hide();
+					} else new_next_url = data.next_url;
+					$('input[name="_instagrate_pro_settings[next_url]"]').val(new_next_url);
+					image_stats(data.stats);
+				}
+				
 				$('#igp-images').removeClass('processing'); 
 				$('#igp-load-images').val('Load More');	
 				$('#igp-load-images').removeAttr('disabled');
@@ -291,7 +325,34 @@ jQuery(document).ready(function($){
                 $('#igp_meta_caption_clean_old').val(data.meta.caption_clean);
 				$('#igp_meta_status_old').text(ucfirst(data.meta.status));
 				$('#igp_meta_status_old').addClass(data.meta.status);
-                $('#igp_meta_image').attr("src", data.meta.image_url);
+                $('#igp_meta_image').show();
+                
+                if (data.meta.media_type == 'video') {
+		            $('#jp_container_1').show();
+	                
+	                $("#igp-jplayer").jPlayer({
+						ready: function () {
+						  $(this).jPlayer("setMedia", {
+						    m4v: data.meta.video_url,
+						    poster: data.meta.image_url
+						  });
+						},
+						swfPath: instagrate_pro.jplayer_path,
+						supplied: "m4v",
+						size: {
+							width: "460px",
+							height: "460px",
+							cssClass: "jp-video-460p"
+						},
+						pause: function() {
+							$(this).next().children('.jp-video-play').show();
+						},
+					});
+	                
+	                $('#igp_meta_image').hide();
+	                
+                } else $('#igp_meta_image').attr("src", data.meta.image_url);
+               
                 $.each(data.meta.tags, function(key, val) {
 					$('#igp_meta_hashtags').append('<span class="button">' + val +'</span>');
 				})
@@ -556,6 +617,8 @@ jQuery(document).ready(function($){
 			 }, 
 			function(data){
 				$('#manual-posting .ig_ajax-loading').hide(); 
+				$('a.edit-image img.pending').addClass('ignore'); 
+				$('a.edit-image img.ignore').removeClass('pending'); 
 				if (data.images != null) {
 					$.each(data.images, function(key, val) {
 						$('a[rel^=' + val.image_id +'] img').attr('class','posted');

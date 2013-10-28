@@ -4,7 +4,7 @@ Plugin Name: Instagrate Pro
 Plugin URI: http://www.instagrate.co.uk/  
 Description: Instagrate Pro is a powerful WordPress plugin that allows you to automatically integrate Instagram images into your WordPress site.
 Author: polevaultweb 
-Version: 1.1.3
+Version: 1.4
 Author URI: http://www.polevaultweb.com/
 
 Copyright 2012  polevaultweb  (email : info@polevaultweb.com)
@@ -44,14 +44,21 @@ class instagrate_pro {
 	private $http_user_agent;
 	
 	private $template_image;
+	private $template_video;
 	private $template_caption;
+	private $template_caption_tags_no_hash;
 	private $template_caption_no_tags;
 	private $template_tags;
+	private $template_tags_first;
 	private $template_username;
 	private $template_user_profile_url;
 	private $template_user_profile_image_url;
+	private $template_instagram_media_type;
+	private $template_instagram_url;
 	private $template_instagram_image_url;
+	private $template_instagram_video_url;
 	private $template_wordpress_image_url;
+	private $template_wordpress_video_url;
 	private $template_wordpress_post_url;
 	private $template_map;
 	private $template_location_lat;
@@ -59,17 +66,22 @@ class instagrate_pro {
 	private $template_location_name;
 	private $template_date;
 	private $template_filter;
+	private $template_likes;
+	private $template_instagram_media_id;
+	private $template_instagram_embed_url;
 	
 	private $debug_mode;
 	private $debug_text;
+	
+	static $video_count = 0;
 
     function __construct()
     {	
         // Set up default vars
         $this->plugin_path = plugin_dir_path( __FILE__ );
         $this->plugin_url = plugin_dir_url( __FILE__ );
-		$this->plugin_version = '1.1.3';
-		$this->plugin_db_version = '1.1.2';
+		$this->plugin_version = '1.4';
+		$this->plugin_db_version = '1.3';
         $this->plugin_table = 'igp_images';
 		$this->plugin_l10n = 'instagrate-pro';
 		
@@ -87,14 +99,21 @@ class instagrate_pro {
 		
 		// Template tags
 		$this->template_image = '';
+		$this->template_video = '';
 		$this->template_caption = '';
+		$this->template_caption_tags_no_hash = '';
 		$this->template_caption_no_tags = '';
 		$this->template_tags = '';
+		$this->template_tags_first = '';
 		$this->template_username = '';
 		$this->template_user_profile_url = '';
 		$this->template_user_profile_image_url = '';
+		$this->template_instagram_media_type = '';
+		$this->template_instagram_url = '';
 		$this->template_instagram_image_url = '';
+		$this->template_instagram_video_url = '';
 		$this->template_wordpress_image_url = '';
+		$this->template_wordpress_video_url = '';
 		$this->template_wordpress_post_url = '';
 		$this->template_map = '';
 		$this->template_location_lat = '';
@@ -102,9 +121,13 @@ class instagrate_pro {
 		$this->template_location_name = '';
 		$this->template_date = '';
 		$this->template_filter = '';
+		$this->template_likes = '[igp-likes]';
+		$this->template_instagram_media_id = '';
+		$this->template_instagram_embed_url = '';
 			
 		$this->debug_mode = false;
 		$this->debug_text = '';
+		
         
 		// Set up activation hooks
         register_activation_hook( __FILE__, array(&$this, 'activate') );
@@ -116,37 +139,47 @@ class instagrate_pro {
 		// Set up l10n
         load_plugin_textdomain( 'instagrate-pro', false, dirname( plugin_basename( __FILE__ ) ) . '/lang' );
         
-        // Add your own hooks/filters
+        // Hooks/filters
         add_action( 'init', array(&$this, 'init') );
         add_filter('post_updated_messages', array(&$this, 'updated_messages'));
         add_action('manage_edit-instagrate_pro_columns', array(&$this, 'edit_columns'));
         add_action('manage_instagrate_pro_posts_custom_column', array(&$this, 'custom_columns'));
 		add_action('admin_menu', array(&$this, 'add_sub_menus'));
+		add_action('admin_menu', array(&$this, 'remove_sub_menus'));
 		add_action('admin_init', array(&$this, 'admin_init'));
 		add_action('admin_print_footer_scripts', array(&$this, 'custom_quicktags'));
-
 		add_action('save_post', array(&$this, 'save_post_meta'));
 		add_action('admin_enqueue_scripts', array(&$this, 'add_admin_scripts'));
+		
+		add_filter('plugin_action_links', array(&$this, 'plugin_action_links' ), 10, 2);
 		add_filter('cron_schedules', array(&$this, 'add_custom_schedules' ));
 		add_filter('admin_init', array(&$this, 'remove_media_button' ));
 		add_filter('admin_post_thumbnail_html',  array(&$this, 'custom_feat_image_text'));
-		add_filter( 'bulk_actions-edit-instagrate_pro',  array(&$this,'remove_bulk_edit') );
-		add_filter( 'sanitize_file_name_chars',  array(&$this,'add_to_sanitize') );
-		add_filter( 'enter_title_here', array(&$this,'custom_enter_title_here') );
+		add_filter('bulk_actions-edit-instagrate_pro',  array(&$this,'remove_bulk_edit') );
+		add_filter('sanitize_file_name_chars',  array(&$this,'add_to_sanitize') );
+		add_filter('enter_title_here', array(&$this,'custom_enter_title_here') );
+		add_filter('get_avatar', array(&$this, 'instagram_avatar'), 10, 5);
 
 		add_action('do_meta_boxes', array(&$this, 'change_image_box'));		
 		add_action('do_meta_boxes', array(&$this, 'change_custom_meta_box'));	
+		add_action('do_meta_boxes', array(&$this, 'change_tag_box'));	
+		
 		add_action('wpmu_new_blog', array(&$this,'new_blog_install'), 10, 6);   
 		add_action('delete_post', array(&$this,'delete_igp_post'));  
-		add_action('admin_init', array(&$this, 'disable_menu'));
+		add_action('admin_menu', array(&$this, 'disable_menu'));
 		add_action('admin_notices', array(&$this, 'plugin_admin_notice'));
 		add_action('wp_enqueue_scripts', array(&$this, 'add_map_scripts'));
+		add_action('the_posts', array(&$this, 'has_video_shortcode'));
 		add_action('scheduled_post_account', array(&$this, 'post_account'));
-		add_action( 'template_redirect', array(&$this,'controller'));
+		add_action('template_redirect', array(&$this,'controller'));
 		
 		add_shortcode('igp_map', array(&$this, 'get_map_shortcode') );
+		add_shortcode('igp_multimap', array(&$this, 'get_multimap_shortcode') );
+		add_shortcode('igp-likes', array(&$this, 'get_likes') );
 		add_shortcode('igp_get_map', array(&$this, 'get_map_shortcode') );
 		add_shortcode('igp-image-position', array($this, 'image_position') );
+		add_shortcode('igp-video', array($this, 'get_video') );
+		add_shortcode('igp-embed', array($this, 'get_embed') );
 		
 		// Ajax Hooks
 		add_action('wp_ajax_igp_post_objects', array(&$this,'igp_post_objects_callback'));
@@ -165,13 +198,17 @@ class instagrate_pro {
 		add_action('wp_ajax_igp_send_debug_data', array(&$this,'igp_send_debug_data_callback'));
 		add_action('wp_ajax_igp_manual_post', array(&$this,'igp_manual_post_callback'));
 		add_action('wp_ajax_igp_duplicate_account', array(&$this,'igp_duplicate_account_callback'));
+		add_action('wp_ajax_igp_sync_likes', array(&$this,'igp_sync_likes'));
+		add_action('wp_ajax_igp_sync_comments', array(&$this,'igp_sync_comments'));
+		add_action('wp_ajax_nopriv_instagram_sync', array($this, 'sync_all_comments_likes'));
+		add_action('wp_ajax_nopriv_instagrate', array($this, 'cron_controller'));
 		
 		
 		// Settings
 		require_once( $this->plugin_path .'includes/wp-settings-framework.php' );
-        $this->wpsf = new WordPressSettingsFramework( $this->plugin_path .'settings/igp-settings.php' );
+        $this->wpsf = new igpWordPressSettingsFramework( $this->plugin_path .'includes/igp-settings.php' );
         add_filter( $this->wpsf->get_option_group() .'_settings_validate', array(&$this, 'validate_settings') );
-        $this->settings = wpsf_get_settings( $this->plugin_path .'settings/igp-settings.php' );
+        $this->settings = wpsf_get_settings( $this->plugin_path .'includes/igp-settings.php' );
 		
 		// Upgrade Check
 		add_action('admin_init', array(&$this,'upgrade_check'));
@@ -179,9 +216,10 @@ class instagrate_pro {
 		// Emoji for stripping emoticons
 		include('includes/emoji.php');
 		
-		// Auto updates
-		include('plugin-updater.php');
-		new igpPluginUpdater( 'http://updates.polevaultweb.com/' );
+		// Auto updates via wp-updates.com
+		require_once('includes/wp-updates-plugin.php');
+		new WPUpdatesPluginUpdater_200( 'http://wp-updates.com/api/1/plugin', plugin_basename(__FILE__));
+
     }
     
     function activate( $network_wide ) {
@@ -251,8 +289,10 @@ class instagrate_pro {
 						  image_id varchar(256) NOT NULL,
 						  image_timestamp bigint(20) NOT NULL,
 						  status enum('pending','posted','ignore','posting') NOT NULL,
+						  media_type varchar(50) NOT NULL,
 						  image_url varchar(256) NOT NULL,
 						  image_thumb_url varchar(256) NOT NULL,
+						  video_url varchar(256) NOT NULL,
 						  tags text NULL,
 						  filter varchar(256) NULL,
 						  link varchar(256) NULL,
@@ -267,6 +307,7 @@ class instagrate_pro {
 						  location_name text NULL,
 						  location_id varchar(256) NULL,
 						  comments_count bigint(20) NOT NULL,
+						  comments longblob NOT NULL,
 						  likes_count bigint(20) NOT NULL,
 						  UNIQUE KEY (id)
 					) DEFAULT CHARACTER SET utf8;";
@@ -278,6 +319,7 @@ class instagrate_pro {
 	}
 		
 	function upgrade_check() {
+		
 		if (!get_option('pvw_igp_version')) {
 			add_option( 'pvw_igp_version',  $this->plugin_version );
 			return;
@@ -309,6 +351,11 @@ class instagrate_pro {
 				$wpdb->query( "alter table $table CHARACTER SET utf8;" );
 		
 			}
+			
+			// Large upgrade to v1.2
+			if ( version_compare( $current_version, '1.2.1', '<' ) ) {
+				$this->migrate_one_two();
+			}
 					
 			// Finally update the database version
 			update_option( 'pvw_igp_version',  $this->plugin_version );
@@ -324,6 +371,18 @@ class instagrate_pro {
 			if(isset($_GET['message']) && $_GET['message'] == '14') {
 				echo 	'<div class="updated">
 							<p>'. __( 'Account duplicated' ) .' </p>
+						</div>';
+			}
+			// Likes Synced Account
+			if(isset($_GET['message']) && $_GET['message'] == '15') {
+				echo 	'<div class="updated">
+							<p>'. __( 'Likes have been synced for this account successfully' ) .' </p>
+						</div>';
+			}
+			// Comments Synced Account
+			if(isset($_GET['message']) && $_GET['message'] == '16') {
+				echo 	'<div class="updated">
+							<p>'. __( 'Comments have been synced for this account successfully' ) .' </p>
 						</div>';
 			}
 			// Display check for user to make sure a blog page is selected 
@@ -413,6 +472,7 @@ class instagrate_pro {
                 'show_ui' => true,
                 'menu_position' => 100,
                 'supports' => array( 'title', 'editor', 'custom-fields', 'thumbnail' ),
+                'taxonomies' => array('post_tag'),
                 'menu_icon' => plugins_url('assets/img/favicon.png' , __FILE__ )
                )
         );
@@ -446,7 +506,7 @@ class instagrate_pro {
 		$account_id = 0;
 		if(isset($_GET['post']) && isset($_GET['action']) && $_GET['action'] == 'edit') $account_id = $_GET['post'];
 		add_meta_box( 'igp_instagram_box', __( 'Instagram Settings', $this->plugin_l10n ), array(&$this, 'meta_box_instagram'), 'instagrate_pro', 'side', 'high' );
-		add_meta_box( 'igp_images_box', __( 'Images'. $this->get_images_key($account_id), $this->plugin_l10n ), array(&$this, 'meta_box_images'), 'instagrate_pro', 'normal', 'high' );
+		add_meta_box( 'igp_images_box', __( 'Instagram Media'. $this->get_images_key($account_id), $this->plugin_l10n ), array(&$this, 'meta_box_images'), 'instagrate_pro', 'normal', 'high' );
 		add_meta_box( 'igp_template_tags_box', __( 'Template Tags', $this->plugin_l10n ), array(&$this, 'meta_box_template_tags'), 'instagrate_pro', 'normal', 'high' );
 		add_meta_box( 'igp_posting_box', __( 'Posting Settings', $this->plugin_l10n ), array(&$this, 'meta_box_posting'), 'instagrate_pro', 'side', 'default' );
 		add_meta_box( 'igp_post_box', __( 'Post Settings', $this->plugin_l10n ), array(&$this, 'meta_box_post'), 'instagrate_pro', 'side', 'default' );
@@ -462,6 +522,18 @@ class instagrate_pro {
 				$this->retrieve_images($post->ID);	
 			}
 		}	
+	}
+	
+	function plugin_action_links($links, $file) {
+	    static $this_plugin;
+		if (!$this_plugin) {
+	        $this_plugin = plugin_basename(__FILE__);
+	    }
+		if ($file == $this_plugin) {
+	        $settings_link = '<a href="' . get_admin_url() .'edit.php?post_type=instagrate_pro&page=instagrate-pro-settings">'. __('Settings') .'</a>';
+	        array_unshift($links, $settings_link);
+	    }
+	    return $links;
 	}
 		
 	function updated_messages( $messages ) {
@@ -484,6 +556,8 @@ class instagrate_pro {
 			12 => __('Instagram account disconnected.', $this->plugin_l10n),
 			13 => __('You did not authorise your Instagram account with this plugin.', $this->plugin_l10n),
 			14 => __('Account duplicated.', $this->plugin_l10n),
+			15 => __('Likes have been synced for this account successfully.', $this->plugin_l10n),
+			16 => __('Comments have been synced for this account successfully.', $this->plugin_l10n)
         );
         
         $messages['instagrate_pro'] = $instagrate_messages;
@@ -495,11 +569,11 @@ class instagrate_pro {
             'cb' => '<input type="checkbox" />',
             'profile-img' => __( '', $this->plugin_l10n ),
             'profile' => __( 'Profile', $this->plugin_l10n ),
-            'images' => __( 'Images', $this->plugin_l10n ),
+            'images' => __( 'Media', $this->plugin_l10n ),
             'frequency' => __( 'Frequency', $this->plugin_l10n ),
-            'multiple-images' => __( 'Multiple Images', $this->plugin_l10n ),
+            'multiple-images' => __( 'Multiple Media', $this->plugin_l10n ),
             'type' => __( 'Type', $this->plugin_l10n ),
-            'imagesaving' => __( 'Image Saving', $this->plugin_l10n ),
+            'imagesaving' => __( 'Media Saving', $this->plugin_l10n ),
             'classification' => __( 'Classification', $this->plugin_l10n ),
             'status' => __( 'Status', $this->plugin_l10n ),
             'title' => __( 'Custom Title', $this->plugin_l10n ),
@@ -533,7 +607,7 @@ class instagrate_pro {
 				$posting = $this->default_val($options, 'instagram_images', '');
 				if ($posting =='') $posting_text = __('Not configured', $this->plugin_l10n);
 				else {
-					$posting_text = ucfirst($posting) . __(' Images', $this->plugin_l10n);
+					$posting_text = ucfirst($posting) . __(' Media', $this->plugin_l10n);
 					if ($posting == 'users' && $this->default_val($options, 'instagram_user', '') != '' && $this->default_val($options, 'instagram_users_id', '') != '') {
 						$posting_text .= '<br/>'. __( 'User', $this->plugin_l10n ) .': <strong>'. $this->default_val($options, 'instagram_user', '') .'</strong>';
 					}
@@ -559,10 +633,10 @@ class instagrate_pro {
 				$multiple = $this->default_val($options, 'posting_multiple', 'each');
 				switch ($multiple) {
 					case 'each':
-						$multiple_text = __( 'Post Per Image', $this->plugin_l10n );
+						$multiple_text = __( 'Post Per Media', $this->plugin_l10n );
 					break;
 					case 'group':
-						$multiple_text = __( 'Images Grouped', $this->plugin_l10n );
+						$multiple_text = __( 'Media Grouped', $this->plugin_l10n );
 					break;
 					case 'single':
 						$type = $this->default_val($options, 'post_type', 'post');
@@ -579,16 +653,25 @@ class instagrate_pro {
    				break;
    			case 'imagesaving':  
 				$feat = ($this->default_val($options, 'post_featured_image', 'off') == 'on') ? '<br/>Featured Image' : '';
-				$saving = ($this->default_val($options, 'post_save_media', 'off') == 'on') ? __( 'Media Library', $this->plugin_l10n ) . $feat : __( 'Instagram Image', $this->plugin_l10n );
+				$saving = ($this->default_val($options, 'post_save_media', 'off') == 'on') ? __( 'Media Library', $this->plugin_l10n ) . $feat : __( 'Instagram Media', $this->plugin_l10n );
 				echo $saving;
    				break;
    			case 'classification':
    				$tax = ($this->default_val($options, 'post_taxonomy', '0') != '0') ? ucwords($this->default_val($options, 'post_taxonomy', '0')) : '';
    				if ($tax != '') {
-   					$term = get_term( $this->default_val($options, 'post_term', '1'), $this->default_val($options, 'post_taxonomy', '0'));
-   					$term_text = 'Not Selected';
-   					if ( !is_wp_error( $term ) ) $term_text = $term->name;
-   					echo __( 'Taxonomy', $this->plugin_l10n ) .': <strong>'. $tax . '</strong><br/>'. __( 'Term', $this->plugin_l10n ) .': <strong>'. $term_text .'</strong>';
+   					$terms = $this->default_val($options, 'post_term', array());
+   					$term_text = '';
+   					if ($terms) {
+	   					foreach ($terms as $term_selected) {
+		   					$term_add = get_term( $term_selected, $this->default_val($options, 'post_taxonomy', '0'));
+		   					if ( !is_wp_error( $term_add ) ) $term_text .= $term_add->name .', ';
+	   					}
+	   					if (substr($term_text, -2) == ', ' ) $term_text = substr($term_text, 0, -2);
+	   				} else {
+   						$term_text = 'Not Selected';
+   					}
+   					
+   					echo __( 'Taxonomy', $this->plugin_l10n ) .': <strong>'. $tax . '</strong><br/>'. __( 'Terms', $this->plugin_l10n ) .': <strong>'. $term_text .'</strong>';
    				} else {
 	   				_e( 'None', $this->plugin_l10n );
    				}
@@ -603,6 +686,11 @@ class instagrate_pro {
    				break;
 			case 'igp-actions':  
 				$actions = '<a class="button igp-duplicate" title="Duplicate Account" rel="'. $post->ID .'" href="#">Duplicate</a>';
+				$actions .= '<p><strong>Sync:</strong></p>';
+				$actions .= '<a class="button igp-sync-likes" title="Sync Likes" rel="'. $post->ID .'" href="#">Likes</a>';
+				if ($this->default_val($this->settings, 'igpsettings_comments_enable-comments', '0') == 1) {
+					$actions .= '<a class="button igp-sync-comments" title="Sync Comments" rel="'. $post->ID .'" href="#">Comments</a>';
+				}
 				echo $actions;
    				break;
         }
@@ -625,7 +713,7 @@ class instagrate_pro {
 				$title = ucwords(str_replace('-', ' ', $tag['name']));
 				$tag_name = '%%'. $tag['name'] .'%%';
 				$num = 200 + $count;
-				$html .= "edButtons[edButtons.length] = new edButton( '". $slug . "', '". $title ."', '". $tag_name ."', '', '', '', ". $num ." ); \n";
+				$html .= "QTags.addButton( '". $slug . "', '". $title ."', '". $tag_name ."', '', '', '". $tag['desc'] ."', ". $num ."); \n";
 				$count ++;
 			}
 			$html .= '</script>';
@@ -656,7 +744,7 @@ class instagrate_pro {
 	function custom_enter_title_here( $title ){
 	    $screen = get_current_screen();
 	    if ( 'instagrate_pro' == $screen->post_type ) {
-	        $title = __( 'Enter your custom title', $this->plugin_l10n ) .', eg. %%caption%%'. __( 'for just the Instagram image caption', $this->plugin_l10n );
+	        $title = __( 'Enter your custom title', $this->plugin_l10n ) .', eg. %%caption%% '. __( 'for just the Instagram image caption', $this->plugin_l10n );
 	    }
 	    return $title;
 	}
@@ -671,6 +759,11 @@ class instagrate_pro {
 		add_meta_box('postcustom', __('Custom Fields For Template Tags', $this->plugin_l10n), 'post_custom_meta_box', 'instagrate_pro', 'normal');
 	}
 	
+	function change_tag_box() {
+		remove_meta_box( 'tagsdiv-post_tag', 'instagrate_pro', 'side' );
+		add_meta_box('tagsdiv-post_tag', __('Default Tags', $this->plugin_l10n), 'post_tags_meta_box', 'instagrate_pro', 'side');
+	}
+	
 	function custom_feat_image_text( $content, $post_id = 0 ){
 		$screen = get_current_screen();
 	    if ( isset($screen) && 'instagrate_pro' == $screen->post_type ) {
@@ -682,6 +775,10 @@ class instagrate_pro {
 	function add_sub_menus() {
 		add_submenu_page( 'edit.php?post_type=instagrate_pro', 'Settings', 'Settings', 'manage_options', 'instagrate-pro-settings', array(&$this, 'settings_page') );
     }
+    
+    function remove_sub_menus() {
+		remove_submenu_page( 'edit.php?post_type=instagrate_pro', 'edit-tags.php?taxonomy=post_tag&amp;post_type=instagrate_pro');
+    }
 	
 	function add_admin_scripts() {
 		global $post;
@@ -692,14 +789,25 @@ class instagrate_pro {
             wp_enqueue_script( 'igp-simple-modal' );
             wp_register_script( 'igp-google-geo', 'https://maps.googleapis.com/maps/api/js?sensor=false', array('jquery'), $this->plugin_version );
 			wp_enqueue_script( 'igp-google-geo' );
-			wp_register_script( 'igp-admin', plugins_url('assets/js/igp-admin.js' , __FILE__ ), array('jquery', 'igp-simple-modal', 'igp-google-geo'), $this->plugin_version );
+			
+			$this->enqueue_video();
+			
+			wp_register_script( 'igp-admin', plugins_url('assets/js/igp-admin.js' , __FILE__ ), array('jquery', 'igp-simple-modal', 'igp-google-geo', 'igp-jplayer'), $this->plugin_version );
             wp_enqueue_script( 'igp-admin' );
-			wp_localize_script( 'igp-admin', 'instagrate_pro', array(  'nonce' => wp_create_nonce('instagrate_pro')	));
+			wp_localize_script( 'igp-admin', 'instagrate_pro', array(  'nonce' => wp_create_nonce('instagrate_pro'), 'jplayer_path' => plugins_url('assets/js/jquery.jplayer/' , __FILE__ )	));
 
 			// css
 			wp_register_style( 'igp-admin-style', plugins_url('assets/css/igp-admin.css' , __FILE__ ), array(), $this->plugin_version);
 			wp_enqueue_style('igp-admin-style');
+		
 		}
+	}
+	
+	private function enqueue_video() {
+		wp_register_script( 'igp-jplayer', plugins_url('assets/js/jquery.jplayer/jquery.jplayer.min.js' , __FILE__ ), array('jquery'), $this->plugin_version );
+        wp_enqueue_script( 'igp-jplayer' );
+        wp_register_style( 'igp-jplayer-style', plugins_url('assets/css/igp-video.css' , __FILE__ ), array(), $this->plugin_version);
+		wp_enqueue_style( 'igp-jplayer-style');
 	}
 	
 	function page_has_maps($posts) {
@@ -724,9 +832,29 @@ class instagrate_pro {
             wp_enqueue_script( 'igp-google-maps' );
             wp_register_script( 'igp-maps', plugins_url('assets/js/igp-maps.js' , __FILE__ ), array('jquery', 'igp-google-maps'), $this->plugin_version );
             wp_enqueue_script( 'igp-maps' );
+            $custom_rel = $this->default_val($this->settings, 'igpsettings_general_lightbox-rel', 'lightbox');
+            wp_localize_script( 'igp-maps', 'igp_maps', array( 'lightbox_rel' => $custom_rel));
+            
+            wp_register_style( 'igp-maps-style', plugins_url('assets/css/igp-maps.css' , __FILE__ ), array(), $this->plugin_version);
+			wp_enqueue_style( 'igp-maps-style');
        	}		
 	}
-		
+	
+	function has_video_shortcode($posts){
+		if (empty($posts)) {
+			return $posts;
+		}
+		$found = false;
+		foreach ($posts as $post) {
+			if (stripos($post->post_content, '[igp-video') !== false) {
+				$found = true;
+				break;
+			}
+		}
+		if ($found) $this->enqueue_video();
+		return $posts;
+	}
+	
 	function add_custom_schedules($schedules) {
 		$new_schedules = array(		'igp_hourly' => array( 	'interval' => 3600,
 															'display' => __( 'Hourly', $this->plugin_l10n ) ),
@@ -745,14 +873,14 @@ class instagrate_pro {
 	}
 	
 	function settings_page() {
-		global $wpsf_settings;
+		global $wpsfigp_settings;
 		$active_tab = isset($_GET['tab']) ? $_GET['tab'] : 'general'; 
 		  ?>
 		<div class="wrap">
 		  <div id="icon-options-general" class="icon32"></div>
 		  <h2><?php _e('Instagrate Pro Settings', $this->plugin_l10n) ?></h2>
 		  <h2 class="nav-tab-wrapper">
-			  <?php foreach( $wpsf_settings as $tab ){ ?>
+			  <?php foreach( $wpsfigp_settings as $tab ){ ?>
 				<a href="?post_type=instagrate_pro&page=<?php echo $_GET['page']; ?>&tab=<?php echo $tab['section_id']; ?>" class="nav-tab<?php echo $active_tab == $tab['section_id'] ? ' nav-tab-active' : ''; ?>"><?php echo $tab['section_title']; ?></a>
 				<?php } ?>
 			  </h2>
@@ -794,15 +922,27 @@ class instagrate_pro {
 		$template_tags = array(	
 							array(
 								'name' => 'image',
-								'desc' => __( 'The image from Instagram, either direct or from the WP media library.', $this->plugin_l10n ),
-								'exclude_from' => array( 'title', 'meta'),
+								'desc' => __( 'The image url, either direct from Instagram or from the WP media library.', $this->plugin_l10n ),
+								'exclude_from' => array( 'title'),
 								'value' => $this->template_image
+							),
+							array(
+								'name' => 'video',
+								'desc' => __( 'The video url, either direct from Instagram or from the WP media library.', $this->plugin_l10n ),
+								'exclude_from' => array( 'title'),
+								'value' => $this->template_video
 							),
 							array(
 								'name' => 'caption',
 								'desc' => __( 'The image caption from Instagram including tags.', $this->plugin_l10n ),
 								'exclude_from' => array(),
 								'value' => $this->template_caption
+							),
+							array(
+								'name' => 'caption-tags-no-hash',
+								'desc' => __( 'The image caption from Instagram including tags without the #.', $this->plugin_l10n ),
+								'exclude_from' => array(),
+								'value' => $this->template_caption_tags_no_hash
 							),
 							array(
 								'name' => 'caption-no-tags',
@@ -815,6 +955,12 @@ class instagrate_pro {
 								'desc' => __( 'The image tags from Instagram', $this->plugin_l10n ),
 								'exclude_from' => array(),
 								'value' => $this->template_tags
+							),
+							array(
+								'name' => 'tags-first',
+								'desc' => __( 'The first image tag from Instagram', $this->plugin_l10n ),
+								'exclude_from' => array(),
+								'value' => $this->template_tags_first
 							),
 							array(
 								'name' => 'username',
@@ -835,16 +981,52 @@ class instagrate_pro {
 								'value' => $this->template_user_profile_image_url
 							),
 							array(
+								'name' => 'instagram-media-type',
+								'desc' => __( 'The type of Instagram media, i.e. image or video.', $this->plugin_l10n ),
+								'exclude_from' => array(),
+								'value' => $this->template_instagram_media_type
+							),
+							array(
+								'name' => 'instagram-media-id',
+								'desc' => __( 'The ID of the Instagram media', $this->plugin_l10n ),
+								'exclude_from' => array(),
+								'value' => $this->template_instagram_media_id
+							),
+							array(
+								'name' => 'instagram-url',
+								'desc' => __( 'The link to the Instagram media page.', $this->plugin_l10n ),
+								'exclude_from' => array( 'title' ),
+								'value' => $this->template_instagram_url
+							),
+							array(
 								'name' => 'instagram-image-url',
 								'desc' => __( 'The link to the Instagram image.', $this->plugin_l10n ),
 								'exclude_from' => array( 'title' ),
 								'value' => $this->template_instagram_image_url
 							),
 							array(
+								'name' => 'instagram-video-url',
+								'desc' => __( 'The link to the Instagram video.', $this->plugin_l10n ),
+								'exclude_from' => array( 'title' ),
+								'value' => $this->template_instagram_video_url
+							),
+							array(
+								'name' => 'instagram-embed-url',
+								'desc' => __( 'The Instagram embed link for images and videos.', $this->plugin_l10n ),
+								'exclude_from' => array( 'title' ),
+								'value' => $this->template_instagram_embed_url
+							),
+							array(
 								'name' => 'wordpress-image-url',
 								'desc' => __( 'The link to the image if saved in the WP media library.', $this->plugin_l10n ),
 								'exclude_from' => array( 'title' ),
 								'value' => $this->template_wordpress_image_url
+							),
+							array(
+								'name' => 'wordpress-video-url',
+								'desc' => __( 'The link to the video if saved in the WP media library.', $this->plugin_l10n ),
+								'exclude_from' => array( 'title' ),
+								'value' => $this->template_wordpress_video_url
 							),
 							array(
 								'name' => 'wordpress-post-url',
@@ -893,6 +1075,12 @@ class instagrate_pro {
 								'desc' => __( 'The Instagram filter used on the image.', $this->plugin_l10n ),
 								'exclude_from' => array(),
 								'value' => $this->template_filter
+							),
+							array(
+								'name' => 'likes',
+								'desc' => __( 'The Instagram Likes count for the image.', $this->plugin_l10n ),
+								'exclude_from' => array(),
+								'value' => $this->template_likes
 							),
 							
 						);
@@ -975,8 +1163,9 @@ class instagrate_pro {
         die;
 	}
 	
-	function get_all_terms( $taxonomy = '' ) {
-		$options[0] = '— '. __('Select', $this->plugin_l10n). ' —';
+	function get_all_terms( $taxonomy = '', $select = true ) {
+		$options = array();
+		if ($select) $options[0] = '— '. __('Select', $this->plugin_l10n). ' —';
 		if ($taxonomy == '0') 
 			return $options;		
 		$terms = get_terms( $taxonomy, array('hide_empty' => 0) );
@@ -995,7 +1184,13 @@ class instagrate_pro {
             return 0;
         $response['error'] = false;
         $response['message'] = '';
-        $objects = $this->get_all_terms($_POST['taxonomy']); 
+        $objects = $this->get_all_terms($_POST['taxonomy'], false); 
+        $taxonomy_label = '';
+        if ($_POST['taxonomy'] != '') {
+        	$taxonomy_obj = get_taxonomy($_POST['taxonomy']);
+        	$taxonomy_label = $taxonomy_obj->labels->name;
+        }
+        $response['label'] = $taxonomy_label;
         $response['objects'] = $objects;
         $response['message'] = 'success';
         echo json_encode($response);
@@ -1088,11 +1283,11 @@ class instagrate_pro {
 						<th scope="row"><?php _e('Image Stream', $this->plugin_l10n); ?></th>
 						<td>
 							<select name="_instagrate_pro_settings[instagram_images]">
-								<option value="recent"<?php if($this->default_val($options, 'instagram_images', 'recent') == 'recent') echo ' selected="selected"'; ?>><?php _e('Recent Images', $this->plugin_l10n); ?></option>
-								<option value="feed"<?php if($this->default_val($options, 'instagram_images', '') == 'feed') echo ' selected="selected"'; ?>><?php _e('Feed Images', $this->plugin_l10n); ?></option>
-								<option value="users"<?php if($this->default_val($options, 'instagram_images', '') == 'users') echo ' selected="selected"'; ?>><?php _e('Users Images', $this->plugin_l10n); ?></option>
-								<option value="tagged"<?php if($this->default_val($options, 'instagram_images', '') == 'tagged') echo ' selected="selected"'; ?>><?php _e('Hashtagged Images', $this->plugin_l10n); ?></option>
-								<option value="location"<?php if($this->default_val($options, 'instagram_images', '') == 'location') echo ' selected="selected"'; ?>><?php _e('Location Images', $this->plugin_l10n); ?></option>
+								<option value="recent"<?php if($this->default_val($options, 'instagram_images', 'recent') == 'recent') echo ' selected="selected"'; ?>><?php _e('My Recent Media', $this->plugin_l10n); ?></option>
+								<option value="feed"<?php if($this->default_val($options, 'instagram_images', '') == 'feed') echo ' selected="selected"'; ?>><?php _e('My Feed', $this->plugin_l10n); ?></option>
+								<option value="users"<?php if($this->default_val($options, 'instagram_images', '') == 'users') echo ' selected="selected"'; ?>><?php _e('Users Media', $this->plugin_l10n); ?></option>
+								<option value="tagged"<?php if($this->default_val($options, 'instagram_images', '') == 'tagged') echo ' selected="selected"'; ?>><?php _e('All Hashtagged Media', $this->plugin_l10n); ?></option>
+								<option value="location"<?php if($this->default_val($options, 'instagram_images', '') == 'location') echo ' selected="selected"'; ?>><?php _e('Location Media', $this->plugin_l10n); ?></option>
 							</select>
 						</td>
 					</tr>
@@ -1131,6 +1326,17 @@ class instagrate_pro {
 							<input type="text" name="_instagrate_pro_settings[instagram_hashtags]" value="<?php echo $this->default_val($options, 'instagram_hashtags', ''); ?>" /><br />
 		                </td>
 		            </tr>
+		            <tr valign="top">
+		                <th scope="row"><?php _e('Media Filter', $this->plugin_l10n); ?></th>
+		                <td>
+							<select name="_instagrate_pro_settings[instagram_media_filter]">
+								<option value="all"<?php if($this->default_val($options, 'instagram_media_filter', 'all') == 'all') echo ' selected="selected"'; ?>><?php _e('Images and Videos', $this->plugin_l10n); ?></option>
+								<option value="image"<?php if($this->default_val($options, 'instagram_media_filter', 'all') == 'image') echo ' selected="selected"'; ?>><?php _e('Only Images', $this->plugin_l10n); ?></option>
+								<option value="video"<?php if($this->default_val($options, 'instagram_media_filter', 'all') == 'video') echo ' selected="selected"'; ?>><?php _e('Only Videos', $this->plugin_l10n); ?></option
+							</select>
+		                </td>
+		            </tr>
+
 				</table>
 				<div style="display: none"> 
 					<input type="hidden" name="_instagrate_pro_settings[token]" value="<?php echo $this->default_val($options, 'token', ''); ?>" /><br />
@@ -1188,7 +1394,8 @@ class instagrate_pro {
 	       _e( 'You will need to connect an Instagram account from the Instagram settings', $this->plugin_l10n );	        
         } else { 			
 			//get images from table
-	        $images = $this->get_images($post->ID);
+	        $limit = $this->default_val($this->settings, 'igpsettings_general_admin-images', '');
+	        $images = $this->get_images($post->ID, '', 'DESC', false, '', $limit);
 	        $show_zero = '';
 			$toggle_load = ' style="display: none;"';
 			$show_bulk = ' style="display: none;"';
@@ -1200,8 +1407,9 @@ class instagrate_pro {
 				}
 				foreach($images as $key => $image) {
 			       $html .= '<li>';
-			       $html .= '<a class="edit-image" href="#" rel="'. $image->image_id .'">';
+			       $html .= '<a class="edit-image '. $image->media_type . '" href="#" rel="'. $image->image_id .'">';
 			       $html .= '<img class="'. $image->status . '" src="'. $image->image_url . '" width="70" alt="'. $image->caption_clean.'" title="'. __( 'Edit', $this->plugin_l10n ) .' '. $image->caption_clean.'">';
+			       $html .= '<span class="video-ind"></span>';
 			       $html .= '</a>';
 				   $html .= '<input id="'. $image->image_id .'" class="igp-bulk" type="checkbox"'.  $show_bulk .'>';
 			       $html .= '</li>';
@@ -1216,7 +1424,7 @@ class instagrate_pro {
 				<input id="igp-load-images" type="button" class="button" value="<?php _e( 'Load More', $this->plugin_l10n ); ?>" <?php echo $toggle_load; ?>>
 				<div id="igp-bulk-wrap" class="igp-bulk" <?php echo $show_bulk; ?>>
 					<label>
-						<input type="checkbox" id="toggle_bulk" /> <span id="toggle_bulk_text"><?php _e('All Images', $this->plugin_l10n); ?></span>
+						<input type="checkbox" id="toggle_bulk" /> <span id="toggle_bulk_text"><?php _e('All Media', $this->plugin_l10n); ?></span>
 					</label>
 					<select name="igp_bulk_status" id="igp_bulk_status">
 						<option value="pending"><?php _e('Pending', $this->plugin_l10n); ?></option>
@@ -1229,7 +1437,70 @@ class instagrate_pro {
 				<?php echo $html; ?>
 			</ul>
 			<div id="igp-edit-image">
-				<p><strong><?php _e('Edit Image Details', $this->plugin_l10n); ?></strong></p>
+				<p><strong><?php _e('Edit Details', $this->plugin_l10n); ?></strong></p>
+				
+				<!--container for everything-->
+				<div id="jp_container_1" class="jp-video jp-video-460p">
+				
+					<!--container in which our video will be played-->
+					<div id="igp-jplayer" class="jp-jplayer"></div>
+					
+					<!--main containers for our controls-->
+					<div class="jp-gui">
+					   
+					   	<div class="jp-video-play" style="display: block;">
+							<a class="jp-video-play-icon jp-play" tabindex="1" href="javascript:;">play</a>
+						</div>
+					   
+					    <div class="jp-interface">
+					        <div class="jp-controls-holder">
+					
+								<!--play and pause buttons-->
+							    <a href="javascript:;" class="jp-play" tabindex="1">play</a>
+							    <a href="javascript:;" class="jp-pause" tabindex="1">pause</a>
+							    <span class="separator sep-1"></span>
+							 
+								<!--progress bar-->
+							    <div class="jp-progress">
+							        <div class="jp-seek-bar">
+										<div class="jp-play-bar"><span></span></div>
+									</div>
+							    </div>
+							 
+							    <!--time notifications-->
+							    <div class="jp-current-time"></div>
+							    <span class="time-sep">/</span>
+							    <div class="jp-duration"></div>
+							    <span class="separator sep-2"></span>
+							 
+							    <!--mute / unmute toggle-->
+							    <a href="javascript:;" class="jp-mute" tabindex="1" title="mute">mute</a>
+							    <a href="javascript:;" class="jp-unmute" tabindex="1" title="unmute">unmute</a>
+							 
+							    <!--volume bar-->
+							    <div class="jp-volume-bar">
+							        <div class="jp-volume-bar-value"><span class="handle"></span></div>
+							    </div>
+							    <span class="separator sep-2"></span>
+							 
+							    <!--full screen toggle-->
+							    <a href="javascript:;" class="jp-full-screen" tabindex="1" title="full screen">full screen</a>
+							    <a href="javascript:;" class="jp-restore-screen" tabindex="1" title="restore screen">restore screen</a>
+								<a href="javascript:;" class="jp-repeat" tabindex="1" title="repeat">repeat</a>
+								<a href="javascript:;" class="jp-repeat-off" tabindex="1" title="repeat off">repeat off</a>
+							
+					        </div><!--end jp-controls-holder-->
+					    </div><!--end jp-interface-->
+					</div><!--end jp-gui-->
+					
+					<!--unsupported message-->
+					<div class="jp-no-solution">
+					    <span>Update Required</span>
+					    To play the media you will need to either update your browser to a recent version or update your <a href="http://get.adobe.com/flashplayer/" target="_blank">Flash plugin</a>.
+					</div>
+				
+				</div><!--end jp_container_1-->
+				
 				<img id="igp_meta_image" class="" width="455" src="<?php echo plugins_url('assets/img/large_spinner.gif' , __FILE__ ); ?>" alt="<?php _e('Image to edit', $this->plugin_l10n); ?>">
 				<table class="form-table">
 					<tr valign="top">
@@ -1281,6 +1552,7 @@ class instagrate_pro {
 					<select name="_instagrate_pro_settings[posting_frequency]">
 						<option value="constant"<?php if($this->default_val($options, 'posting_frequency', 'constant') == 'constant') echo ' selected="selected"'; ?>><?php _e('Constant', $this->plugin_l10n); ?></option>
 						<option value="schedule"<?php if($this->default_val($options, 'posting_frequency', '') == 'schedule') echo ' selected="selected"'; ?>><?php _e('Scheduled', $this->plugin_l10n); ?></option>
+						<option value="cron"<?php if($this->default_val($options, 'posting_frequency', '') == 'cron') echo ' selected="selected"'; ?>><?php _e('Cron Job', $this->plugin_l10n); ?></option>
 						<option value="manual"<?php if($this->default_val($options, 'posting_frequency', '') == 'manual') echo ' selected="selected"'; ?>><?php _e('Manual', $this->plugin_l10n); ?></option>
 					</select>
 				</td>
@@ -1390,11 +1662,11 @@ class instagrate_pro {
 				</td>
             </tr>
 			 <tr valign="top">
-                <th scope="row"><?php _e('Multiple Images', $this->plugin_l10n); ?></th>
+                <th scope="row"><?php _e('Multiple Media', $this->plugin_l10n); ?></th>
                 <td>
 					<select name="_instagrate_pro_settings[posting_multiple]">
-						<option value="each"<?php if($this->default_val($options, 'posting_multiple', 'each') == 'each') echo ' selected="selected"'; ?>><?php echo ucfirst($this->default_val($options, 'post_type', 'post')) . ' '. __('Per Image', $this->plugin_l10n); ?></option>
-						<option value="group"<?php if($this->default_val($options, 'posting_multiple', '') == 'group') echo ' selected="selected"'; ?>><?php _e('Images Grouped', $this->plugin_l10n); ?></option>
+						<option value="each"<?php if($this->default_val($options, 'posting_multiple', 'each') == 'each') echo ' selected="selected"'; ?>><?php echo ucfirst($this->default_val($options, 'post_type', 'post')) . ' '. __('Per Media', $this->plugin_l10n); ?></option>
+						<option value="group"<?php if($this->default_val($options, 'posting_multiple', '') == 'group') echo ' selected="selected"'; ?>><?php _e('Media Grouped', $this->plugin_l10n); ?></option>
 						<option value="single"<?php if($this->default_val($options, 'posting_multiple', '') == 'single') echo ' selected="selected"'; ?>><?php echo __('Same', $this->plugin_l10n) .' '. ucfirst($this->default_val($options, 'post_type', 'post')) ?></option>
 					</select>
 				</td>
@@ -1413,7 +1685,7 @@ class instagrate_pro {
 				</td>
             </tr>
 			<tr valign="top" class="single_post">
-                <th scope="row"><?php _e('Images Location', $this->plugin_l10n); ?></th>
+                <th scope="row"><?php _e('Media Location', $this->plugin_l10n); ?></th>
                <td>
 					<select name="_instagrate_pro_settings[posting_single_location]">
 						<option value="top"<?php if($this->default_val($options, 'posting_single_location', 'top') == 'top') echo ' selected="selected"'; ?>><?php _e('Top', $this->plugin_l10n); ?></option>
@@ -1423,12 +1695,22 @@ class instagrate_pro {
 					</select>
 				</td>
             </tr>
-			<tr valign="top" class="not_each_image">
-                <th scope="row"><?php _e('Image Ordering', $this->plugin_l10n); ?></th>
+			<tr valign="top" class="single_post grouped">
+                <th scope="row"><?php _e('Media Ordering', $this->plugin_l10n); ?></th>
                <td>
 					<select name="_instagrate_pro_settings[posting_image_order]">
 						<option value="ASC"<?php if($this->default_val($options, 'posting_image_order', 'ASC') == 'ASC') echo ' selected="selected"'; ?>><?php _e('Oldest at Top', $this->plugin_l10n); ?></option>
 						<option value="DESC"<?php if($this->default_val($options, 'posting_image_order', '') == 'DESC') echo ' selected="selected"'; ?>><?php _e('Newest at Top', $this->plugin_l10n); ?></option>						
+					</select>
+				</td>
+            </tr>
+            <tr valign="top" class="grouped">
+                <th scope="row"><?php _e('Multi Map', $this->plugin_l10n); ?></th>
+               <td>
+					<select name="_instagrate_pro_settings[grouped_multi_map]">
+						<option value="none"<?php if($this->default_val($options, 'grouped_multi_map', 'none') == 'none') echo ' selected="selected"'; ?>><?php _e('No multi map', $this->plugin_l10n); ?></option>
+						<option value="bottom"<?php if($this->default_val($options, 'grouped_multi_map', 'none') == 'bottom') echo ' selected="selected"'; ?>><?php _e('Map at bottom', $this->plugin_l10n); ?></option>
+						<option value="top"<?php if($this->default_val($options, 'grouped_multi_map', 'none') == 'top') echo ' selected="selected"'; ?>><?php _e('Map at top', $this->plugin_l10n); ?></option>					
 					</select>
 				</td>
             </tr>
@@ -1443,7 +1725,7 @@ class instagrate_pro {
         ?>
         <table class="form-table igp-admin"> 
             <tr valign="top">
-                <th scope="row"><?php _e('Save Image to Media Library', $this->plugin_l10n); ?></th>
+                <th scope="row"><?php _e('Save Instagram Media to Media Library', $this->plugin_l10n); ?></th>
                 <td><input type="hidden" name="_instagrate_pro_settings[post_save_media]" value="off" />
                 <label><input type="checkbox" name="_instagrate_pro_settings[post_save_media]" value="on"<?php if($this->default_val($options, 'post_save_media', 'off') == 'on') echo ' checked="checked"'; ?> /> 
                 </label></td>
@@ -1470,22 +1752,31 @@ class instagrate_pro {
 				</td>
             </tr>
 			<tr valign="top">
-                <th scope="row"><?php _e('Term', $this->plugin_l10n); ?></th>
+                <?php 
+                $taxonomy = $this->default_val($options, 'post_taxonomy', '');
+                $taxonomy_label = '';
+                if ($taxonomy != '') {
+                	$taxonomy_obj = get_taxonomy($taxonomy);
+                	$taxonomy_label = $taxonomy_obj->labels->name;
+                }
+                ?>
+                <th scope="row" id="tax_plural_label"><?php echo $taxonomy_label; ?></th>
                 <td>
-					<select name="_instagrate_pro_settings[post_term]">
-					<?php 	
-						$taxonomy = $this->default_val($options, 'post_taxonomy', '');
-						$terms = $this->get_all_terms( $taxonomy );
-						foreach ($terms as $key => $term) {
-							($this->default_val($options, 'post_term', '') == $key) ? $selected = ' selected="selected"': $selected = '';
-							echo '<option value="'. $key .'"'. $selected .'>'. $term .'</option>';
+					<div id="post_terms">
+						<?php 	
+						if ($taxonomy != '') {
+							$terms = $this->get_all_terms( $taxonomy, false );
+							foreach ($terms as $key => $term) {
+								(in_array($key, (array)$this->default_val($options, 'post_term', '')) ) ? $selected = ' checked': $selected = '';
+								echo '<input type="checkbox" name="_instagrate_pro_settings[post_term][]" value="'. $key .'" '. $selected .'/> '. $term .'<br />';
+							}
 						}
 					?>	
-					</select>
+					</div>
 				</td>
             </tr>
             <tr valign="top">
-                <th scope="row"><?php _e('Convert Image Hashtags to', $this->plugin_l10n); ?></th>
+                <th scope="row"><?php _e('Convert Media Hashtags to', $this->plugin_l10n); ?></th>
                 <td>
 					<select name="_instagrate_pro_settings[post_tag_taxonomy]">
 					<?php 	
@@ -1615,6 +1906,7 @@ class instagrate_pro {
 		$html .= '<li><a target="_blank" href="http://www.instagrate.co.uk/help">'. __( 'Help', $this->plugin_l10n ) .'</a> - '. __( 'get help on what settings mean and how to use them', $this->plugin_l10n ) .'</li>';
 		$html .= '<li><a target="_blank" href="http://www.instagrate.co.uk/help#templates">'. __( 'Template Tags', $this->plugin_l10n ) .'</a> - '. __( 'get some simple examples of using template tags for the custom content', $this->plugin_l10n ) .'</li>';
 		$html .= '<li><a target="_blank" href="http://www.polevaultweb.com/support/forum/instagrate-pro-plugin/">'. __( 'Support', $this->plugin_l10n ) .'</a> - '. __( 'read the support forum and post a new topic', $this->plugin_l10n ) .'</li>';
+		$html .= '<li><a target="_blank" href="http://www.instagrate.co.uk/category/release/">'. __( 'Changelog', $this->plugin_l10n ) .'</a> - '. __( 'read the plugin\'s changelog', $this->plugin_l10n ) .'</li>';
 		$html .= '</ul>';
 		echo $html; 
     }
@@ -1636,9 +1928,9 @@ class instagrate_pro {
 		// Schedule
         if ($settings['posting_frequency'] == 'schedule') {
         	$old_settings = get_post_meta( $post_id, '_instagrate_pro_settings', true ); 
-			$old_sch = $old_settings['posting_schedule'];
+			$old_sch = isset($old_settings['posting_schedule']) ? $old_settings['posting_schedule'] : ''; 
 			$old_day = isset($old_settings['posting_day']) ? $old_settings['posting_day'] : ''; 
-			$old_time = $old_settings['posting_time'];
+			$old_time = isset($old_settings['posting_time']) ? $old_settings['posting_time'] : ''; 
 			$new_sch = $settings['posting_schedule'];
 			$new_day = isset($settings['posting_day']) ? $settings['posting_day'] : '';
 			$new_time = $settings['posting_time'];
@@ -1722,6 +2014,28 @@ class instagrate_pro {
 			$user = $data->data;
 		}
 		return $user;
+	}
+	
+	function instagram_get_media($access, $media_id) {
+		$url = 'media/'. $media_id. '/';
+		$data = $this->do_http_request( $access, $url, array());
+		$media = '';
+		if (!$data) return $media;
+		if ($data->meta->code == 200) {
+			$media = $data->data;
+		}
+		return $media;
+	}
+	
+	function instagram_get_media_comments($access, $media_id) {
+		$url = 'media/'. $media_id. '/comments';
+		$data = $this->do_http_request( $access, $url, array());
+		$media = '';
+		if (!$data) return $media;
+		if ($data->meta->code == 200) {
+			$media = $data->data;
+		}
+		return $media;
 	}
 	
 	function instagram_connect() {
@@ -1945,13 +2259,20 @@ class instagrate_pro {
 				$tags = (isset($image->tags)) ? $image->tags : '';
 				$caption_clean_no_tags = $this->caption_strip_tags($caption_clean, $tags);
 			}
+			$comments = (isset($image->comments->data)) ? $image->comments->data : array();
+			if ($this->default_val($this->settings, 'igpsettings_comments_enable-comments', '0') == 1 && $image->comments->count > 8 ) {
+				$comments = $this->get_comments('', $image->id, $account_id);
+			}
+
 			$data = array(
 				'account_id' => esc_attr($account_id),
 				'image_id' => esc_attr($image->id),
 				'status' => $status,
 				'image_timestamp' => esc_attr($image->created_time),
+				'media_type' => esc_attr($image->type),
 				'image_url' => esc_attr($image->images->standard_resolution->url),
 				'image_thumb_url' => esc_attr($image->images->thumbnail->url),
+				'video_url' => (isset($image->videos->standard_resolution->url)) ? esc_attr($image->videos->standard_resolution->url) : '',
 				'tags' => (isset($image->tags)) ? serialize($image->tags) : '',
 				'filter' => (isset($image->filter)) ? esc_attr($image->filter) : 'nofilter',
 				'link' => esc_attr($image->link),
@@ -1966,19 +2287,24 @@ class instagrate_pro {
 				'location_name' => (isset($image->location->name)) ? esc_attr($image->location->name) : '',			
 				'location_id' => (isset($image->location->id)) ? esc_attr($image->location->id) : '',
 				'comments_count' => esc_attr($image->comments->count),
-				'likes_count' => esc_attr($image->likes->count)
+				'likes_count' => esc_attr($image->likes->count),
+				'comments' => base64_encode(serialize($comments)),
 			);
-
 			$wpdb->insert($wpdb->prefix . $this->plugin_table , $data);
+
 		}
 	}
 	
-	function get_images($account_id, $status = '', $order = 'DESC', $exclude_other_accounts = false, $locked = '') {
+	function get_images($account_id, $status = '', $order = 'DESC', $exclude_other_accounts = false, $locked = '', $limit = '', $offset = '') {
 		global $wpdb;
 		$table = $wpdb->prefix . $this->plugin_table;
 		if ($status != '') $status = 'AND status = "'. $status .'"';
 		$exclude = ($exclude_other_accounts) ? "AND image_id NOT IN (SELECT image_id FROM $table WHERE account_id <> $account_id AND status = 'posted')" : '';
-		$images = $wpdb->get_results("SELECT * FROM $table WHERE account_id = $account_id $status $exclude ORDER BY image_timestamp $order");
+		
+		if($limit != '') $limit = ' LIMIT '. $limit;
+		if($offset != '') $limit = ' LIMIT 20 OFFSET '. $offset;
+
+		$images = $wpdb->get_results("SELECT * FROM $table WHERE account_id = $account_id $status $exclude ORDER BY image_timestamp $order$limit");
 	
 		if ($locked != '') {
 			$meta = array ( 'status' => $locked );
@@ -2030,6 +2356,7 @@ class instagrate_pro {
 							  ,location_name
 							  ,location_id
 							  ,comments_count
+							  ,comments
 							  ,likes_count
 						)
 					SELECT 	$new_account_id
@@ -2052,6 +2379,7 @@ class instagrate_pro {
 							  ,location_name
 							  ,location_id
 							  ,comments_count
+							  ,comments
 							  ,likes_count
 					FROM $table_name
 					WHERE account_id = $old_account_id
@@ -2075,6 +2403,16 @@ class instagrate_pro {
 										FROM $table
 										WHERE account_id = $account_id 
 										GROUP BY status" , OBJECT_K);
+		return $stats;				
+	}
+	
+	// TODO
+	function images_total($account_id) {
+		global $wpdb;
+		$table = $wpdb->prefix . $this->plugin_table;
+		$stats = $wpdb->get_results( "	SELECT COUNT(*) AS Total
+										FROM $table
+										WHERE account_id = $account_id");
 		return $stats;				
 	}
 	
@@ -2264,15 +2602,41 @@ class instagrate_pro {
             return 0;
 		if ( !isset($_POST['post_id']))
             return 0;
+        if ( !isset($_POST['img_count']))
+            return 0;
         $response['error'] = false;
         $response['message'] = '';
         $response['next_url'] = '';
-        $images = $this->load_images($_POST['post_id']);
-        $response['stats'] = $this->account_stats($_POST['post_id']);
-		$account_settings = get_post_meta($_POST['post_id'], '_instagrate_pro_settings', true ); 
-        $response['images'] = $images;
-        $response['next_url'] = $account_settings['next_url'];
+        $response['load'] = false;
+        
+        $all_count = $this->images_total($_POST['post_id']);
+
+		if($_POST['img_count'] < $all_count[0]->Total && $this->default_val($this->settings, 'igpsettings_general_admin-images', '') != '' ) {
+	        
+	        $older_images = $this->get_images($_POST['post_id'], '', 'DESC', false, '', 20, $_POST['img_count']);
+	        $images = array();
+	        foreach($older_images as $image) {
+		        $images[] = array(	'id' => $image->image_id,
+		        					'images' => array('thumbnail' => array('url' => $image->image_thumb_url)),
+		        					'status' => $image->status,
+		        					'media_type' => $image->media_type,
+		        				);
+		        
+	        }
+	        $response['images'] = $images;
+	        // TODO
+	        
+        } else {
+	       
+	        $images = $this->load_images($_POST['post_id']);
+	        $response['stats'] = $this->account_stats($_POST['post_id']);
+			$account_settings = get_post_meta($_POST['post_id'], '_instagrate_pro_settings', true ); 
+	        $response['images'] = $images;
+	        $response['next_url'] = $account_settings['next_url'];
+	        $response['load'] = true;
+        }
         $response['message'] = 'success';
+        
         echo json_encode($response);
         die;
 	}
@@ -2280,7 +2644,7 @@ class instagrate_pro {
 	function get_image_meta($image_id, $account_id) {
         global $wpdb;
 		$table = $wpdb->prefix . $this->plugin_table;
-		$meta = $wpdb->get_row( "SELECT image_url, caption_clean, caption_clean_no_tags, status, tags FROM $table WHERE account_id = $account_id AND image_id = '$image_id'" );
+		$meta = $wpdb->get_row( "SELECT * FROM $table WHERE account_id = $account_id AND image_id = '$image_id'" );
 		$meta->caption_clean =  $meta->caption_clean ; 
 		$meta->caption_clean_no_tags = $meta->caption_clean_no_tags;
 		$meta->tags = unserialize($meta->tags);
@@ -2444,7 +2808,7 @@ class instagrate_pro {
 			$message = $this->get_install_body();
 			$headers =  "From: \"$current_user->display_name\" <$current_user->user_email>\r\n";
 			$response[0] = wp_mail( 'support@polevaultweb.com',$subject,$message,$headers,$debug_file);
-			$response[1] = __( 'Debug file sent successfully', $this->plugin_l10n );
+			$response[1] = __( 'Debug file sent successfully. Please make sure you have raised an issue on the Support Forum. Without knowing the issue this file isn\'t much help on its own and will not be responded too.', $this->plugin_l10n );
 		} else {
 			$response[1] = __( 'Cannot send file. Debug mode must be on and a debug.txt file needs to have been created.', $this->plugin_l10n );
 		}
@@ -2459,7 +2823,7 @@ class instagrate_pro {
         $email = $this->send_install_data();
 		if ($email) {
 			$response['error'] = false;
-			$response['message'] = __( 'Install data sent successfully', $this->plugin_l10n );
+			$response['message'] = __( 'Install data sent successfully. Please make sure you have raised an issue on the Support Forum. Without knowing the issue this file isn\'t much help on its own and will not be responded too.', $this->plugin_l10n );
 		}
         echo json_encode($response);
         die;	
@@ -2493,6 +2857,34 @@ class instagrate_pro {
 		$response['redirect'] = '';
         $this->duplicate_account($_POST['post_id']);
 		$redirect = get_admin_url() .'edit.php?post_type=instagrate_pro&message=14';
+		$response['redirect'] = $redirect;
+        echo json_encode($response);
+        die;
+	}
+	
+	function igp_sync_likes() {
+        if ( !isset($_POST['nonce']) || !wp_verify_nonce( $_POST['nonce'], 'instagrate_pro' ))
+            return 0;
+		if ( !isset($_POST['post_id']))
+          return 0;
+        $response['error'] = false;
+		$response['redirect'] = '';
+        $this->sync_likes($_POST['post_id']);
+		$redirect = get_admin_url() .'edit.php?post_type=instagrate_pro&message=15';
+		$response['redirect'] = $redirect;
+        echo json_encode($response);
+        die;
+	}
+	
+	function igp_sync_comments() {
+        if ( !isset($_POST['nonce']) || !wp_verify_nonce( $_POST['nonce'], 'instagrate_pro' ))
+            return 0;
+		if ( !isset($_POST['post_id']))
+          return 0;
+        $response['error'] = false;
+		$response['redirect'] = '';
+        $this->sync_comments($_POST['post_id']);
+		$redirect = get_admin_url() .'edit.php?post_type=instagrate_pro&message=16';
 		$response['redirect'] = $redirect;
         echo json_encode($response);
         die;
@@ -2572,9 +2964,19 @@ class instagrate_pro {
 					$data['['. $key .'] '. strtoupper($meta_key)] = $meta;
 				}
 				foreach( $account_settings as $setting_key => $setting ) {
-					if ($setting_key == 'post_term' && $setting != 0 ) {
-						$term = get_term( $setting, $account_settings['post_taxonomy'] );
-						$setting = $term->name; 	
+					if ($setting_key == 'post_term' ) {
+						$terms = $setting;
+	   					$term_text = '';
+	   					if ($terms) {
+		   					foreach ($terms as $term_selected) {
+			   					$term_add = get_term( $term_selected, $account_settings['post_taxonomy'] );
+			   					if ( !is_wp_error( $term_add ) ) $term_text .= $term_add->name .', ';
+		   					}
+		   					if (substr($term_text, -2) == ', ' ) $term_text = substr($term_text, 0, -2);
+		   				} else {
+	   						$term_text = 'Not Selected';
+	   					}
+						$setting = $term_text; 	
 					}
 					if ($setting_key == 'posting_same_post' && $setting != 0 && $account_settings['posting_multiple'] == 'single') {
 						$single_post = get_post( $setting );
@@ -2677,7 +3079,7 @@ class instagrate_pro {
 		return $special_chars;		
 	}
 	
-	function attach_image($url, $postid, $post_name) {
+	function attach_image($url, $postid, $post_name, $type = 'image') {
 		require_once(ABSPATH . "wp-admin" . '/includes/image.php');
 		require_once(ABSPATH . "wp-admin" . '/includes/file.php');
 		require_once(ABSPATH . "wp-admin" . '/includes/media.php');
@@ -2685,8 +3087,9 @@ class instagrate_pro {
 		$tmp = download_url( $url );
 		$file = basename( $url );
 		$info = pathinfo($file);
-	
-		$file_name = ($post_name == '') ? $file : $post_name;
+		
+		$image_id = $this->default_val($this->settings, 'igpsettings_general_image-save-name', '0');
+		$file_name = ($post_name == '' || $image_id == 1) ? $file : $post_name;
 		$file_name = sanitize_file_name($file_name);
 		$file_name = remove_accents($file_name);
 		$file_name = substr($file_name, 0, 100);
@@ -2699,16 +3102,16 @@ class instagrate_pro {
 		// Check for download errors
 		if ( is_wp_error( $tmp ) ) {
 			@unlink( $file_array[ 'tmp_name' ] );
-$this->make_debug('Attaching Image: '. $file_name);
-$this->make_debug('Error Attaching Image - download_url: '. $tmp->get_error_message());
+$this->make_debug('Attaching '. $type .': '. $file_name);
+$this->make_debug('Error Attaching '. $type .' - download_url: '. $tmp->get_error_message());
 			return 0;
 		}
 		$id = media_handle_sideload( $file_array, $postid );
 		// Check for handle sideload errors.
 		if ( is_wp_error( $id ) ) {
 			@unlink( $file_array['tmp_name'] );
-$this->make_debug('Attaching Image: '. $file_name);
-$this->make_debug('Error Attaching Image - media_handle_sideload: '. $id->get_error_message());
+$this->make_debug('Attaching '. $type .': '. $file_name);
+$this->make_debug('Error Attaching '. $type .' - media_handle_sideload: '. $id->get_error_message());
 			return 0;
 		} else return $id;
 	}
@@ -2720,21 +3123,28 @@ $this->make_debug('Error Attaching Image - media_handle_sideload: '. $id->get_er
 		if ( !isset($_POST['post_id']) || !isset($_POST['frequency']) )
             return 0;
         $response['error'] = false;
-        $response['message'] = '';
+        $response['message'] = '';	
 		$images = $this->post_account($_POST['post_id'], 'manual');
         $response['stats'] = $this->account_stats($_POST['post_id']);
 		$response['meta'] = 'Done';
 		$response['images'] = $images;
 		$count = 0;
-		$msg = "No images posted";
+		$msg = "No media posted";
 		if (is_array($images)) {
 			$count = sizeof($images);
-			$image_txt =  ($count > 1) ? ' images posted' : ' image posted';
+			$image_txt =  ($count > 1) ? ' media items posted' : ' media item posted';
 			$msg = $count . $image_txt;
 		}
 		$response['message'] = $msg;
         echo json_encode($response);
         die;
+	}
+	
+	function get_likes($atts, $content = null) {
+		extract(shortcode_atts(array(), $atts));
+		global $post; 
+		$likes = get_post_meta($post->ID, 'ig_likes', true);
+		return $likes;
 	}
 	
 	function get_map_shortcode($atts, $content = null) {
@@ -2761,8 +3171,148 @@ $this->make_debug('Error Attaching Image - media_handle_sideload: '. $id->get_er
 			}
 			$html .= 'style="width: '.$width. $width_type .'; height: '.$height. $height_type .';">';
 			$html .= '</div>';
+		} 
+		return $html;
+	}
+	
+	function get_multimap_shortcode($atts, $content = null) {
+		extract(shortcode_atts(array(	'style' => 'ROADMAP',
+										'class' => '',
+										'width' => '400',
+										'height' => '300',
+										'width_type' => 'pixel',
+										'height_type' => 'pixel'  ), $atts));
+		$html = '';
+		global $post;
+		$markers = get_post_meta($post->ID, '_igp_latlon', TRUE);
+		if (is_array($markers) && $markers && count($markers) > 0) {
+			$width_type = ($width_type == 'percent')? '%' : 'px';
+			$height_type = ($height_type == 'percent')? '%' : 'px';
+					
+			$html .= '<div class="multi_map_canvas '.$class.'" ';
+			$html .= 'data-markers="'. htmlspecialchars(json_encode($markers)) . '" ';
+			$html .= 'data-style="'.$style.'" ';
+			$html .= 'style="width: '.$width. $width_type .'; height: '.$height. $height_type .';">';
+			$html .= '</div>';
 		}
 		return $html;
+	}
+	
+	function get_embed($atts, $content = null) {
+		extract(shortcode_atts(array(	'url' => '',
+										'width' => '612',
+										'height' => '710' ), $atts));
+		$html = '';
+		if ($url != '') {
+			$html .= '<iframe src="'. $url .'" width="'. $width .'" height="'. $height .'" frameborder="0" scrolling="no" allowtransparency="true"></iframe>';
+		}
+		return $html;
+	}
+	
+	function get_video($atts, $content = null) {
+		$this->video_count += 1;
+		
+		if (empty($atts['src'])) {
+			return '';
+		}
+
+        $default = array(
+            'src' => '',
+            'title' => '',
+            'poster' => '',
+            'size' => 'large'
+        );
+        
+        extract(shortcode_atts($default, $atts));
+        
+		$dim = '620';
+		
+		switch ($size) {
+			case 'medium':
+				$dim = '460';
+				break;
+			case 'small':
+				$dim = '320';
+				break;
+			case 'large':
+				$dim = '620';
+				break;
+		}
+
+		$count = $this->video_count;
+		$jsurl = plugins_url('assets/js/jquery.jplayer/' , __FILE__ );
+		
+		$player = '
+			<script type="text/javascript">
+				//<![CDATA[
+				jQuery(document).ready(function($){ 
+					var videoHeight = "auto";
+					if ($.browser.mozilla) {
+						var realWidth = $("#jp_container_'. $count. '").parent().width();
+						if (realWidth > '. $dim .') realWidth = '. $dim .';
+						videoHeight = realWidth + "px";
+					}
+					$("#igp-jplayer-'. $count .'").jPlayer({
+						ready: function () {
+						  $(this).jPlayer("setMedia", {
+						    m4v: "'. $src .'",
+						    poster: "'. $poster. '"
+						  });
+						},
+						play: function() { // To avoid multiple jPlayers playing together.
+							$(this).jPlayer("pauseOthers");
+						},
+						swfPath: "'. $jsurl .'",
+						supplied: "m4v",
+						size: {
+							width: "100%",
+							height: videoHeight,
+							cssClass: "jp-video-'. $dim .'p"
+						},
+						cssSelectorAncestor: "#jp_container_'. $count. '"
+					});
+				});	
+				//]]>
+			</script>
+			<div id="jp_container_'. $count. '" class="jp-video jp-video-'. $dim .'p">
+				<div id="igp-jplayer-'. $count .'" class="jp-jplayer"></div>
+				<div class="jp-gui">
+					<div class="jp-video-play" style="display: block;">
+						<a class="jp-video-play-icon jp-play" tabindex="1" href="javascript:;">play</a>
+					</div>
+				   	<div class="jp-interface">
+				        <div class="jp-controls-holder">
+						    <a href="javascript:;" class="jp-play" tabindex="1">play</a>
+						    <a href="javascript:;" class="jp-pause" tabindex="1">pause</a>
+						    <span class="separator sep-1"></span>
+						    <div class="jp-progress">
+						        <div class="jp-seek-bar">
+									<div class="jp-play-bar"><span></span></div>
+								</div>
+						    </div>
+						    <div class="jp-current-time"></div>
+						    <span class="time-sep">/</span>
+						    <div class="jp-duration"></div>
+						    <span class="separator sep-2"></span>
+						    <a href="javascript:;" class="jp-mute" tabindex="1" title="mute">mute</a>
+						    <a href="javascript:;" class="jp-unmute" tabindex="1" title="unmute">unmute</a>
+						    <div class="jp-volume-bar">
+						        <div class="jp-volume-bar-value"><span class="handle"></span></div>
+						    </div>
+						    <span class="separator sep-2"></span>
+						    <a href="javascript:;" class="jp-full-screen" tabindex="1" title="full screen">full screen</a>
+						    <a href="javascript:;" class="jp-restore-screen" tabindex="1" title="restore screen">restore screen</a>
+							<a href="javascript:;" class="jp-repeat" tabindex="1" title="repeat">repeat</a>
+							<a href="javascript:;" class="jp-repeat-off" tabindex="1" title="repeat off">repeat off</a>
+				        </div>
+				    </div>
+				</div>
+				<div class="jp-no-solution">
+				    <span>Update Required</span>
+				    To play the media you will need to either update your browser to a recent version or update your <a href="http://get.adobe.com/flashplayer/" target="_blank">Flash plugin</a>.
+				</div>
+			</div>';
+		return str_replace("\r\n", '', $player);
 	}
 	
 	function make_debug($text, $divider = false) {
@@ -2802,10 +3352,11 @@ $this->make_debug('Error Attaching Image - media_handle_sideload: '. $id->get_er
 		if (ini_get('safe_mode')) $this->make_debug('Safe Mode On'); else @set_time_limit(0);
 		if ($frequency == '') $frequency = 'schedule';		
 		$account = get_post($account_id);
-		if ($account->post_status != 'publish') {
+		if (isset($account->post_status) && $account->post_status != 'publish') {
 $this->make_debug('Account not published');
 			return $this->write_debug($account_id);
 		}
+		if ($frequency == 'manual') $this->lock_account($account_id, false);
 		$account_settings = get_post_meta($account_id, '_instagrate_pro_settings', true );
 		if ($frequency == 'schedule') $schedule = $this->default_val($account_settings, 'posting_schedule', 'igp_daily');
 		// Check if Account locked
@@ -2821,6 +3372,7 @@ $this->make_debug('Account Now Locked');
 		$is_home = $this->default_val($this->settings, 'igpsettings_general_bypass-home', '0');
 		$dup_image = $this->default_val($this->settings, 'igpsettings_general_allow-duplicates', '0');
 		$default_title = $this->default_val($this->settings, 'igpsettings_general_default-title', 'Instagram Image');
+		$title_limit = $this->default_val($this->settings, 'igpsettings_general_title-limit', '');
 		$credit_link = $this->default_val($this->settings, 'igpsettings_general_credit-link', '0');
 $this->make_debug('Starting to Post Account: '. $account_id);
 $this->make_debug('Frequency: '. $frequency);
@@ -2838,7 +3390,7 @@ $this->make_debug('credit_link option: '. $credit_link);
 $this->make_debug('Account has empty token and last id');
 			return $this->write_debug($account_id);
 		}
-		
+		$settings->posting_frequency = (isset($settings->posting_frequency)) ? $settings->posting_frequency : 'constant';
 		// Check the account has the correct frequency
 		if ($frequency != $settings->posting_frequency) {
 $this->make_debug('Account frequency ('. $settings->posting_frequency .') is not the running frequency ('. $frequency .')');
@@ -2921,15 +3473,35 @@ $this->make_debug('Images to post: '. sizeof($images) );
 		$i = 0;
 		//Account specific settings
 		$wp_post_author = $settings->post_author;
-		$wp_post_category = $settings->post_term;
 		$wp_post_status = $settings->post_status;
 		$wp_post_type = $settings->post_type;
 		$wp_post_tax = $settings->post_taxonomy;
-		$wp_post_term = $settings->post_term;
+		$wp_post_term = isset($settings->post_term) ? $settings->post_term : array();
+		$media_filter = isset($settings->instagram_media_filter) ? $settings->instagram_media_filter : 'all'; 
+		$multimap = isset($settings->grouped_multi_map) ? $settings->grouped_multi_map : 'none'; 
+		
+		// Media Filtering
+		if ($media_filter != 'all') {
+			foreach ($images as $key => $image) {
+				if($image->media_type != $media_filter) {
+					$this->bulk_edit_status($account_id, 'ignore', $image->image_id);
+					$this->make_debug('Media Filter set as '. $media_filter .' - Instagram Media is '. $image->media_type);
+					unset($images[$key]);
+				}
+			}
+		}
 		
 		// Custom Featured image
 		$custom_feat_attach_id = get_post_thumbnail_id( $account_id );
 		
+		// Default Tags
+		$default_tags_all = wp_get_post_tags($account_id);
+		$default_tags = array();
+		if ($default_tags_all) {
+			foreach($default_tags_all as $tag_default) {
+				$default_tags[] = $tag_default->name;
+			}
+		}
 		if (!empty($tags)) {
 			foreach ($images as $key => $image) {
 				// Hashtag filtering on images
@@ -2940,7 +3512,8 @@ $this->make_debug('Images to post: '. sizeof($images) );
 					if (is_array($hashtags)) {
 						$tags = array_map('strtolower', $tags);
 						$hashtags = array_map('strtolower', $hashtags);
-						if(count(array_intersect($tags, $hashtags)) != count($tags)) {
+						if(count(array_intersect($tags, $hashtags)) < 1) {
+							$this->bulk_edit_status($account_id, 'ignore', $image->image_id);
 							unset($images[$key]);
 						}
 					}
@@ -2963,9 +3536,13 @@ $this->make_debug('Image not pending');
 						break;
 					}			
 					// Set up template tags for title
+					$this->template_instagram_media_type = $image->media_type;
+					$this->template_instagram_media_id = $image->image_id;
 					$this->template_caption = $image->caption_clean;
+					$this->template_caption_tags_no_hash = str_replace('#', '', $image->caption_clean);
 					$this->template_caption_no_tags = $image->caption_clean_no_tags;
 					$this->template_tags = implode(' ', unserialize($image->tags));
+					$this->template_tags_first = reset(unserialize($image->tags));
 					$this->template_username = $image->username;
 					$this->template_date = date( 'M d, Y @ H:i', $image->image_timestamp);
 					$this->template_filter = $image->filter;
@@ -2976,6 +3553,10 @@ $this->make_debug('Image not pending');
 					$template_tags = $this->get_template_tags('title');
 					// Custom title
 					$wp_post_title = $this->replace_template_tags($account->post_title, $template_tags, $default_title);
+					// Limit post title
+					if ($title_limit != '' && is_numeric($title_limit) && floor($title_limit) == $title_limit) {
+						$wp_post_title = substr($wp_post_title, 0, $title_limit);
+					}					
 					// Post date
 					$wp_post_date_gmt = date('Y-m-d H:i:s',current_time('timestamp',1) - (($count-$i) * 20));
 					$wp_post_date = date('Y-m-d H:i:s',current_time('timestamp',0) - (($count-$i) * 20));
@@ -2984,6 +3565,7 @@ $this->make_debug('Image not pending');
 						$wp_post_date = $instagram_date;
 						$wp_post_date_gmt = $wp_post_date;					
 					}
+					
 					// Insert post
 					$new_post = array(	'post_title' => $wp_post_title,
 										'post_content' => '',
@@ -2998,13 +3580,14 @@ $this->make_debug($new_post);
 					$new_post_id = wp_insert_post( $new_post );
 					$new_post = get_post($new_post_id);
 					// Post Tax and Term
-					if ($wp_post_tax != '0' && $wp_post_term != '0') {
-						$inserted_terms = wp_set_post_terms($new_post_id, array($wp_post_term), $wp_post_tax);
+					if ($wp_post_tax != '0' && $wp_post_term) {
+						$inserted_terms = wp_set_post_terms($new_post_id, $wp_post_term, $wp_post_tax);
 						if ( is_wp_error( $inserted_terms ) ) $this->make_debug('Error: Setting Tax Term - '. $inserted_terms->get_error_message());						
 					}
 					// Post Tags
 					if ($settings->post_tag_taxonomy != '0') {
 						$wp_post_tags = unserialize($image->tags);
+						$wp_post_tags = array_merge($wp_post_tags, $default_tags);
 						$inserted_terms = wp_set_post_terms($new_post_id, $wp_post_tags, $settings->post_tag_taxonomy, true);
 						if ( is_wp_error( $inserted_terms ) ) $this->make_debug('Error: Setting Tag Terms - '. $inserted_terms->get_error_message());						
 					}
@@ -3034,6 +3617,29 @@ $this->make_debug($new_post);
 						if ($custom_feat_attach_id) add_post_meta($new_post_id, '_thumbnail_id', $custom_feat_attach_id);
 					}
 					
+					// Post Video
+					$instagram_video = $image->video_url;
+					$wp_video_url = '';
+					if ($settings->post_save_media == 'on' && $image->media_type == 'video') { 
+						$file_name = $image->caption_clean;
+						if ($file_name == '') $file_name = $new_post->post_title;
+						$att_image = $this->strip_querysting($image->video_url);
+						// Load into media library
+						$attach_id = $this->attach_image($att_image, $new_post_id, $file_name, 'video' );
+						if ($attach_id != 0) {
+							// Get new shot image url from media attachment
+							$instagram_video = wp_get_attachment_url($attach_id);
+							$wp_video_url = $instagram_video;
+						}
+					} 
+					
+					// Comments 
+					if ($this->default_val($this->settings, 'igpsettings_comments_enable-comments', '0') == 1) {
+						$comments = $image->comments;
+						if ($comments != '' ) $comments = unserialize(base64_decode($image->comments));
+						$this->import_comments($settings->token, $comments, $image->image_id, $new_post_id, $image->id);
+					}
+					
 					// Location map (shortcode)
 					$map = '';
 					if($image->latitude != '' && $image->longitude != '') {
@@ -3041,10 +3647,15 @@ $this->make_debug($new_post);
 						$map = '[igp_map lat="'. $image->latitude .'" lon="'. $image->longitude .'" marker="'. $image->location_name .'" style="'. $settings->map_style .'" class="'. $settings->map_css .'" width="'. $settings->map_width .'" height="'. $settings->map_height .'" width_type="'. $settings->map_width_type .'" height_type="'. $settings->map_height_type .'"]';
 					}
 					$this->template_image = $instagram_image;
+					$this->template_video = $instagram_video;
 					$this->template_user_profile_url = 'http://instagram.com/'. $image->username;
 					$this->template_user_profile_image_url = $image->user_image_url;
-					$this->template_instagram_image_url = $image->link;
+					$this->template_instagram_url = $image->link;
+					$this->template_instagram_image_url = $image->image_url;
+					$this->template_instagram_video_url = $image->video_url;
+					$this->template_instagram_embed_url = str_replace('http:', '', $image->link) . 'embed/';
 					$this->template_wordpress_image_url = $wp_image_url;
+					$this->template_wordpress_video_url = $wp_video_url;
 					$this->template_wordpress_post_url = get_permalink( $new_post_id );
 					$this->template_map = $map;
 					// Template tags for content
@@ -3054,6 +3665,10 @@ $this->make_debug($new_post);
 					// Template tags for meta
 					$template_tags = $this->get_template_tags('meta');
 					// Post meta 
+					add_post_meta($new_post_id, '_igp_id', $image->id);
+					add_post_meta($new_post_id, '_igp_instagram_id', $image->image_id);
+					add_post_meta($new_post_id, 'ig_likes', $image->likes_count);
+
 					$account_meta = get_post_meta( $account_id );
 					foreach ($account_meta as $meta_key => $meta_value) {
 						// Add meta to new post
@@ -3082,9 +3697,13 @@ $this->make_debug($update_post);
 			break;
 			case 'group':
 				// Set up template tags for title
+				$this->template_instagram_media_type = '';
+				$this->template_instagram_media_id = '';
 				$this->template_caption = '';
+				$this->template_caption_tags_no_hash = '';
 				$this->template_caption_no_tags = '';
 				$this->template_tags = '';
+				$this->template_tags_first = '';
 				$this->template_username = '';
 				$this->template_date = '';
 				$this->template_filter = '';
@@ -3095,11 +3714,16 @@ $this->make_debug($update_post);
 				$template_tags = $this->get_template_tags('title');
 				// Custom title
 				$wp_post_title = $this->replace_template_tags($account->post_title, $template_tags, $default_title);
+				// Limit post title
+				if ($title_limit != '' && is_numeric($title_limit) && floor($title_limit) == $title_limit) {
+					$wp_post_title = substr($wp_post_title, 0, $title_limit);
+				}
 				// Post date
 				$wp_post_date_gmt = date('Y-m-d H:i:s', current_time('timestamp', 1));
 				$wp_post_date = date('Y-m-d H:i:s', current_time('timestamp', 0));
 				// Insert post
 				$wp_post_content = '';
+				$lat_lng = array();
 				$new_post = array(	'post_title' => $wp_post_title,
 									'post_content' => $wp_post_content,
 									'post_author' => $wp_post_author,
@@ -3113,8 +3737,8 @@ $this->make_debug($new_post);
 				$new_post_id = wp_insert_post( $new_post );
 				$new_post = get_post($new_post_id);
 				// Post Tax and Term
-				if ($wp_post_tax != '0' && $wp_post_term != '0') {
-					$inserted_terms = wp_set_post_terms($new_post_id, array($wp_post_term), $wp_post_tax);
+				if ($wp_post_tax != '0' && $wp_post_term) {
+					$inserted_terms = wp_set_post_terms($new_post_id, $wp_post_term, $wp_post_tax);
 					if ( is_wp_error( $inserted_terms ) ) $this->make_debug('Error: Setting Tax Term - '. $inserted_terms->get_error_message());						
 				}
 				// Post format
@@ -3130,6 +3754,7 @@ $this->make_debug('Image not pending');
 					}
 					if ($settings->post_tag_taxonomy != '0') {
 						$wp_post_tags = unserialize($image->tags);
+						$wp_post_tags = array_merge($wp_post_tags, $default_tags);
 						$inserted_terms = wp_set_post_terms($new_post_id, $wp_post_tags, $settings->post_tag_taxonomy, true);
 						if ( is_wp_error( $inserted_terms ) ) $this->make_debug('Error: Setting Terms - '. $inserted_terms->get_error_message());						
 					}
@@ -3157,15 +3782,39 @@ $this->make_debug('Image not pending');
 						if ($custom_feat_attach_id) update_post_meta($new_post_id, '_thumbnail_id', $custom_feat_attach_id);
 					}
 					
+					// Post Video
+					$instagram_video = $image->video_url;
+					$wp_video_url = '';
+					if ($settings->post_save_media == 'on' && $image->media_type == 'video') { 
+						$file_name = $image->caption_clean;
+						if ($file_name == '') $file_name = $new_post->post_title;
+						$att_image = $this->strip_querysting($image->video_url);
+						// Load into media library
+						$attach_id = $this->attach_image($att_image, $new_post_id, $file_name, 'video' );
+						if ($attach_id != 0) {
+							// Get new shot video url from media attachment
+							$instagram_video = wp_get_attachment_url($attach_id);
+							$wp_video_url = $instagram_video;
+						}
+					} 
+					
 					// Location map (shortcode)
 					$map = '';
 					if($image->latitude != '' && $image->longitude != '') {
-						update_post_meta($new_post_id, '_igp_latlon' , $image->latitude .','. $image->longitude);
+						$lat_lng[] = array(	'lat' => $image->latitude, 
+											'lng' => $image->longitude, 
+											'marker' => $image->location_name,
+											'image' => $instagram_image,
+										);
 						$map = '[igp_map lat="'. $image->latitude .'" lon="'. $image->longitude .'" marker="'. $image->location_name .'" style="'. $settings->map_style .'" class="'. $settings->map_css .'" width="'. $settings->map_width .'" height="'. $settings->map_height .'" width_type="'. $settings->map_width_type .'" height_type="'. $settings->map_height_type .'"]';
 					}
+					$this->template_instagram_media_type = $image->media_type;
+					$this->template_instagram_media_id = $image->image_id;
 					$this->template_caption = $image->caption_clean;
+					$this->template_caption_tags_no_hash = str_replace('#', '', $image->caption_clean);
 					$this->template_caption_no_tags = $image->caption_clean_no_tags;
 					$this->template_tags = implode(' ', unserialize($image->tags));
+					$this->template_tags_first = reset(unserialize($image->tags));
 					$this->template_username = $image->username;
 					$this->template_date = date( 'M d, Y @ H:i', $image->image_timestamp);
 					$this->template_filter = $image->filter;
@@ -3173,10 +3822,15 @@ $this->make_debug('Image not pending');
 					$this->template_location_lat = $image->latitude;
 					$this->template_location_lng = $image->longitude;
 					$this->template_image = $instagram_image;
+					$this->template_video = $instagram_video;
 					$this->template_user_profile_url = 'http://instagram.com/'. $image->username;
 					$this->template_user_profile_image_url = $image->user_image_url;
-					$this->template_instagram_image_url = $image->link;
+					$this->template_instagram_url = $image->link;
+					$this->template_instagram_image_url = $image->image_url;
+					$this->template_instagram_video_url = $image->video_url;
+					$this->template_instagram_embed_url = str_replace('http:', '', $image->link) . 'embed/';
 					$this->template_wordpress_image_url = $wp_image_url;
+					$this->template_wordpress_video_url = $wp_video_url;
 					$this->template_wordpress_post_url = get_permalink( $new_post_id );
 					$this->template_map = $map;
 					// Template tags for content
@@ -3190,9 +3844,16 @@ $this->make_debug('Image not pending');
 					$meta = array ( 'status' => 'posted' );
 					$this->save_image_meta($image->image_id, $account_id, $meta);
 				}
-				// Remove all but first occurrence of [gallery]
+				// Update post meta with Lat Lng
+				update_post_meta($new_post_id, '_igp_latlon' , $lat_lng);
 				
-				
+			
+				// Multi Map
+				if ($multimap != 'none') {
+					$multimap_sc = '[igp_multimap style="'. $settings->map_style .'" class="'. $settings->map_css .'" width="'. $settings->map_width .'" height="'. $settings->map_height .'" width_type="'. $settings->map_width_type .'" height_type="'. $settings->map_height_type .'"]';
+					$wp_post_content = ($multimap == 'top') ? $multimap_sc .'<br>'. $wp_post_content : $wp_post_content .'<br>'. $multimap_sc;
+				}
+		
 				// Credit links
 				if ($credit_link) {
 					$wp_post_content = $comment_credit . $wp_post_content . $link_credit;
@@ -3213,6 +3874,10 @@ $this->make_debug($update_post);
 				$old_content = $new_post->post_content;
 				// Add all images to Post Content
 				$wp_post_content = '';
+				$old_lat_lng = get_post_meta( $new_post_id, '_igp_latlon');
+				if (!is_array($old_lat_lng)) $old_lat_lng = array();
+				if (isset($old_lat_lng[0])) $old_lat_lng = $old_lat_lng[0];
+				$lat_lng = array();
 				foreach ($images as $image) {
 $this->make_debug('Image ID: '. $image->image_id, true);
 $this->make_debug('Image Status: '. $image->status);
@@ -3223,6 +3888,7 @@ $this->make_debug('Image not pending');
 					// Post Tags
 					if ($settings->post_tag_taxonomy != '0') {
 						$wp_post_tags = unserialize($image->tags);
+						$wp_post_tags = array_merge($wp_post_tags, $default_tags);
 						$inserted_terms = wp_set_post_terms($new_post_id, $wp_post_tags, $settings->post_tag_taxonomy, true);
 						if ( is_wp_error( $inserted_terms ) ) $this->make_debug('Error: Setting Terms - '. $inserted_terms->get_error_message());						
 					}
@@ -3250,15 +3916,39 @@ $this->make_debug('Image not pending');
 						if ($custom_feat_attach_id) update_post_meta($new_post_id, '_thumbnail_id', $custom_feat_attach_id);
 					}
 					
+					// Post Video
+					$instagram_video = $image->video_url;
+					$wp_video_url = '';
+					if ($settings->post_save_media == 'on' && $image->media_type == 'video') { 
+						$file_name = $image->caption_clean;
+						if ($file_name == '') $file_name = $new_post->post_title;
+						$att_image = $this->strip_querysting($image->video_url);
+						// Load into media library
+						$attach_id = $this->attach_image($att_image, $new_post_id, $file_name, 'video' );
+						if ($attach_id != 0) {
+							// Get new shot video url from media attachment
+							$instagram_video = wp_get_attachment_url($attach_id);
+							$wp_video_url = $instagram_video;
+						}
+					} 
+					
 					// Location map (shortcode)
 					$map = '';
 					if($image->latitude != '' && $image->longitude != '') {
-						update_post_meta($new_post_id, '_igp_latlon' , $image->latitude .','. $image->longitude);
+						$lat_lng[] = array(	'lat' => $image->latitude, 
+											'lng' => $image->longitude, 
+											'marker' => $image->location_name,
+											'image' => $instagram_image,
+										);
 						$map = '[igp_map lat="'. $image->latitude .'" lon="'. $image->longitude .'" marker="'. $image->location_name .'" style="'. $settings->map_style .'" class="'. $settings->map_css .'" width="'. $settings->map_width .'" height="'. $settings->map_height .'" width_type="'. $settings->map_width_type .'" height_type="'. $settings->map_height_type .'"]';
 					}
+					$this->template_instagram_media_type = $image->media_type;
+					$this->template_instagram_media_id = $image->image_id;
 					$this->template_caption = $image->caption_clean;
+					$this->template_caption_tags_no_hash = str_replace('#', '', $image->caption_clean);
 					$this->template_caption_no_tags = $image->caption_clean_no_tags;
 					$this->template_tags = implode(' ', unserialize($image->tags));
+					$this->template_tags_first = reset(unserialize($image->tags));
 					$this->template_username = $image->username;
 					$this->template_date = date( 'M d, Y @ H:i', $image->image_timestamp);
 					$this->template_filter = $image->filter;
@@ -3266,10 +3956,15 @@ $this->make_debug('Image not pending');
 					$this->template_location_lat = $image->latitude;
 					$this->template_location_lng = $image->longitude;
 					$this->template_image = $instagram_image;
+					$this->template_video = $instagram_video;
 					$this->template_user_profile_url = 'http://instagram.com/'. $image->username;
 					$this->template_user_profile_image_url = $image->user_image_url;
-					$this->template_instagram_image_url = $image->link;
+					$this->template_instagram_url = $image->link;
+					$this->template_instagram_image_url = $image->image_url;
+					$this->template_instagram_video_url = $image->video_url;
+					$this->template_instagram_embed_url = str_replace('http:', '', $image->link) . 'embed/';
 					$this->template_wordpress_image_url = $wp_image_url;
+					$this->template_wordpress_video_url = $wp_video_url;
 					$this->template_wordpress_post_url = get_permalink( $new_post_id );
 					$this->template_map = $map;
 					// Template tags for content
@@ -3283,6 +3978,10 @@ $this->make_debug('Image not pending');
 					$meta = array ( 'status' => 'posted' );
 					$this->save_image_meta($image->image_id, $account_id, $meta);
 				}
+				// Update post meta with Lat Lng
+				$lat_lng = array_merge($old_lat_lng, $lat_lng);
+				update_post_meta($new_post_id, '_igp_latlon' , $lat_lng);
+				
 				// Update post
 				$update_post = array();
 				$update_post['ID'] = $new_post_id;
@@ -3322,24 +4021,36 @@ $this->make_debug($update_post);
 		return $images;
 	}
 	
-	function controller() {
+	private function master_controller($frequency) {
 		// Check if debug mode is on
 		$this->debug_mode = $this->default_val($this->settings, 'igpsettings_support_debug-mode', '0');
-$this->make_debug('Starting the controller for accounts that post constantly');
-		// Follow only real time, constant posting accounts
+$this->make_debug('Starting the controller for accounts with the frequency '. $frequency);
+
 		$accounts = $this->get_accounts('publish');
 $this->make_debug('Total accounts: '. sizeof($accounts) );
 		if(isset($accounts) && $accounts) {
 			foreach($accounts as $key => $account) {
 				$account_settings = get_post_meta($key, '_instagrate_pro_settings', true );
 $this->make_debug('Account: '.  $key);
-				// Check if constant			
-				if ($this->default_val($account_settings, 'posting_frequency', 'constant')  == 'constant') {
-$this->make_debug('Account: '.  $key. ' is a constant poster. Run the posting function');
-					$this->post_account($key, 'constant', '');
+				// Check if correct frequency			
+				if ($this->default_val($account_settings, 'posting_frequency', 'constant')  == $frequency) {
+$this->make_debug('Account: '.  $key. ' is a '. $frequency .' poster. Run the posting function');
+					
+					if ($frequency == 'cron') $this->lock_account($key, false);
+					
+					$this->post_account($key, $frequency, '');
 				}
 			}
 		}
+	}
+	
+	function controller() {
+		$this->master_controller('constant');
+	}
+	
+	function cron_controller() {
+		instagrate_pro::master_controller('cron');
+	    exit;
 	}
 	
 	function set_schedule($account_id, $day, $time, $frequency) {
@@ -3488,7 +4199,7 @@ $this->make_debug('Account: '.  $key. ' is a constant poster. Run the posting fu
 				$new_account_meta['post_type'] = $old_options[$tag. '_post_type'];
 				if ($old_options[$tag. '_post_type'] == 'post') {
 					$new_account_meta['post_taxonomy'] = 'category';
-					$new_account_meta['post_term'] = $old_options[$tag. '_post_category'];
+					$new_account_meta['post_term'] = (array)$old_options[$tag. '_post_category'];
 					if ($old_options[$tag. '_tags'] == 'true') $new_account_meta['post_tag_taxonomy'] = 'post_tag';
 				}
 				$new_account_meta['post_author'] = $old_options[$tag. '_post_author'];
@@ -3592,7 +4303,220 @@ $this->make_debug('Account: '.  $key. ' is a constant poster. Run the posting fu
 		delete_option('pvw_igp_accounts'); 
 		
 	}
+	
+	function migrate_one_two() {
+		$accounts = $this->get_accounts('publish');
+		global $wpdb;
+		
+		if(isset($accounts) && $accounts) {
+			foreach($accounts as $key => $account) {
+				$title_template = $account['custom_title'];
+				
+				$images = $this->get_images($key, 'posted');
 
+				if(isset($images) && $images) {
+					foreach($images as $image) {
+						// Set up template tags for title
+						$this->template_caption = $image->caption_clean;
+						$this->template_caption_tags_no_hash = str_replace('#', '', $image->caption_clean);
+						$this->template_caption_no_tags = $image->caption_clean_no_tags;
+						$this->template_tags = implode(' ', unserialize($image->tags));
+						$this->template_tags_first = reset(unserialize($image->tags));
+						$this->template_username = $image->username;
+						$this->template_date = date( 'M d, Y @ H:i', $image->image_timestamp);
+						$this->template_filter = $image->filter;
+						$this->template_location_name = $image->location_name;
+						$this->template_location_lat = $image->latitude;
+						$this->template_location_lng = $image->longitude;
+						// Template tags for title
+						$template_tags = $this->get_template_tags('title');
+						// Custom title
+						$wp_post_title = $this->replace_template_tags($title_template, $template_tags, 'migrate_one_two');
+						
+						$post_table = $wpdb->prefix .'posts';
+											
+						$querystr = $wpdb->prepare( "	SELECT ID 
+														FROM $post_table  
+														WHERE post_title = %s
+														AND post_status = 'publish' ", $wp_post_title );
+
+						$posts = $wpdb->get_results($querystr, OBJECT);
+			
+						foreach($posts as $post) {
+							update_post_meta($post->ID, '_igp_id', $image->id);
+							update_post_meta($post->ID, 'ig_likes', $image->likes_count);
+						}
+					}
+				}				
+			}
+		}
+		
+	}
+	
+	function sync_likes($account_id = 0) {
+		$access_token = '';
+		//get all likes count from instagram on images in _igp_images table
+		$acc_where = '';
+		if($account_id == 0) {
+			$accounts = $this->get_accounts('publish');
+			if(isset($accounts) && $accounts && count($accounts) > 0) {
+				$account_id = key($accounts);
+			}
+		} else $acc_where = 'AND account_id = '. $account_id;
+		if ($account_id == 0) return;
+		
+		$account_settings = get_post_meta($account_id, '_instagrate_pro_settings', true );
+		$settings = (object)$account_settings;
+		if (isset($settings->token) && $settings->token != '') $access_token = $settings->token;
+		
+		if ($access_token == '') return;
+		
+		global $wpdb;
+		$table = $wpdb->prefix . $this->plugin_table;
+		$images = $wpdb->get_results("SELECT * FROM $table WHERE status = 'posted' $acc_where");
+		foreach($images as $image) {
+			$image_id = $image->image_id;
+			$media = $this->instagram_get_media($access_token, $image_id);
+			$likes = $media->likes->count;
+			$wpdb->query( "UPDATE $table SET likes_count = $likes WHERE image_id = '$image_id'"	);			
+		}
+		$meta_table = $wpdb->prefix .'postmeta';
+		$post_table = $wpdb->prefix .'posts';
+		//sync those like counts across posts that have been created
+		$wpdb->query( 
+				"UPDATE $meta_table a
+				INNER JOIN $meta_table b
+					ON a.post_id = b.post_id
+					AND b.meta_key = '_igp_id'
+						INNER JOIN $table c
+						ON b.meta_value = c.id 
+				SET a.meta_value = c.likes_count
+				WHERE a.meta_key = 'ig_likes'"
+		);	
+	}
+	
+	function instagram_avatar($avatar, $id_or_email, $size, $default, $alt) {
+		if ( $this->default_val($this->settings, 'igpsettings_comments_avatar', '1') == 0 ) 
+			return $avatar;
+		$comment = $id_or_email;
+		if (!isset($comment->comment_ID))
+			return $avatar;
+		$return = $avatar;
+		$ig_avatar = get_comment_meta($comment->comment_ID, '_igp_comment_avatar', true);	
+		if ($ig_avatar) {
+			$return = "<img alt='{$comment->comment_author} profile image' src='{$ig_avatar}' class='avatar avatar-{$size} photo' height='{$size}' width='{$size}' />";
+		}
+		return $return;
+	}
+	
+	function get_comments($access_token = '', $image_id, $account_id = 0) {
+		if ($access_token == '') {
+			$account_settings = get_post_meta($account_id, '_instagrate_pro_settings', true );
+			$access_token = $account_settings['token'];
+		}	
+		$comments = $this->instagram_get_media_comments($access_token, $image_id);
+		return $comments;
+	}
+		
+	function import_comments($access_token, $comments, $image_id, $post_id, $id, $sync = false) {
+		global $wpdb;
+		if ($comments == '') {
+			$comments = $this->get_comments($access_token, $image_id);
+			$data = array(
+				'comments' => (isset($comments)) ? base64_encode(serialize($comments)) : array(),
+			);
+			$where = array( 'id' => $id	);
+			$wpdb->update($wpdb->prefix . $this->plugin_table , $data, $where);
+		} 
+		
+		$meta_table = $wpdb->prefix .'commentmeta';
+		
+		foreach($comments as $comment) {
+			$querystr = "	SELECT count(*) 
+							FROM $meta_table m 
+							WHERE m.meta_key = '_igp_comment_id'
+							AND m.meta_value = '$comment->id'	";
+			$exists = $wpdb->get_var($querystr);
+			
+			if($exists > 0) continue;
+						
+			$content = $comment->text;
+			if ($this->default_val($this->settings, 'igpsettings_comments_mentions', '1') == 1) {
+				$content = preg_replace("/@(\w+)/", "<a href=\"http://instagram.com/\\1\" target=\"_blank\">@\\1</a>", $content);
+			}	
+			// set comment data
+			$data = array(
+			    'comment_post_ID' => $post_id,
+			    'comment_author' => $comment->from->username,
+			    'comment_author_email' => '@instagram_igp',
+			    'comment_author_url' => 'http://instagram.com/'. $comment->from->username,
+			    'comment_content' => $content,
+			    'comment_type' => '',
+			    'comment_parent' => 0,
+			    'user_id' => 0,
+			    'comment_author_IP' => '127.0.0.1',
+			    'comment_agent' => 'Mozilla/5.0 (Windows; U; Windows NT 5.1; en-US; rv:1.9.0.10) Gecko/2009042316 Firefox/3.0.10 (.NET CLR 3.5.30729)',
+			    'comment_date' => date('Y-m-d H:i:s', $comment->created_time),
+			    'comment_approved' => $this->default_val($this->settings, 'igpsettings_comments_auto-approve', '0'),
+			);
+						
+			$comment_id = wp_insert_comment($data);
+			
+			//set comment meta ig comment id
+			add_comment_meta( $comment_id, '_igp_comment_id', $comment->id, true ); 
+			//set comment meta with user image url
+			add_comment_meta( $comment_id, '_igp_comment_avatar', $comment->from->profile_picture, true ); 
+			
+		}	
+	}
+	
+	function sync_comments($account_id = 0) {
+		
+		if ($this->default_val($this->settings, 'igpsettings_comments_enable-comments', '0') == 0) 
+			return;
+		
+		$access_token = '';
+		$acc_where = '';
+		if($account_id == 0) {
+			$accounts = $this->get_accounts('publish');
+			if(isset($accounts) && $accounts && count($accounts) > 0) {
+				$account_id = key($accounts);
+			}
+		} else $acc_where = 'AND account_id = '. $account_id;
+		if ($account_id == 0) return;
+		
+		$account_settings = get_post_meta($account_id, '_instagrate_pro_settings', true );
+		$settings = (object)$account_settings;
+		if (isset($settings->token) && $settings->token != '') $access_token = $settings->token;
+		
+		if ($access_token == '') return;
+		
+		global $wpdb;
+		$table = $wpdb->prefix . $this->plugin_table;
+		$images = $wpdb->get_results("SELECT * FROM $table WHERE status = 'posted' $acc_where");
+		foreach($images as $image) {
+			//get posts with the ig_id
+			$meta_table = $wpdb->prefix .'postmeta';
+			$post_table = $wpdb->prefix .'posts';
+			$querystr = "	SELECT post_id 
+							FROM $meta_table m 
+							WHERE m.meta_key = '_igp_id'
+							AND m.meta_value = '$image->id'	";
+
+			$posts = $wpdb->get_results($querystr, OBJECT);
+			
+			foreach($posts as $post) {
+				$this->import_comments($access_token, '', $image->image_id, $post->post_id, $image->id, true);
+			}					
+		}
+
+	}
+	
+	function sync_all_comments_likes(){
+		instagrate_pro::sync_comments();
+	    instagrate_pro::sync_likes();
+	    exit;
+	}
 }
 new instagrate_pro();
 

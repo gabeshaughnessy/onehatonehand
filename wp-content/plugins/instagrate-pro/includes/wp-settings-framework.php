@@ -8,11 +8,11 @@
  * @license MIT
  */
 
-if( !class_exists('WordPressSettingsFramework') ){
+if( !class_exists('igpWordPressSettingsFramework') ){
     /**
-     * WordPressSettingsFramework class
+     * igpWordPressSettingsFramework class
      */
-    class WordPressSettingsFramework {
+    class igpWordPressSettingsFramework {
     
         /**
          * @access private
@@ -92,15 +92,15 @@ if( !class_exists('WordPressSettingsFramework') ){
     	}
     	
     	/**
-         * Displays the "section_description" if speicified in $wpsf_settings
+         * Displays the "section_description" if speicified in $wpsfigp_settings
          *
          * @param array callback args from add_settings_section()
          */
     	function section_intro( $args )
     	{
-        	global $wpsf_settings;
-        	if(!empty($wpsf_settings)){
-        		foreach($wpsf_settings as $section){
+        	global $wpsfigp_settings;
+        	if(!empty($wpsfigp_settings)){
+        		foreach($wpsfigp_settings as $section){
                     if($section['section_id'] == $args['id']){
                         if(isset($section['section_description']) && $section['section_description']) echo '<p>'. $section['section_description'] .'</p>';
                         break;
@@ -110,14 +110,14 @@ if( !class_exists('WordPressSettingsFramework') ){
     	}
     	
     	/**
-         * Processes $wpsf_settings and adds the sections and fields via the WordPress settings API
+         * Processes $wpsfigp_settings and adds the sections and fields via the WordPress settings API
          */
     	function process_settings()
     	{
-            global $wpsf_settings;
-        	if(!empty($wpsf_settings)){
-        	    usort($wpsf_settings, array(&$this, 'sort_array'));
-        		foreach($wpsf_settings as $section){
+            global $wpsfigp_settings;
+        	if(!empty($wpsfigp_settings)){
+        	    usort($wpsfigp_settings, array(&$this, 'sort_array'));
+        		foreach($wpsfigp_settings as $section){
             		if(isset($section['section_id']) && $section['section_id'] && isset($section['section_title'])){
                 		add_settings_section( $section['section_id'], $section['section_title'], array(&$this, 'section_intro'), $this->option_group );
                 		if(isset($section['fields']) && is_array($section['fields']) && !empty($section['fields'])){
@@ -133,7 +133,7 @@ if( !class_exists('WordPressSettingsFramework') ){
     	}
     	
     	/**
-         * Usort callback. Sorts $wpsf_settings by "section_order"
+         * Usort callback. Sorts $wpsfigp_settings by "section_order"
          * 
          * @param mixed section order a
          * @param mixed section order b

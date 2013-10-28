@@ -436,11 +436,16 @@ function makePortfolioCycles(){
 			resizePortfolioSections();
 		});
 		function afterCycle(currSlideElement, nextSlideElement, options, forwardFlag){
+			//Stop video Playback
+			videoElement = jQuery(currSlideElement).find('iframe');
+			if(videoElement){
+				videoSrc = jQuery(videoElement).attr('src');
+				jQuery(videoElement).attr('src', '');
+				jQuery(videoElement).attr('src', videoSrc);
+			}
 
 			var nextslide = jQuery(nextSlideElement).attr('data-target');
 			var currslide = jQuery(currSlideElement).attr('data-target');
-			console.log('next slide: ', nextslide);
-			console.log('current slide: ', currslide);
 			
 			if(jQuery(nextSlideElement).parent().parent().attr('id') == 'portfolio'){
 				if(nextslide.indexOf('hh_project/portfolio-page') >= 0){
@@ -552,6 +557,7 @@ function makeCaseStudyCycles(){
 		    pager:  '#case-study-nav', 
 		    next: '#case-studies .next',
 		    prev: '#case-studies .prev',
+		    after: afterCycle,
 		     
 		    // callback fn that creates a thumbnail to use as pager anchor 
 		    pagerAnchorBuilder: function(idx, slide) { 
@@ -574,6 +580,14 @@ function makeCaseStudyCycles(){
 			resizePortfolioSections();
 		});
 		function afterCycle(currSlideElement, nextSlideElement, options, forwardFlag){
+			//Stop video Playback
+			videoElement = jQuery(currSlideElement).find('iframe');
+			if(videoElement){
+				videoSrc = jQuery(videoElement).attr('src');
+				jQuery(videoElement).attr('src', '');
+				jQuery(videoElement).attr('src', videoSrc);
+			}
+
 			if(jQuery(nextSlideElement).hasClass('isotope-grid')){
 				var $container = jQuery('.filter-target');
 				if($container.length > 0){

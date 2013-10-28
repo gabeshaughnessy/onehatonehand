@@ -124,7 +124,9 @@
 		 			if ( $media_query->have_posts() ) : while ( $media_query->have_posts() ) : $media_query->the_post(); 
 	 				$id = get_the_ID();
 					$tour_items .= '<li id="post_'.$id.'" class="instagram listing" data-target="'.get_permalink().'">';
+					$tour_items .= '<a href="'.wp_get_attachment_url( get_post_thumbnail_id($id) ).'">';
 					$tour_items .= get_the_post_thumbnail($id,  array(200,200), array('class' => 'no-texture'));
+					$tour_items .= '</a>';
 					$tour_items .= '</li>';
 					 endwhile;
 					 endif;
