@@ -444,7 +444,7 @@ function makePortfolioCycles(){
 		});
 		function afterCycle(currSlideElement, nextSlideElement, options, forwardFlag){
 			nextElementID = jQuery(nextSlideElement).attr('data-target');
-			if(nextElementID.indexOf('shop-tour') != -1){		
+			if(nextElementID != undefined && nextElementID.indexOf('shop-tour') != -1){		
 				playAnimation("animate-shop-tour");
 			}
 			//Stop video Playback
