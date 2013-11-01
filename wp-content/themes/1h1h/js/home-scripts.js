@@ -443,7 +443,8 @@ function makePortfolioCycles(){
 			resizePortfolioSections();
 		});
 		function afterCycle(currSlideElement, nextSlideElement, options, forwardFlag){
-			if(jQuery(nextSlideElement).attr('data-target') == 'http://onehatonehand/our-shop/shop-tour/'){		
+			nextElementID = jQuery(nextSlideElement).attr('data-target');
+			if(nextElementID.indexOf('shop-tour') != -1){		
 				playAnimation("animate-shop-tour");
 			}
 			//Stop video Playback
