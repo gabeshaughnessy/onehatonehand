@@ -79,7 +79,7 @@ wp_deregister_script('jquery');
 	wp_enqueue_script('modernizr', get_template_directory_uri() . '/js/modernizr.js', array('jquery') );
 	
 	wp_enqueue_script('touch-punch',
-		get_template_directory_uri() . '/js/jquery.touchPunch.min.js',
+		get_template_directory_uri() . '/js/jQuery.touchPunch.min.js',
 		array('jquery'), false);	
 
 	wp_enqueue_script('touchwipe',get_template_directory_uri() . '/js/jquery.touchwipe.min.js',array('jquery'));	
