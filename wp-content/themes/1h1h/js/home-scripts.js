@@ -771,6 +771,7 @@ jQuery(window).load(function(){
 		    jQuery('#portfolio-nav').slideUp('fast');
 		    jQuery('#portfolio .nav-tab').hide();
 			  playAnimation("animate-shop-tour");
+			  jQuery('#tour .portfolio-wrapper').cycle(0);
 		  	  	 } //end in view
 	  	  
   	  else {
