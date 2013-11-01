@@ -85,10 +85,23 @@ jQuery(document).ready(function($){
 	if($('select[name="_instagrate_pro_settings[posting_frequency]"] option:selected').val() == 'manual') $('.manual').show();
     
 	$('select[name="_instagrate_pro_settings[posting_frequency]"]').change(function(){
-		if($('option:selected', this).val() == 'manual') $('.manual').show();
+		if($('option:selected', this).val() == 'manual') {
+			$('.manual').show();
+			var post_id = $('#post_ID').val();
+			$.post(ajaxurl, 
+	            { action:'igp_manual_frequency',
+	              post_id: post_id,
+				  nonce: instagrate_pro.nonce }, 
+	            function(data){}
+	         , 'json');
+	        return false;
+		}
 		else $('.manual').hide();
     });
 	
+	$('.grouped').hide();
+	$('.single_post').hide();
+		
 	// Multiple Images - Single
 	if($('select[name="_instagrate_pro_settings[posting_multiple]"] option:selected').val() == 'single') $('.single_post').show();
    
@@ -552,7 +565,7 @@ jQuery(document).ready(function($){
 				var i = 0;
 				$.each(data.images, function(key, val) {
 					i++;
-					$('#igp-images').append('<li><a class="edit-image" rel="' + val.id + '" href="#"><img class="pending" width="70" alt="" src="' + val.images.thumbnail.url +'"></a><input id="' + val.id + '" class="igp-bulk" type="checkbox"></li>');
+					$('#igp-images').append('<li><a class="edit-image ' + val.type + '" rel="' + val.id + '" href="#"><img class="pending" width="70" alt="" src="' + val.images.thumbnail.url +'"><span class="video-ind"></span></a><input id="' + val.id + '" class="igp-bulk" type="checkbox"></li>');
 				});
 				$('input[name="_instagrate_pro_settings[next_url]"]').val(data.next_url);
 				$('input[name="_instagrate_pro_settings[last_id]"]').val(data.last_id);

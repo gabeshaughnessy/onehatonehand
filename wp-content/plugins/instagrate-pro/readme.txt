@@ -5,7 +5,7 @@ Author URI: http://www.polevaultweb.com/
 Tags: instagram, posts, integration, automatic, post, wordpress, posting, images
 Requires at least: 3.0
 Tested up to: 3.6
-Stable tag: 1.4
+Stable tag: 1.4.2
 
 The best plugin to automatically integrate Instagram images with WordPress.
 
@@ -30,6 +30,22 @@ To update the plugin either use the automatic updater or manually follow these s
 4. Activate the plugin through the 'Plugins' menu in WordPress.
 
 == Changelog ==
+
+= 1.4.2 =
+
+* New - Ability to set the Caption of an image when saving to media library. Full control with template tags and a filter: igp_image_caption.
+* New - Title length limit options - characters, words.
+* New - Post title filter: igp_post_title
+* Fix - Map CSS issue.
+
+= 1.4.1 =
+
+* New - Map zoom level setting.
+* Improvement - For WordPress 3.6 installs [igp-video] uses the default HTML video player in WordPress.
+* Fix - Bug when frequency changes to 'Manual' then button pressed straight away didn't work.
+* Fix - Videos in admin didn't have icon when stream changed.
+* New - Icon changed to new logo.
+
 
 = 1.4 =
 

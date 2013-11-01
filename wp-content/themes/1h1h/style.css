@@ -744,8 +744,11 @@ cursor: pointer;
 .full-width.wrapper .page-content {
 	width:  100%;
 }
-.tour-entry.full-width {
-	margin-top: 115px;
+.tour-entry.full-width{
+	margin-top: 85px;
+}
+.tour-entry.edge-animation{
+	margin-top: 150px;
 }
 .page-template-page-tour-php .tour-entry.full-width {
 		margin-top: 0px;
@@ -1095,3 +1098,17 @@ background:  transparent url(images/hatches50px.png) repeat; }
 	height: 500px !important;
 	overflow:  scroll;
 }
+
+/* EDGE ANIMATION TEMPLATE */
+.page-template-page-animation-php .section.edge-animation {
+	padding-top: 80px;
+}
+.wrapper.edge-animation, .section.edge-animation .wrapper{
+	text-align: center;
+	width:100%;
+}
+.section .edge-animation .content {
+	cursor: pointer;
+}
+.page-template-page-animation-php .edge-animation.wrapper > div { margin: auto;}
+.edge-animation.wrapper .content > div { margin: auto;}

@@ -17,9 +17,17 @@ $wpsfigp_settings[] = array(
             'std' => 'Instagram Image'
         ),
         array(
+            'id' => 'title-limit-type',
+            'title' => __( 'Title Length Limit', $plugin_l10n ),
+            'desc' => __( 'Set type of length limit.', $plugin_l10n ),
+            'type' => 'select',
+            'choices' => array('characters' => 'Characters', 'words' => 'Words'),
+            'std' => 'characters'
+        ),
+        array(
             'id' => 'title-limit',
             'title' => __( 'Title Length Limit', $plugin_l10n ),
-            'desc' => __( 'Enter a number of characters to limit the title length. Leave blank for no limit.', $plugin_l10n ),
+            'desc' => __( 'Enter a number of characters/words to limit the title length. Leave blank for no limit.', $plugin_l10n ),
             'type' => 'text',
             'std' => ''
         ),
@@ -59,6 +67,13 @@ $wpsfigp_settings[] = array(
             'desc' => __( 'When saving the images to the media library the filename will be the caption. However, by checking this box it will save the images with the Instagram image ID as the filename e.g. c6077c14fe0a11e2b55e22000a9f09fb_7.jpg. This avoids any issues with non standard characters in the filename which can lead to the images not being displayed.', $plugin_l10n ),
             'type' => 'checkbox',
             'std' => 0
+        ),
+        array(
+            'id' => 'image-caption',
+            'title' => __( 'Add Caption to Saved Image', $plugin_l10n ),
+            'desc' => __( 'When saving images to the media library this will add the "Caption" based on the above text allowing tags (eg. %%caption%% or %%caption-no-tags%%). Also runs through a filter "igp_image_caption". Leave blank for no caption.', $plugin_l10n ),
+            'type' => 'text',
+            'std' => '%%caption-no-tags%%'
         ),
          array(
             'id' => 'lightbox-rel',
