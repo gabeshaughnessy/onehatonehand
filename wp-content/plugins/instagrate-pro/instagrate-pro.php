@@ -4,7 +4,7 @@ Plugin Name: Instagrate Pro
 Plugin URI: http://www.instagrate.co.uk/  
 Description: Instagrate Pro is a powerful WordPress plugin that allows you to automatically integrate Instagram images into your WordPress site.
 Author: polevaultweb 
-Version: 1.4
+Version: 1.4.2
 Author URI: http://www.polevaultweb.com/
 
 Copyright 2012  polevaultweb  (email : info@polevaultweb.com)
@@ -80,7 +80,7 @@ class instagrate_pro {
         // Set up default vars
         $this->plugin_path = plugin_dir_path( __FILE__ );
         $this->plugin_url = plugin_dir_url( __FILE__ );
-		$this->plugin_version = '1.4';
+		$this->plugin_version = '1.4.2';
 		$this->plugin_db_version = '1.3';
         $this->plugin_table = 'igp_images';
 		$this->plugin_l10n = 'instagrate-pro';
@@ -189,6 +189,7 @@ class instagrate_pro {
 		add_action('wp_ajax_igp_load_images', array(&$this,'igp_load_images_callback'));
 		add_action('wp_ajax_igp_load_meta', array(&$this,'igp_load_meta_callback'));
 		add_action('wp_ajax_igp_save_meta', array(&$this,'igp_save_meta_callback'));
+		add_action('wp_ajax_igp_manual_frequency', array(&$this,'igp_manual_frequency_callback'));
 		add_action('wp_ajax_igp_bulk_edit_status', array(&$this,'igp_bulk_edit_status_callback'));
 		add_action('wp_ajax_igp_disconnect', array(&$this,'igp_disconnect_callback'));
 		add_action('wp_ajax_igp_change_stream', array(&$this,'igp_change_stream_callback'));
@@ -218,7 +219,7 @@ class instagrate_pro {
 		
 		// Auto updates via wp-updates.com
 		require_once('includes/wp-updates-plugin.php');
-		new WPUpdatesPluginUpdater_200( 'http://wp-updates.com/api/1/plugin', plugin_basename(__FILE__));
+		new WPUpdatesPluginUpdater_200( 'http://wp-updates.com/api/2/plugin', plugin_basename(__FILE__));
 
     }
     
@@ -1280,7 +1281,7 @@ class instagrate_pro {
 				</div>
 				<table class="form-table igp-admin"> 
 					<tr valign="top">
-						<th scope="row"><?php _e('Image Stream', $this->plugin_l10n); ?></th>
+						<th scope="row"><?php _e('Media Stream', $this->plugin_l10n); ?></th>
 						<td>
 							<select name="_instagrate_pro_settings[instagram_images]">
 								<option value="recent"<?php if($this->default_val($options, 'instagram_images', 'recent') == 'recent') echo ' selected="selected"'; ?>><?php _e('My Recent Media', $this->plugin_l10n); ?></option>
@@ -1878,6 +1879,12 @@ class instagrate_pro {
 						<option value="pixel"<?php if($this->default_val($options, 'map_height_type', 'pixel') == 'pixel') echo ' selected="selected"'; ?>>px</option>
 						<option value="percent"<?php if($this->default_val($options, 'map_height_type', '') == 'percent') echo ' selected="selected"'; ?>>%</option>
 					</select>
+				</td>
+            </tr>
+            <tr valign="top">
+                <th scope="row"><?php _e('Zoom Level', $this->plugin_l10n); ?></th>
+                <td>
+					<input type="text" class="small-text" name="_instagrate_pro_settings[map_zoom]" value="<?php echo $this->default_val($options, 'map_zoom', '15'); ?>" />
 				</td>
             </tr>
 		</table>
@@ -2651,6 +2658,21 @@ class instagrate_pro {
 		return $meta;	
 	}
 	
+	function igp_manual_frequency_callback() {
+		if ( !isset($_POST['nonce']) || !wp_verify_nonce( $_POST['nonce'], 'instagrate_pro' ))
+            return 0;
+		if ( !isset($_POST['post_id']) )
+            return 0;
+        $response['error'] = false;
+        $response['message'] = '';
+        $old_post_meta = get_post_meta($_POST['post_id'], '_instagrate_pro_settings', true );
+		$old_post_meta['posting_frequency'] = 'manual';
+		update_post_meta($_POST['post_id'], '_instagrate_pro_settings', $old_post_meta);
+        $response['message'] = 'success';
+        echo json_encode($response);
+        die;
+	}
+	
 	function igp_load_meta_callback() {
 		if ( !isset($_POST['nonce']) || !wp_verify_nonce( $_POST['nonce'], 'instagrate_pro' ))
             return 0;
@@ -3079,7 +3101,7 @@ class instagrate_pro {
 		return $special_chars;		
 	}
 	
-	function attach_image($url, $postid, $post_name, $type = 'image') {
+	function attach_image($url, $postid, $post_name, $type = 'image', $image_caption = '') {
 		require_once(ABSPATH . "wp-admin" . '/includes/image.php');
 		require_once(ABSPATH . "wp-admin" . '/includes/file.php');
 		require_once(ABSPATH . "wp-admin" . '/includes/media.php');
@@ -3107,13 +3129,25 @@ $this->make_debug('Error Attaching '. $type .' - download_url: '. $tmp->get_erro
 			return 0;
 		}
 		$id = media_handle_sideload( $file_array, $postid );
+		
 		// Check for handle sideload errors.
 		if ( is_wp_error( $id ) ) {
 			@unlink( $file_array['tmp_name'] );
 $this->make_debug('Attaching '. $type .': '. $file_name);
 $this->make_debug('Error Attaching '. $type .' - media_handle_sideload: '. $id->get_error_message());
 			return 0;
-		} else return $id;
+		} 
+		
+		// If caption supplied add it to the image attachement
+		if ($image_caption != '') {
+			$attachment_post = array(
+			  'ID' => $id,
+			  'post_excerpt' => apply_filters('igp_image_caption', $image_caption)
+			);
+			wp_update_post( $attachment_post );
+		}
+		
+		return $id;
 	}
 	
 	
@@ -3156,7 +3190,9 @@ $this->make_debug('Error Attaching '. $type .' - media_handle_sideload: '. $id->
 										'width' => '400',
 										'height' => '300',
 										'width_type' => 'pixel',
-										'height_type' => 'pixel'  ), $atts));
+										'height_type' => 'pixel',
+										'zoom' => '15'
+										  ), $atts));
 		$html = '';
 		if ($lat != '' && $lon != '') {
 			$width_type = ($width_type == 'percent')? '%' : 'px';
@@ -3166,6 +3202,7 @@ $this->make_debug('Error Attaching '. $type .' - media_handle_sideload: '. $id->
 			$html .= 'data-lat="'.$lat.'" ';
 			$html .= 'data-lon="'.$lon.'" ';
 			$html .= 'data-style="'.$style.'" ';
+			$html .= 'data-zoom="'.$zoom.'" ';
 			if ($marker != '') {
 				$html .= 'data-marker="'.$marker.'" ';
 			}
@@ -3181,7 +3218,8 @@ $this->make_debug('Error Attaching '. $type .' - media_handle_sideload: '. $id->
 										'width' => '400',
 										'height' => '300',
 										'width_type' => 'pixel',
-										'height_type' => 'pixel'  ), $atts));
+										'height_type' => 'pixel',
+										'zoom' => '15'  ), $atts));
 		$html = '';
 		global $post;
 		$markers = get_post_meta($post->ID, '_igp_latlon', TRUE);
@@ -3192,6 +3230,7 @@ $this->make_debug('Error Attaching '. $type .' - media_handle_sideload: '. $id->
 			$html .= '<div class="multi_map_canvas '.$class.'" ';
 			$html .= 'data-markers="'. htmlspecialchars(json_encode($markers)) . '" ';
 			$html .= 'data-style="'.$style.'" ';
+			$html .= 'data-zoom="'.$zoom.'" ';
 			$html .= 'style="width: '.$width. $width_type .'; height: '.$height. $height_type .';">';
 			$html .= '</div>';
 		}
@@ -3215,104 +3254,129 @@ $this->make_debug('Error Attaching '. $type .' - media_handle_sideload: '. $id->
 		if (empty($atts['src'])) {
 			return '';
 		}
-
-        $default = array(
-            'src' => '',
-            'title' => '',
-            'poster' => '',
-            'size' => 'large'
-        );
-        
-        extract(shortcode_atts($default, $atts));
-        
-		$dim = '620';
-		
-		switch ($size) {
-			case 'medium':
-				$dim = '460';
-				break;
-			case 'small':
-				$dim = '320';
-				break;
-			case 'large':
-				$dim = '620';
-				break;
-		}
-
 		$count = $this->video_count;
-		$jsurl = plugins_url('assets/js/jquery.jplayer/' , __FILE__ );
-		
-		$player = '
-			<script type="text/javascript">
-				//<![CDATA[
-				jQuery(document).ready(function($){ 
-					var videoHeight = "auto";
-					if ($.browser.mozilla) {
-						var realWidth = $("#jp_container_'. $count. '").parent().width();
-						if (realWidth > '. $dim .') realWidth = '. $dim .';
-						videoHeight = realWidth + "px";
-					}
-					$("#igp-jplayer-'. $count .'").jPlayer({
-						ready: function () {
-						  $(this).jPlayer("setMedia", {
-						    m4v: "'. $src .'",
-						    poster: "'. $poster. '"
-						  });
-						},
-						play: function() { // To avoid multiple jPlayers playing together.
-							$(this).jPlayer("pauseOthers");
-						},
-						swfPath: "'. $jsurl .'",
-						supplied: "m4v",
-						size: {
-							width: "100%",
-							height: videoHeight,
-							cssClass: "jp-video-'. $dim .'p"
-						},
-						cssSelectorAncestor: "#jp_container_'. $count. '"
-					});
-				});	
-				//]]>
-			</script>
-			<div id="jp_container_'. $count. '" class="jp-video jp-video-'. $dim .'p">
-				<div id="igp-jplayer-'. $count .'" class="jp-jplayer"></div>
-				<div class="jp-gui">
-					<div class="jp-video-play" style="display: block;">
-						<a class="jp-video-play-icon jp-play" tabindex="1" href="javascript:;">play</a>
+		if (function_exists('wp_video_shortcode') && !isset($atts['jplayer'])) {
+				
+			if (!isset($atts['width']) && !isset($atts['height']) ) {
+				switch ($atts['size']) {
+					case 'medium':
+						$atts['width'] = $atts['height'] = '460';
+						break;
+					case 'small':
+						$dim = '320';
+						break;
+					case 'large':
+						$dim = '620';
+						break;
+					default:
+						$dim = '620';
+						break;	
+				}
+				$atts['width'] = $atts['height'] = $dim;
+				unset($atts['size']);	
+				
+			}
+			return wp_video_shortcode($atts);
+		} else {
+			
+			$default = array(
+	            'src' => '',
+	            'title' => '',
+	            'poster' => '',
+	            'size' => 'large'
+	        );
+	        
+	        extract(shortcode_atts($default, $atts));
+	        
+			$dim = '620';
+			
+			switch ($size) {
+				case 'medium':
+					$dim = '460';
+					break;
+				case 'small':
+					$dim = '320';
+					break;
+				case 'large':
+					$dim = '620';
+					break;
+			}
+	
+			
+			$jsurl = plugins_url('assets/js/jquery.jplayer/' , __FILE__ );
+			
+			$player = '
+				<script type="text/javascript">
+					//<![CDATA[
+					jQuery(document).ready(function($){ 
+						var videoHeight = "auto";
+						if ($.browser.mozilla) {
+							var realWidth = $("#jp_container_'. $count. '").parent().width();
+							if (realWidth > '. $dim .') realWidth = '. $dim .';
+							videoHeight = realWidth + "px";
+						}
+						$("#igp-jplayer-'. $count .'").jPlayer({
+							ready: function () {
+							  $(this).jPlayer("setMedia", {
+							    m4v: "'. $src .'",
+							    poster: "'. $poster. '"
+							  });
+							},
+							play: function() { // To avoid multiple jPlayers playing together.
+								$(this).jPlayer("pauseOthers");
+							},
+							swfPath: "'. $jsurl .'",
+							supplied: "m4v",
+							size: {
+								width: "100%",
+								height: videoHeight,
+								cssClass: "jp-video-'. $dim .'p"
+							},
+							cssSelectorAncestor: "#jp_container_'. $count. '"
+						});
+					});	
+					//]]>
+				</script>
+				<div id="jp_container_'. $count. '" class="jp-video jp-video-'. $dim .'p">
+					<div id="igp-jplayer-'. $count .'" class="jp-jplayer"></div>
+					<div class="jp-gui">
+						<div class="jp-video-play" style="display: block;">
+							<a class="jp-video-play-icon jp-play" tabindex="1" href="javascript:;">play</a>
+						</div>
+					   	<div class="jp-interface">
+					        <div class="jp-controls-holder">
+							    <a href="javascript:;" class="jp-play" tabindex="1">play</a>
+							    <a href="javascript:;" class="jp-pause" tabindex="1">pause</a>
+							    <span class="separator sep-1"></span>
+							    <div class="jp-progress">
+							        <div class="jp-seek-bar">
+										<div class="jp-play-bar"><span></span></div>
+									</div>
+							    </div>
+							    <div class="jp-current-time"></div>
+							    <span class="time-sep">/</span>
+							    <div class="jp-duration"></div>
+							    <span class="separator sep-2"></span>
+							    <a href="javascript:;" class="jp-mute" tabindex="1" title="mute">mute</a>
+							    <a href="javascript:;" class="jp-unmute" tabindex="1" title="unmute">unmute</a>
+							    <div class="jp-volume-bar">
+							        <div class="jp-volume-bar-value"><span class="handle"></span></div>
+							    </div>
+							    <span class="separator sep-2"></span>
+							    <a href="javascript:;" class="jp-full-screen" tabindex="1" title="full screen">full screen</a>
+							    <a href="javascript:;" class="jp-restore-screen" tabindex="1" title="restore screen">restore screen</a>
+								<a href="javascript:;" class="jp-repeat" tabindex="1" title="repeat">repeat</a>
+								<a href="javascript:;" class="jp-repeat-off" tabindex="1" title="repeat off">repeat off</a>
+					        </div>
+					    </div>
 					</div>
-				   	<div class="jp-interface">
-				        <div class="jp-controls-holder">
-						    <a href="javascript:;" class="jp-play" tabindex="1">play</a>
-						    <a href="javascript:;" class="jp-pause" tabindex="1">pause</a>
-						    <span class="separator sep-1"></span>
-						    <div class="jp-progress">
-						        <div class="jp-seek-bar">
-									<div class="jp-play-bar"><span></span></div>
-								</div>
-						    </div>
-						    <div class="jp-current-time"></div>
-						    <span class="time-sep">/</span>
-						    <div class="jp-duration"></div>
-						    <span class="separator sep-2"></span>
-						    <a href="javascript:;" class="jp-mute" tabindex="1" title="mute">mute</a>
-						    <a href="javascript:;" class="jp-unmute" tabindex="1" title="unmute">unmute</a>
-						    <div class="jp-volume-bar">
-						        <div class="jp-volume-bar-value"><span class="handle"></span></div>
-						    </div>
-						    <span class="separator sep-2"></span>
-						    <a href="javascript:;" class="jp-full-screen" tabindex="1" title="full screen">full screen</a>
-						    <a href="javascript:;" class="jp-restore-screen" tabindex="1" title="restore screen">restore screen</a>
-							<a href="javascript:;" class="jp-repeat" tabindex="1" title="repeat">repeat</a>
-							<a href="javascript:;" class="jp-repeat-off" tabindex="1" title="repeat off">repeat off</a>
-				        </div>
-				    </div>
-				</div>
-				<div class="jp-no-solution">
-				    <span>Update Required</span>
-				    To play the media you will need to either update your browser to a recent version or update your <a href="http://get.adobe.com/flashplayer/" target="_blank">Flash plugin</a>.
-				</div>
-			</div>';
-		return str_replace("\r\n", '', $player);
+					<div class="jp-no-solution">
+					    <span>Update Required</span>
+					    To play the media you will need to either update your browser to a recent version or update your <a href="http://get.adobe.com/flashplayer/" target="_blank">Flash plugin</a>.
+					</div>
+				</div>';
+			return str_replace("\r\n", '', $player);
+		}
 	}
 	
 	function make_debug($text, $divider = false) {
@@ -3347,6 +3411,18 @@ $this->make_debug('Error Attaching '. $type .' - media_handle_sideload: '. $id->
 		if ($lock) $account_settings['locked'] = 'locked';
 		update_post_meta($account_id, '_instagrate_pro_settings', $account_settings);
 	}
+	
+	function limit_title($wp_post_title, $title_limit_type, $title_limit) {
+		if ($title_limit != '' && is_numeric($title_limit) && floor($title_limit) == $title_limit) {
+			if ($title_limit_type == 'characters') {
+				$wp_post_title = substr($wp_post_title, 0, $title_limit);
+			} else if ($title_limit_type == 'words') {
+				 $words = explode(" ", $wp_post_title);
+				 $wp_post_title = implode(" ",array_splice($words, 0, $title_limit));
+			}			
+		}
+		return apply_filters('igp_post_title', $wp_post_title);
+	}
 		
 	function post_account($account_id, $frequency = '', $schedule = '') {
 		if (ini_get('safe_mode')) $this->make_debug('Safe Mode On'); else @set_time_limit(0);
@@ -3373,7 +3449,9 @@ $this->make_debug('Account Now Locked');
 		$dup_image = $this->default_val($this->settings, 'igpsettings_general_allow-duplicates', '0');
 		$default_title = $this->default_val($this->settings, 'igpsettings_general_default-title', 'Instagram Image');
 		$title_limit = $this->default_val($this->settings, 'igpsettings_general_title-limit', '');
+		$title_limit_type = $this->default_val($this->settings, 'igpsettings_general_title-limit-type', 'characters');
 		$credit_link = $this->default_val($this->settings, 'igpsettings_general_credit-link', '0');
+		$image_caption_tag = $this->default_val($this->settings, 'igpsettings_general_image-caption', '');
 $this->make_debug('Starting to Post Account: '. $account_id);
 $this->make_debug('Frequency: '. $frequency);
 $this->make_debug('Schedule: '. $schedule);
@@ -3479,6 +3557,7 @@ $this->make_debug('Images to post: '. sizeof($images) );
 		$wp_post_term = isset($settings->post_term) ? $settings->post_term : array();
 		$media_filter = isset($settings->instagram_media_filter) ? $settings->instagram_media_filter : 'all'; 
 		$multimap = isset($settings->grouped_multi_map) ? $settings->grouped_multi_map : 'none'; 
+		$map_zoom = isset($settings->map_zoom) ? $settings->map_zoom : '15';  
 		
 		// Media Filtering
 		if ($media_filter != 'all') {
@@ -3551,12 +3630,12 @@ $this->make_debug('Image not pending');
 					$this->template_location_lng = $image->longitude;
 					// Template tags for title
 					$template_tags = $this->get_template_tags('title');
+					// Image caption
+					$image_caption = ($image_caption_tag != '') ? $this->replace_template_tags($image_caption_tag, $template_tags, '') : '';
 					// Custom title
 					$wp_post_title = $this->replace_template_tags($account->post_title, $template_tags, $default_title);
 					// Limit post title
-					if ($title_limit != '' && is_numeric($title_limit) && floor($title_limit) == $title_limit) {
-						$wp_post_title = substr($wp_post_title, 0, $title_limit);
-					}					
+					$wp_post_title = $this->limit_title($wp_post_title, $title_limit_type, $title_limit);
 					// Post date
 					$wp_post_date_gmt = date('Y-m-d H:i:s',current_time('timestamp',1) - (($count-$i) * 20));
 					$wp_post_date = date('Y-m-d H:i:s',current_time('timestamp',0) - (($count-$i) * 20));
@@ -3602,7 +3681,7 @@ $this->make_debug($new_post);
 						if ($file_name == '') $file_name = $new_post->post_title;
 						$att_image = $this->strip_querysting($image->image_url);
 						// Load into media library
-						$attach_id = $this->attach_image($att_image, $new_post_id, $file_name );
+						$attach_id = $this->attach_image($att_image, $new_post_id, $file_name, 'image', $image_caption);
 						if ($attach_id != 0) {
 							// Get new shot image url from media attachment
 							$instagram_image = wp_get_attachment_url($attach_id);
@@ -3625,7 +3704,7 @@ $this->make_debug($new_post);
 						if ($file_name == '') $file_name = $new_post->post_title;
 						$att_image = $this->strip_querysting($image->video_url);
 						// Load into media library
-						$attach_id = $this->attach_image($att_image, $new_post_id, $file_name, 'video' );
+						$attach_id = $this->attach_image($att_image, $new_post_id, $file_name, 'video', $image_caption );
 						if ($attach_id != 0) {
 							// Get new shot image url from media attachment
 							$instagram_video = wp_get_attachment_url($attach_id);
@@ -3644,7 +3723,7 @@ $this->make_debug($new_post);
 					$map = '';
 					if($image->latitude != '' && $image->longitude != '') {
 						update_post_meta($new_post_id, '_igp_latlon' , $image->latitude .','. $image->longitude);
-						$map = '[igp_map lat="'. $image->latitude .'" lon="'. $image->longitude .'" marker="'. $image->location_name .'" style="'. $settings->map_style .'" class="'. $settings->map_css .'" width="'. $settings->map_width .'" height="'. $settings->map_height .'" width_type="'. $settings->map_width_type .'" height_type="'. $settings->map_height_type .'"]';
+						$map = '[igp_map lat="'. $image->latitude .'" lon="'. $image->longitude .'" marker="'. $image->location_name .'" style="'. $settings->map_style .'" class="'. $settings->map_css .'" width="'. $settings->map_width .'" height="'. $settings->map_height .'" width_type="'. $settings->map_width_type .'" height_type="'. $settings->map_height_type .'" zoom="'. $map_zoom .'"]';
 					}
 					$this->template_image = $instagram_image;
 					$this->template_video = $instagram_video;
@@ -3715,9 +3794,7 @@ $this->make_debug($update_post);
 				// Custom title
 				$wp_post_title = $this->replace_template_tags($account->post_title, $template_tags, $default_title);
 				// Limit post title
-				if ($title_limit != '' && is_numeric($title_limit) && floor($title_limit) == $title_limit) {
-					$wp_post_title = substr($wp_post_title, 0, $title_limit);
-				}
+				$wp_post_title = $this->limit_title($wp_post_title, $title_limit_type, $title_limit);
 				// Post date
 				$wp_post_date_gmt = date('Y-m-d H:i:s', current_time('timestamp', 1));
 				$wp_post_date = date('Y-m-d H:i:s', current_time('timestamp', 0));
@@ -3752,6 +3829,23 @@ $this->make_debug('Image Status: '. $image->status);
 $this->make_debug('Image not pending');
 						break;
 					}
+					$this->template_instagram_media_type = $image->media_type;
+					$this->template_instagram_media_id = $image->image_id;
+					$this->template_caption = $image->caption_clean;
+					$this->template_caption_tags_no_hash = str_replace('#', '', $image->caption_clean);
+					$this->template_caption_no_tags = $image->caption_clean_no_tags;
+					$this->template_tags = implode(' ', unserialize($image->tags));
+					$this->template_tags_first = reset(unserialize($image->tags));
+					$this->template_username = $image->username;
+					$this->template_date = date( 'M d, Y @ H:i', $image->image_timestamp);
+					$this->template_filter = $image->filter;
+					$this->template_location_name = $image->location_name;
+					$this->template_location_lat = $image->latitude;
+					$this->template_location_lng = $image->longitude;
+					$title_template_tags = $this->get_template_tags('title');
+					// Image captions
+					$image_caption = ($image_caption_tag != '') ? $this->replace_template_tags($image_caption_tag, $title_template_tags, '') : '';
+					
 					if ($settings->post_tag_taxonomy != '0') {
 						$wp_post_tags = unserialize($image->tags);
 						$wp_post_tags = array_merge($wp_post_tags, $default_tags);
@@ -3767,7 +3861,7 @@ $this->make_debug('Image not pending');
 						if ($file_name == '') $file_name = $new_post->post_title;
 						$att_image = $this->strip_querysting($image->image_url);
 						// Load into media library
-						$attach_id = $this->attach_image($att_image, $new_post_id, $file_name );
+						$attach_id = $this->attach_image($att_image, $new_post_id, $file_name, 'image', $image_caption );
 						if ($attach_id != 0) {
 							// Get new shot image url from media attachment
 							$instagram_image = wp_get_attachment_url($attach_id);
@@ -3790,7 +3884,7 @@ $this->make_debug('Image not pending');
 						if ($file_name == '') $file_name = $new_post->post_title;
 						$att_image = $this->strip_querysting($image->video_url);
 						// Load into media library
-						$attach_id = $this->attach_image($att_image, $new_post_id, $file_name, 'video' );
+						$attach_id = $this->attach_image($att_image, $new_post_id, $file_name, 'video', $image_caption );
 						if ($attach_id != 0) {
 							// Get new shot video url from media attachment
 							$instagram_video = wp_get_attachment_url($attach_id);
@@ -3806,21 +3900,8 @@ $this->make_debug('Image not pending');
 											'marker' => $image->location_name,
 											'image' => $instagram_image,
 										);
-						$map = '[igp_map lat="'. $image->latitude .'" lon="'. $image->longitude .'" marker="'. $image->location_name .'" style="'. $settings->map_style .'" class="'. $settings->map_css .'" width="'. $settings->map_width .'" height="'. $settings->map_height .'" width_type="'. $settings->map_width_type .'" height_type="'. $settings->map_height_type .'"]';
+						$map = '[igp_map lat="'. $image->latitude .'" lon="'. $image->longitude .'" marker="'. $image->location_name .'" style="'. $settings->map_style .'" class="'. $settings->map_css .'" width="'. $settings->map_width .'" height="'. $settings->map_height .'" width_type="'. $settings->map_width_type .'" height_type="'. $settings->map_height_type .'" zoom="'. $map_zoom .'"]';
 					}
-					$this->template_instagram_media_type = $image->media_type;
-					$this->template_instagram_media_id = $image->image_id;
-					$this->template_caption = $image->caption_clean;
-					$this->template_caption_tags_no_hash = str_replace('#', '', $image->caption_clean);
-					$this->template_caption_no_tags = $image->caption_clean_no_tags;
-					$this->template_tags = implode(' ', unserialize($image->tags));
-					$this->template_tags_first = reset(unserialize($image->tags));
-					$this->template_username = $image->username;
-					$this->template_date = date( 'M d, Y @ H:i', $image->image_timestamp);
-					$this->template_filter = $image->filter;
-					$this->template_location_name = $image->location_name;
-					$this->template_location_lat = $image->latitude;
-					$this->template_location_lng = $image->longitude;
 					$this->template_image = $instagram_image;
 					$this->template_video = $instagram_video;
 					$this->template_user_profile_url = 'http://instagram.com/'. $image->username;
@@ -3850,7 +3931,7 @@ $this->make_debug('Image not pending');
 			
 				// Multi Map
 				if ($multimap != 'none') {
-					$multimap_sc = '[igp_multimap style="'. $settings->map_style .'" class="'. $settings->map_css .'" width="'. $settings->map_width .'" height="'. $settings->map_height .'" width_type="'. $settings->map_width_type .'" height_type="'. $settings->map_height_type .'"]';
+					$multimap_sc = '[igp_multimap style="'. $settings->map_style .'" class="'. $settings->map_css .'" width="'. $settings->map_width .'" height="'. $settings->map_height .'" width_type="'. $settings->map_width_type .'" height_type="'. $settings->map_height_type .'" zoom="'. $map_zoom .'"]';
 					$wp_post_content = ($multimap == 'top') ? $multimap_sc .'<br>'. $wp_post_content : $wp_post_content .'<br>'. $multimap_sc;
 				}
 		
@@ -3884,7 +3965,25 @@ $this->make_debug('Image Status: '. $image->status);
 					if ($image->status != 'pending') {
 $this->make_debug('Image not pending');
 						break;
-					}	
+					}
+					
+					$this->template_instagram_media_type = $image->media_type;
+					$this->template_instagram_media_id = $image->image_id;
+					$this->template_caption = $image->caption_clean;
+					$this->template_caption_tags_no_hash = str_replace('#', '', $image->caption_clean);
+					$this->template_caption_no_tags = $image->caption_clean_no_tags;
+					$this->template_tags = implode(' ', unserialize($image->tags));
+					$this->template_tags_first = reset(unserialize($image->tags));
+					$this->template_username = $image->username;
+					$this->template_date = date( 'M d, Y @ H:i', $image->image_timestamp);
+					$this->template_filter = $image->filter;
+					$this->template_location_name = $image->location_name;
+					$this->template_location_lat = $image->latitude;
+					$this->template_location_lng = $image->longitude;
+					$title_template_tags = $this->get_template_tags('title');
+					// Image caption
+					$image_caption = ($image_caption_tag != '') ? $this->replace_template_tags($image_caption_tag, $title_template_tags, '') : '';
+					
 					// Post Tags
 					if ($settings->post_tag_taxonomy != '0') {
 						$wp_post_tags = unserialize($image->tags);
@@ -3901,7 +4000,7 @@ $this->make_debug('Image not pending');
 						if ($file_name == '') $file_name = $new_post->post_title;
 						$att_image = $this->strip_querysting($image->image_url);
 						// Load into media library
-						$attach_id = $this->attach_image($att_image, $new_post_id, $file_name );
+						$attach_id = $this->attach_image($att_image, $new_post_id, $file_name, 'image', $image_caption );
 						if ($attach_id != 0) {
 							// Get new shot image url from media attachment
 							$instagram_image = wp_get_attachment_url($attach_id);
@@ -3924,7 +4023,7 @@ $this->make_debug('Image not pending');
 						if ($file_name == '') $file_name = $new_post->post_title;
 						$att_image = $this->strip_querysting($image->video_url);
 						// Load into media library
-						$attach_id = $this->attach_image($att_image, $new_post_id, $file_name, 'video' );
+						$attach_id = $this->attach_image($att_image, $new_post_id, $file_name, 'video', $image_caption );
 						if ($attach_id != 0) {
 							// Get new shot video url from media attachment
 							$instagram_video = wp_get_attachment_url($attach_id);
@@ -3940,21 +4039,9 @@ $this->make_debug('Image not pending');
 											'marker' => $image->location_name,
 											'image' => $instagram_image,
 										);
-						$map = '[igp_map lat="'. $image->latitude .'" lon="'. $image->longitude .'" marker="'. $image->location_name .'" style="'. $settings->map_style .'" class="'. $settings->map_css .'" width="'. $settings->map_width .'" height="'. $settings->map_height .'" width_type="'. $settings->map_width_type .'" height_type="'. $settings->map_height_type .'"]';
+						$map = '[igp_map lat="'. $image->latitude .'" lon="'. $image->longitude .'" marker="'. $image->location_name .'" style="'. $settings->map_style .'" class="'. $settings->map_css .'" width="'. $settings->map_width .'" height="'. $settings->map_height .'" width_type="'. $settings->map_width_type .'" height_type="'. $settings->map_height_type .'" zoom="'. $map_zoom .'"]';
 					}
-					$this->template_instagram_media_type = $image->media_type;
-					$this->template_instagram_media_id = $image->image_id;
-					$this->template_caption = $image->caption_clean;
-					$this->template_caption_tags_no_hash = str_replace('#', '', $image->caption_clean);
-					$this->template_caption_no_tags = $image->caption_clean_no_tags;
-					$this->template_tags = implode(' ', unserialize($image->tags));
-					$this->template_tags_first = reset(unserialize($image->tags));
-					$this->template_username = $image->username;
-					$this->template_date = date( 'M d, Y @ H:i', $image->image_timestamp);
-					$this->template_filter = $image->filter;
-					$this->template_location_name = $image->location_name;
-					$this->template_location_lat = $image->latitude;
-					$this->template_location_lng = $image->longitude;
+					
 					$this->template_image = $instagram_image;
 					$this->template_video = $instagram_video;
 					$this->template_user_profile_url = 'http://instagram.com/'. $image->username;

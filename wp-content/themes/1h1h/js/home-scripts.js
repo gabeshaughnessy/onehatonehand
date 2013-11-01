@@ -398,6 +398,13 @@ function addTouchSupport(){
 document.body.addEventListener("gesturechange", gestureChange, false);
 
 }
+function playAnimation(compID){
+	var animation = AdobeEdge.getComposition(compID);
+			if(animation != undefined)	{
+				stage = animation.getStage();
+				stage.play(0);
+				}
+}
 
 function makePortfolioCycles(){
 		var navID;
@@ -436,6 +443,9 @@ function makePortfolioCycles(){
 			resizePortfolioSections();
 		});
 		function afterCycle(currSlideElement, nextSlideElement, options, forwardFlag){
+			if(jQuery(nextSlideElement).attr('data-target') == 'http://onehatonehand/our-shop/shop-tour/'){		
+				playAnimation("animate-shop-tour");
+			}
 			//Stop video Playback
 			videoElement = jQuery(currSlideElement).find('iframe');
 			if(videoElement){
@@ -751,6 +761,7 @@ jQuery(window).load(function(){
 	jQuery('#tour').bind('inview', function (event, visible) {
 	  if (visible == true) {
 	  //alert('active tour'); //for debugging
+	  
 	  	 jQuery('.section').removeClass('active');
 	  
 	  currentSection = jQuery('#tour');
@@ -759,7 +770,7 @@ jQuery(window).load(function(){
 		    jQuery('.menu-main-menu-container').slideDown('fast');
 		    jQuery('#portfolio-nav').slideUp('fast');
 		    jQuery('#portfolio .nav-tab').hide();
-		  
+			  playAnimation("animate-shop-tour");
 		  	  	 } //end in view
 	  	  
   	  else {

@@ -14,7 +14,7 @@ jQuery(document).ready(function($) {
 		
 		var mapstyle = $(Element).attr("data-style");	
 	    var myLatlng = new google.maps.LatLng(lat, lon);
-	    var myOptions = {	zoom: 14,
+	    var myOptions = {		zoom: parseInt($(Element).attr("data-zoom")),
 								center: myLatlng,
 								mapTypeId: google.maps.MapTypeId[mapstyle]
 							};
@@ -42,7 +42,7 @@ jQuery(document).ready(function($) {
 		var mapstyle = $(Element).attr("data-style");	
 	   
 	    var centerLatlng = new google.maps.LatLng(markers[0].lat, markers[0].lng);
-	    var myOptions = {	zoom: 14,
+	    var myOptions = {	zoom: parseInt($(Element).attr("data-zoom")),
 							center: centerLatlng,
 							mapTypeId: google.maps.MapTypeId[mapstyle]
 						};
