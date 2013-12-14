@@ -4,7 +4,7 @@ Plugin URI: http://www.instagrate.co.uk/
 Author URI: http://www.polevaultweb.com/
 Tags: instagram, posts, integration, automatic, post, wordpress, posting, images
 Requires at least: 3.0
-Tested up to: 3.6
+Tested up to: 3.7.1
 Stable tag: 1.4.2
 
 The best plugin to automatically integrate Instagram images with WordPress.
@@ -30,6 +30,22 @@ To update the plugin either use the automatic updater or manually follow these s
 4. Activate the plugin through the 'Plugins' menu in WordPress.
 
 == Changelog ==
+
+= 1.5 =
+
+* New - Tested up to 3.7.1
+* New - Licensing (sellwire.net) and updates (wp-updates.com) verification
+* New - Exclude a hashtag in filtering, eg. tag1, tag2, -tag3
+* New - Filter 'igp_tag_sep' for %%tags%% tag. Default: " "
+* New - Settings to hide certain meta boxes on the edit account page
+* New - Ability to refresh you connect account's profile image
+* New - All template tags run through filters for customising. E.g. %%location-name%% can be filtered with 'igp_template_location_name'
+* Improvement - Added a check for is_front_page()
+* Fix - Multiple hashag filtering
+* Fix - Map JS and CSS not added unless shortcodes present
+* Fix - Removed PHP warning wpdb::prepare() on multisite installs
+* Fix - Responsive videos in WP 3.6+
+* Fix - Issues with long captions in account admin images
 
 = 1.4.2 =
 

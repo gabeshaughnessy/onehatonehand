@@ -205,11 +205,11 @@ if( !class_exists('igpWordPressSettingsFramework') ){
     		    case 'checkboxes':
     		        foreach($choices as $ckey=>$cval){
     		            $val = '';
-    		            if(isset($options[$el_id .'_'. $ckey])) $val = $options[$el_id .'_'. $ckey];
+    		            if(isset($options[$el_id .'-'. $ckey])) $val = $options[$el_id .'-'. $ckey];
     		            elseif(is_array($std) && in_array($ckey, $std)) $val = $ckey;
     		            $val = esc_html(esc_attr($val));
-        		        echo '<input type="hidden" name="'. $this->option_group .'_settings['. $el_id .'_'. $ckey .']" value="0" />';
-        		        echo '<label><input type="checkbox" name="'. $this->option_group .'_settings['. $el_id .'_'. $ckey .']" id="'. $el_id .'_'. $ckey .'" value="'. $ckey .'" class="'. $class .'"'. (($ckey == $val) ? ' checked="checked"' : '') .' /> '. $cval .'</label><br />';
+        		        echo '<input type="hidden" name="'. $this->option_group .'_settings['. $el_id .'-'. $ckey .']" value="0" />';
+        		        echo '<label><input type="checkbox" name="'. $this->option_group .'_settings['. $el_id .'-'. $ckey .']" id="'. $el_id .'_'. $ckey .'" value="'. $ckey .'" class="'. $class .'"'. (($ckey == $val) ? ' checked="checked"' : '') .' /> '. $cval .'</label><br />';
     		        }
     		        if($desc)  echo '<p class="description">'. $desc .'</p>';
     		        break;
@@ -261,6 +261,31 @@ if( !class_exists('igpWordPressSettingsFramework') ){
     		    case 'custom':
     		        echo $std;
     		        break;
+    		    case 'license':
+    		    	$key = (isset($options[$el_id. '-key'])) ? $options[$el_id. '-key'] : '';
+    		    	$key = esc_attr(stripslashes($key));
+    		    	$status = (isset($options[$el_id. '-status'])) ? $options[$el_id. '-status'] : false;
+    		    	$status = esc_attr(stripslashes($status));
+    		    	echo '<div id="igp_license">';
+					echo '<input type="hidden" name="'. $this->option_group .'_settings['. $el_id .'-status]" value="'. $status .'">';
+    		    	if( $status !== false && $status == 'activated' ) { 
+    		    		echo '<input type="hidden" name="'. $this->option_group .'_settings['. $el_id .'-key]" value="'. $key .'">';
+						echo '<span style="color:green;">'. __('Active: ', 'instagrate-pro') .'</span>';
+						echo '<span class="regular-text">'. $key .'</span><br>  ';
+						echo '<input id="deactivate-license" type="button" class="button-secondary" value="'. __('Deactivate License', 'instagrate-pro') .'"/>';
+    		    	} else {
+	    		    	if (instagrate_pro::is_license_constant()) {
+							echo '<input type="hidden" name="'. $this->option_group .'_settings['. $el_id .'-key]" value="'. instagrate_pro::get_license_key($options) .'">';
+							echo '<span class="regular-text">'. instagrate_pro::get_license_key($options) .'</span><br>  ';
+							echo '<p class="description">'. __('Activate this license to enable automatic upgrades', 'instagrate-pro'). '</p>';
+						} else {
+							echo '<input type="text" name="'. $this->option_group .'_settings['. $el_id .'-key]" id="'. $el_id .'-key" value="'. $key .'" class="regular-text '. $class .'" />';
+							echo '<p class="description">'. __('Enter a valid license key to enable automatic upgrades', 'instagrate-pro'). '</p>';
+						}
+						echo '<input id="activate-license" type="button" class="button-primary" value="'. __('Activate License', 'instagrate-pro') .'"/>';
+    		    	}
+    		    	echo '<span class="spinner"></span></div>';
+    		    	break;
         		default:
         		    break;
     		}

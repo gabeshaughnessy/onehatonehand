@@ -4,7 +4,7 @@ Plugin Name: Instagrate Pro
 Plugin URI: http://www.instagrate.co.uk/  
 Description: Instagrate Pro is a powerful WordPress plugin that allows you to automatically integrate Instagram images into your WordPress site.
 Author: polevaultweb 
-Version: 1.4.2
+Version: 1.5
 Author URI: http://www.polevaultweb.com/
 
 Copyright 2012  polevaultweb  (email : info@polevaultweb.com)
@@ -32,6 +32,9 @@ class instagrate_pro {
 	private $plugin_db_version;
     private $plugin_table;
 	private $plugin_l10n;
+	
+	private $sellwire_id;
+	private $sellwire_url;
     
 	private $api_base;
 	private $access_token_url;
@@ -80,10 +83,14 @@ class instagrate_pro {
         // Set up default vars
         $this->plugin_path = plugin_dir_path( __FILE__ );
         $this->plugin_url = plugin_dir_url( __FILE__ );
-		$this->plugin_version = '1.4.2';
+		$this->plugin_version = '1.5';
 		$this->plugin_db_version = '1.3';
         $this->plugin_table = 'igp_images';
 		$this->plugin_l10n = 'instagrate-pro';
+		
+		// Sellwire 
+		$this->sellwire_id = 'uz';
+		$this->sellwire_url = 'https://app.sellwire.net/api/1/';
 		
 		// Instagram API
 		$this->consumer_key = '41107c261543439b870a95c97fd17398';
@@ -192,6 +199,7 @@ class instagrate_pro {
 		add_action('wp_ajax_igp_manual_frequency', array(&$this,'igp_manual_frequency_callback'));
 		add_action('wp_ajax_igp_bulk_edit_status', array(&$this,'igp_bulk_edit_status_callback'));
 		add_action('wp_ajax_igp_disconnect', array(&$this,'igp_disconnect_callback'));
+		add_action('wp_ajax_igp_refresh', array(&$this,'igp_refresh_callback'));
 		add_action('wp_ajax_igp_change_stream', array(&$this,'igp_change_stream_callback'));
 		add_action('wp_ajax_igp_get_user_id', array(&$this,'igp_get_user_id_callback'));
 		add_action('wp_ajax_igp_get_locations', array(&$this,'igp_get_locations_callback'));
@@ -204,7 +212,10 @@ class instagrate_pro {
 		add_action('wp_ajax_nopriv_instagram_sync', array($this, 'sync_all_comments_likes'));
 		add_action('wp_ajax_nopriv_instagrate', array($this, 'cron_controller'));
 		
-		
+		add_action('wp_ajax_igp_activate_license', array(&$this, 'activate_license'));
+        add_action('wp_ajax_igp_deactivate_license', array(&$this, 'deactivate_license'));
+        add_action('after_plugin_row_'. plugin_basename( __FILE__ ), array( $this, 'plugin_row' ), 11 );
+        
 		// Settings
 		require_once( $this->plugin_path .'includes/wp-settings-framework.php' );
         $this->wpsf = new igpWordPressSettingsFramework( $this->plugin_path .'includes/igp-settings.php' );
@@ -219,7 +230,8 @@ class instagrate_pro {
 		
 		// Auto updates via wp-updates.com
 		require_once('includes/wp-updates-plugin.php');
-		new WPUpdatesPluginUpdater_200( 'http://wp-updates.com/api/2/plugin', plugin_basename(__FILE__));
+		$license = $this->get_license_key();
+		new WPUpdatesPluginUpdater_200( 'http://wp-updates.com/api/2/plugin', plugin_basename(__FILE__), $license);
 
     }
     
@@ -230,7 +242,7 @@ class instagrate_pro {
 	        if ($network_wide) {
 	            $current_blog = $wpdb->blogid;
 	            // Get all blog ids
-	            $blogids = $wpdb->get_col($wpdb->prepare("SELECT blog_id FROM $wpdb->blogs"));
+	            $blogids = $wpdb->get_col("SELECT blog_id FROM $wpdb->blogs");
 	            foreach ($blogids as $blog_id) {
 	                switch_to_blog($blog_id);
 	                $this->install();
@@ -259,7 +271,7 @@ class instagrate_pro {
 	        if ($network_wide) {
 	            $current_blog = $wpdb->blogid;
 	            // Get all blog ids
-	            $blogids = $wpdb->get_col($wpdb->prepare("SELECT blog_id FROM $wpdb->blogs"));
+	            $blogids = $wpdb->get_col("SELECT blog_id FROM $wpdb->blogs");
 	            foreach ($blogids as $blog_id) {
 	                switch_to_blog($blog_id);
 	                $this->deactivate_plugin();
@@ -508,11 +520,18 @@ class instagrate_pro {
 		if(isset($_GET['post']) && isset($_GET['action']) && $_GET['action'] == 'edit') $account_id = $_GET['post'];
 		add_meta_box( 'igp_instagram_box', __( 'Instagram Settings', $this->plugin_l10n ), array(&$this, 'meta_box_instagram'), 'instagrate_pro', 'side', 'high' );
 		add_meta_box( 'igp_images_box', __( 'Instagram Media'. $this->get_images_key($account_id), $this->plugin_l10n ), array(&$this, 'meta_box_images'), 'instagrate_pro', 'normal', 'high' );
-		add_meta_box( 'igp_template_tags_box', __( 'Template Tags', $this->plugin_l10n ), array(&$this, 'meta_box_template_tags'), 'instagrate_pro', 'normal', 'high' );
+		
+		if ($this->default_val($this->settings, 'igpsettings_general_hide-meta-template', '0') == '0')
+			add_meta_box( 'igp_template_tags_box', __( 'Template Tags', $this->plugin_l10n ), array(&$this, 'meta_box_template_tags'), 'instagrate_pro', 'normal', 'high' );
+			
+			
 		add_meta_box( 'igp_posting_box', __( 'Posting Settings', $this->plugin_l10n ), array(&$this, 'meta_box_posting'), 'instagrate_pro', 'side', 'default' );
 		add_meta_box( 'igp_post_box', __( 'Post Settings', $this->plugin_l10n ), array(&$this, 'meta_box_post'), 'instagrate_pro', 'side', 'default' );
-		add_meta_box( 'igp_map_map', __( 'Map Settings', $this->plugin_l10n ), array(&$this, 'meta_box_map'), 'instagrate_pro', 'side', 'low' );
-		add_meta_box( 'igp_links', __( 'Useful Links', $this->plugin_l10n ), array(&$this, 'meta_box_links'), 'instagrate_pro', 'normal', 'low' );
+		if ($this->default_val($this->settings, 'igpsettings_general_hide-meta-map', '0') == '0')
+			add_meta_box( 'igp_map_map', __( 'Map Settings', $this->plugin_l10n ), array(&$this, 'meta_box_map'), 'instagrate_pro', 'side', 'low' );
+		
+		if ($this->default_val($this->settings, 'igpsettings_general_hide-meta-links', '0') == '0')
+			add_meta_box( 'igp_links', __( 'Useful Links', $this->plugin_l10n ), array(&$this, 'meta_box_links'), 'instagrate_pro', 'normal', 'low' );
 		$this->instagram_connect();
 
 		// Retrieve Images if PT is Instagrate_pro, account is logged in and not auto-draft
@@ -752,17 +771,20 @@ class instagrate_pro {
 	
 	function change_image_box() {
 		remove_meta_box( 'postimagediv', 'instagrate_pro', 'side' );
-		add_meta_box('postimagediv', __('Custom Featured Image', $this->plugin_l10n), 'post_thumbnail_meta_box', 'instagrate_pro', 'side', 'low');
+		if ($this->default_val($this->settings, 'igpsettings_general_hide-meta-featured', '0') == '0')
+			add_meta_box('postimagediv', __('Custom Featured Image', $this->plugin_l10n), 'post_thumbnail_meta_box', 'instagrate_pro', 'side', 'low');
 	}
 	
 	function change_custom_meta_box() {
-		remove_meta_box( 'postcustom', 'instagrate_pro', 'side' );
-		add_meta_box('postcustom', __('Custom Fields For Template Tags', $this->plugin_l10n), 'post_custom_meta_box', 'instagrate_pro', 'normal');
+		remove_meta_box( 'postcustom', 'instagrate_pro', 'normal' );
+		if ($this->default_val($this->settings, 'igpsettings_general_hide-meta-custom', '0') == '0')	
+			add_meta_box('postcustom', __('Custom Fields For Template Tags', $this->plugin_l10n), 'post_custom_meta_box', 'instagrate_pro', 'normal');
 	}
 	
 	function change_tag_box() {
 		remove_meta_box( 'tagsdiv-post_tag', 'instagrate_pro', 'side' );
-		add_meta_box('tagsdiv-post_tag', __('Default Tags', $this->plugin_l10n), 'post_tags_meta_box', 'instagrate_pro', 'side');
+		if ($this->default_val($this->settings, 'igpsettings_general_hide-meta-tags', '0') == '0')
+			add_meta_box('tagsdiv-post_tag', __('Default Tags', $this->plugin_l10n), 'post_tags_meta_box', 'instagrate_pro', 'side');
 	}
 	
 	function custom_feat_image_text( $content, $post_id = 0 ){
@@ -800,7 +822,6 @@ class instagrate_pro {
 			// css
 			wp_register_style( 'igp-admin-style', plugins_url('assets/css/igp-admin.css' , __FILE__ ), array(), $this->plugin_version);
 			wp_enqueue_style('igp-admin-style');
-		
 		}
 	}
 	
@@ -811,12 +832,34 @@ class instagrate_pro {
 		wp_enqueue_style( 'igp-jplayer-style');
 	}
 	
+	function has_map_shortcode($content) {
+		$shortcodes = array( 'igp_map', 'igp_multimap', 'igp_get_map' ); 
+		foreach ($shortcodes as $shortcode) {
+			if ($this->has_shortcode_wrap($content, $shortcode)) {
+				return true;
+			}
+		}
+		return false;
+	}
+	
+	function has_shortcode_wrap($content, $shortcode = '') {  
+	    if (function_exists('has_shortcode')) return has_shortcode($content, $shortcode);
+	    $found = false;  
+	    if (!$shortcode) {  
+	        return $found;  
+	    }   
+	    if ( stripos($content, '[' . $shortcode) !== false ) {  
+	        $found = true;  
+	    }  
+	    return $found;  
+	} 
+	
 	function page_has_maps($posts) {
 		$result = false;
 		if (isset($posts) && is_array($posts)) {			
 			foreach ($posts as $post) {
 				$post_id = $post->ID;
-				if (get_post_meta($post_id, '_igp_latlon')) {
+				if (get_post_meta($post_id, '_igp_latlon') && $this->has_map_shortcode($post->post_content)) {
 					$result = true;
 					break;
 				}				
@@ -914,10 +957,123 @@ class instagrate_pro {
   
 	function validate_settings( $input ) { return $input; }
 	
-	function default_val( $options, $value, $default = '' ){
+	public static function default_val( $options, $value, $default = '' ){
         if( !isset($options[$value]) ) return $default;
         else return $options[$value];
     }
+    
+    function license_args() {
+	    $args = array( 	'timeout' => 15, 
+	    				'sslverify' => false,
+	    				'user-agent' => 'WordPress; '. home_url()	
+	    		     );
+	    return $args;
+    }
+    
+    public static function is_license_constant() {
+		return defined( 'IGP_LICENSE' );
+	}
+
+	public static function get_license_key($settings = false) {
+		if (instagrate_pro::is_license_constant()) {
+			$license = IGP_LICENSE;
+		} else {
+			if ($settings !== false) $settings = $this->settings;
+			$license = trim(instagrate_pro::default_val($settings, 'igpsettings_support_license-key', ''));
+		}
+		return $license;
+	}
+    
+    function plugin_row() {
+		$licence = $this->get_license_key();
+		if( empty( $licence ) ) {
+			$settings_link = sprintf( '<a href="%s">%s</a>', admin_url('edit.php?post_type=instagrate_pro&page=instagrate-pro-settings&tab=support'), __( 'Settings', $this->plugin_l10n ) );
+			$message = 'To finish activating Instagrate Pro, please go to ' . $settings_link . ' and enter your licence key and activate it to enable automatic updates.';
+		}
+		else return;
+		?>
+		<tr class="plugin-update-tr igp-custom">
+			<td colspan="3" class="plugin-update">
+				<div class="update-message">
+					<div class="igp-licence-error-notice"><?php echo $message; ?></div>
+				</div>
+			</td>
+		</tr>
+		<?php
+	}
+    
+    function activate_license() {
+    	if ( !isset($_POST['nonce']) || !wp_verify_nonce( $_POST['nonce'], plugin_basename('instagrate_pro') ))
+            return 0;
+        
+        if ( !isset($_POST['license_key']) ) return 0;
+        
+        $ajax_response['error'] = false;
+        $ajax_response['message'] = '';
+               
+        $options = get_option( 'igpsettings_settings' );		
+		$license = trim($_POST['license_key']);
+		$options['igpsettings_support_license-key'] = $license;
+			
+		$api_params = array( 
+			'license' 	=> $license, 
+			'file' => $this->sellwire_id
+		);		
+		$response = wp_remote_get( add_query_arg( $api_params, $this->sellwire_url. 'activate_license' ), $this->license_args() );
+		if ( is_wp_error( $response ) ) {
+			$ajax_response['error'] = true;
+			$ajax_response['message'] = $response->get_error_message();
+		} else {
+			$license_data = json_decode( wp_remote_retrieve_body( $response ) );
+			if (isset($license_data->license)) {
+				$options['igpsettings_support_license-status'] = $license_data->license;
+				$ajax_response['license_status'] = $license_data->license;
+				$ajax_response['redirect'] = admin_url('edit.php?post_type=instagrate_pro&page=instagrate-pro-settings&tab=support');
+			} else if (isset($license_data->error)) {
+				$ajax_response['error'] = true;
+				$ajax_response['message'] = $license_data->error;
+			}
+		}
+		update_option( 'igpsettings_settings', $options );
+		echo json_encode($ajax_response);
+        die;
+    }
+	
+	function deactivate_license() {
+		if ( !isset($_POST['nonce']) || !wp_verify_nonce( $_POST['nonce'], plugin_basename('instagrate_pro') ))
+            return 0;
+
+		$ajax_response['error'] = false;
+        $ajax_response['message'] = '';
+        
+		$options = get_option( 'igpsettings_settings' );		
+		$license = trim( $this->default_val($options, 'igpsettings_support_license-key', '') );
+
+		$api_params = array( 
+			'license' 	=> $license, 
+			'file' => $this->sellwire_id
+		);
+		$response = wp_remote_get( add_query_arg( $api_params, $this->sellwire_url. 'deactivate_license' ), $this->license_args() );
+		if ( is_wp_error( $response ) ) {
+			$ajax_response['error'] = true;
+			$ajax_response['message'] = $response->get_error_message();
+		} else {
+			$license_data = json_decode( wp_remote_retrieve_body( $response ) );
+			if (isset($license_data->license) || (isset($license_data->error) && $license_data->error == 'License expired')) {
+				unset($options['igpsettings_support_license-key']);
+				unset($options['igpsettings_support_license-status']);
+				update_option('igpsettings_settings', $options );
+				$ajax_response['license_status'] = 'deactivated';
+				$ajax_response['redirect'] = admin_url('edit.php?post_type=instagrate_pro&page=instagrate-pro-settings&tab=support');
+			} else if (isset($license_data->error)) {
+				$ajax_response['error'] = true;
+				$ajax_response['message'] = $license_data->error;
+			}
+		}
+		echo json_encode($ajax_response);
+        die;
+		
+	}
 	
 	function get_template_tags( $filter = '') {
 		$template_tags = array(	
@@ -1084,7 +1240,8 @@ class instagrate_pro {
 								'value' => $this->template_likes
 							),
 							
-						);
+						);				
+						
 		if ($filter != '') {
 			foreach ($template_tags as $tag_key => $tag ) {
 				if (!empty($tag['exclude_from'])) {
@@ -1094,6 +1251,14 @@ class instagrate_pro {
 				}
 			}
 		}
+		
+		// Apply filters to template tags
+		foreach ($template_tags as $tag_key => $tag ) {
+			$filter_name = 'igp_template_'. str_replace('-', '_', $tag['name']);
+			$filter_value = $tag['value'];
+			$template_tags[$tag_key]['value'] = apply_filters( $filter_name, $filter_value);
+		}
+		
 		return $template_tags;
     }
 	
@@ -1272,11 +1437,13 @@ class instagrate_pro {
 						<?php 
 							$profile_src = (!isset($options['user_thumb']) || $options['user_thumb'] == '') ? plugins_url('assets/img/not-connected.png' , __FILE__ ) : $options['user_thumb'];
 						?>
-						<img src="<?php echo $profile_src; ?>" width="50" height="50" alt="Instagram profile image for <?php echo $options['username']; ?>">
+						<img id="user-thumb" src="<?php echo $profile_src; ?>" width="50" height="50" alt="Instagram profile image for <?php echo $options['username']; ?>">
 					</div>
 					<div class="igp-details">
 						<p><b><?php echo $options['username']; ?></b></p>
 						<input id="igp-logout" class="button" type="button" value="Disconnect">
+						<input id="igp-refresh" class="button" type="button" value="Refresh">
+						<div class="spinner"></div>
 					</div>
 				</div>
 				<table class="form-table igp-admin"> 
@@ -1407,9 +1574,10 @@ class instagrate_pro {
 					$show_zero = ' style="display: none;"';
 				}
 				foreach($images as $key => $image) {
+			       $title = esc_attr( substr($image->caption_clean_no_tags, 0, 20) );
 			       $html .= '<li>';
 			       $html .= '<a class="edit-image '. $image->media_type . '" href="#" rel="'. $image->image_id .'">';
-			       $html .= '<img class="'. $image->status . '" src="'. $image->image_url . '" width="70" alt="'. $image->caption_clean.'" title="'. __( 'Edit', $this->plugin_l10n ) .' '. $image->caption_clean.'">';
+			       $html .= '<img class="'. $image->status . '" src="'. $image->image_url . '" width="70" alt="'. $title .'" title="'. __( 'Edit', $this->plugin_l10n ) .' '. $title .'">';
 			       $html .= '<span class="video-ind"></span>';
 			       $html .= '</a>';
 				   $html .= '<input id="'. $image->image_id .'" class="igp-bulk" type="checkbox"'.  $show_bulk .'>';
@@ -1893,7 +2061,7 @@ class instagrate_pro {
 	
 	function meta_box_template_tags() {
         $template_tags = $this->get_template_tags();
-        $html = '<p>'. __( 'You can use the following template tags in the title, content and custom field values', $this->plugin_l10n ) .'</p>';
+        $html = '<p>'. __( 'You can use the following template tags in the title, content and custom field values:', $this->plugin_l10n ) .'</p>';
         foreach ($template_tags as $tag ) {
 			$no_title = ' ';
 			if (!empty($tag['exclude_from'])) {
@@ -1905,6 +2073,7 @@ class instagrate_pro {
 			}
 			$html .= '<b>%%'. $tag['name'] .'%%</b> - '. $tag['desc'] . $no_title .'<br/>';
 		}
+		$html .= '<p>'. __( 'You can also run these through filters for each. The filter name is in the format igp_template_[tag] where tag has underscores not hypens, <br>e.g. %%location-name%% can be filtered with \'igp_template_location_name\')', $this->plugin_l10n ) .'</p>';
         echo $html; 
     }
 	
@@ -2114,6 +2283,24 @@ class instagrate_pro {
 		$this->delete_images($_POST['post_id'] );
 		$redirect = get_admin_url() .'post.php?post='. $_POST['post_id'] .'&action=edit&message=12';
 		$response['redirect'] = $redirect;
+        $response['message'] = 'success';
+        echo json_encode($response);
+        die;
+	}
+	
+	function igp_refresh_callback() {
+		if ( !isset($_POST['nonce']) || !wp_verify_nonce( $_POST['nonce'], 'instagrate_pro' ))
+            return 0;
+		if ( !isset($_POST['post_id']))
+            return 0;
+        $response['error'] = false;
+        $response['message'] = '';
+        $response['redirect'] = '';
+		$account_settings = get_post_meta( $_POST['post_id'], '_instagrate_pro_settings', true ); 
+		$user = $this->instagram_get_user( $account_settings['token'], $account_settings['user_id'] );
+		$account_settings['user_thumb'] = $user->profile_picture;
+		update_post_meta($_POST['post_id'], '_instagrate_pro_settings', $account_settings);
+		$response['user_thumb'] = $account_settings['user_thumb'];
         $response['message'] = 'success';
         echo json_encode($response);
         die;
@@ -3418,7 +3605,7 @@ $this->make_debug('Error Attaching '. $type .' - media_handle_sideload: '. $id->
 				$wp_post_title = substr($wp_post_title, 0, $title_limit);
 			} else if ($title_limit_type == 'words') {
 				 $words = explode(" ", $wp_post_title);
-				 $wp_post_title = implode(" ",array_splice($words, 0, $title_limit));
+				 $wp_post_title = implode(" ", array_splice($words, 0, $title_limit));
 			}			
 		}
 		return apply_filters('igp_post_title', $wp_post_title);
@@ -3480,7 +3667,7 @@ $this->make_debug('Posting constantly as '. $settings->post_type);
 			switch ($settings->post_type) {
 				case 'post':
 					if ($settings->posting_multiple != 'single') {
-						if ( !is_home() && !is_category( $settings->post_term ) && !is_tax( $settings->post_taxonomy, $settings->post_term ) ) {
+						if ( !is_front_page() && !is_home() && !is_category( $settings->post_term ) && !is_tax( $settings->post_taxonomy, $settings->post_term ) ) {
 $this->make_debug('Not single '. $settings->post_type .' but not homepage or category page('. $settings->post_term .')' );
 							return $this->write_debug($account_id);
 						}
@@ -3581,9 +3768,11 @@ $this->make_debug('Images to post: '. sizeof($images) );
 				$default_tags[] = $tag_default->name;
 			}
 		}
+		
+		// Hashtag filtering on images
 		if (!empty($tags)) {
 			foreach ($images as $key => $image) {
-				// Hashtag filtering on images
+
 				$hashtags = unserialize($image->tags);
 				if($hashtags !== false) {
 	$this->make_debug('Image '. $key . ' - Tags: ');	
@@ -3591,7 +3780,23 @@ $this->make_debug('Images to post: '. sizeof($images) );
 					if (is_array($hashtags)) {
 						$tags = array_map('strtolower', $tags);
 						$hashtags = array_map('strtolower', $hashtags);
-						if(count(array_intersect($tags, $hashtags)) < 1) {
+						
+						$tag_match = true;
+						foreach ($tags as $tag) {
+							if (substr($tag, 0, 1) == '-') {
+								if (in_array(substr($tag, 1), $hashtags)) {
+									$tag_match = false;
+									break;
+								}
+							} else {
+								if (!in_array($tag, $hashtags)) {
+									$tag_match = false;
+									break;
+								}
+							}
+						}
+						
+						if (!$tag_match) {
 							$this->bulk_edit_status($account_id, 'ignore', $image->image_id);
 							unset($images[$key]);
 						}
@@ -3599,6 +3804,8 @@ $this->make_debug('Images to post: '. sizeof($images) );
 				}
 			}
 		}
+		
+		
 		if (empty($images)) {
 $this->make_debug('0 Images to post');
 			return $this->write_debug($account_id);
@@ -3620,8 +3827,9 @@ $this->make_debug('Image not pending');
 					$this->template_caption = $image->caption_clean;
 					$this->template_caption_tags_no_hash = str_replace('#', '', $image->caption_clean);
 					$this->template_caption_no_tags = $image->caption_clean_no_tags;
-					$this->template_tags = implode(' ', unserialize($image->tags));
-					$this->template_tags_first = reset(unserialize($image->tags));
+					$this->template_tags = implode( apply_filters( 'igp_tag_sep', ' '), unserialize($image->tags));
+					$image_tags = unserialize($image->tags);
+					$this->template_tags_first = reset( $image_tags );
 					$this->template_username = $image->username;
 					$this->template_date = date( 'M d, Y @ H:i', $image->image_timestamp);
 					$this->template_filter = $image->filter;
@@ -3834,8 +4042,9 @@ $this->make_debug('Image not pending');
 					$this->template_caption = $image->caption_clean;
 					$this->template_caption_tags_no_hash = str_replace('#', '', $image->caption_clean);
 					$this->template_caption_no_tags = $image->caption_clean_no_tags;
-					$this->template_tags = implode(' ', unserialize($image->tags));
-					$this->template_tags_first = reset(unserialize($image->tags));
+					$this->template_tags = implode( apply_filters( 'igp_tag_sep', ' '), unserialize($image->tags));
+					$image_tags = unserialize($image->tags);
+					$this->template_tags_first = reset( $image_tags );
 					$this->template_username = $image->username;
 					$this->template_date = date( 'M d, Y @ H:i', $image->image_timestamp);
 					$this->template_filter = $image->filter;
@@ -3972,8 +4181,9 @@ $this->make_debug('Image not pending');
 					$this->template_caption = $image->caption_clean;
 					$this->template_caption_tags_no_hash = str_replace('#', '', $image->caption_clean);
 					$this->template_caption_no_tags = $image->caption_clean_no_tags;
-					$this->template_tags = implode(' ', unserialize($image->tags));
-					$this->template_tags_first = reset(unserialize($image->tags));
+					$this->template_tags = implode( apply_filters( 'igp_tag_sep', ' '), unserialize($image->tags));
+					$image_tags = unserialize($image->tags);
+					$this->template_tags_first = reset( $image_tags );
 					$this->template_username = $image->username;
 					$this->template_date = date( 'M d, Y @ H:i', $image->image_timestamp);
 					$this->template_filter = $image->filter;
@@ -4407,8 +4617,9 @@ $this->make_debug('Account: '.  $key. ' is a '. $frequency .' poster. Run the po
 						$this->template_caption = $image->caption_clean;
 						$this->template_caption_tags_no_hash = str_replace('#', '', $image->caption_clean);
 						$this->template_caption_no_tags = $image->caption_clean_no_tags;
-						$this->template_tags = implode(' ', unserialize($image->tags));
-						$this->template_tags_first = reset(unserialize($image->tags));
+						$this->template_tags = implode( apply_filters( 'igp_tag_sep', ' '), unserialize($image->tags));
+						$image_tags = unserialize($image->tags);
+						$this->template_tags_first = reset( $image_tags );
 						$this->template_username = $image->username;
 						$this->template_date = date( 'M d, Y @ H:i', $image->image_timestamp);
 						$this->template_filter = $image->filter;
@@ -4612,7 +4823,7 @@ function igp_uninstall_plugin() {
 	if (function_exists('is_multisite') && is_multisite()) {
 		$current_blog = $wpdb->blogid;
 		// Get all blog ids
-		$blogids = $wpdb->get_col($wpdb->prepare("SELECT blog_id FROM $wpdb->blogs"));
+		$blogids = $wpdb->get_col("SELECT blog_id FROM $wpdb->blogs");
 		foreach ($blogids as $blog_id) {
 			switch_to_blog($blog_id);
 			igp_uninstall();

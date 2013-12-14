@@ -83,6 +83,20 @@ $wpsfigp_settings[] = array(
             'std' => 'lightbox'
         ),
         array(
+            'id' => 'hide-meta',
+            'title' => __( 'Hide Meta Boxes', $plugin_l10n ),
+            'desc' => __( 'Hide meta boxes on the edit account page.', $plugin_l10n ),
+            'type' => 'checkboxes',
+            'std' => 0,
+            'choices' => array( 'template' => 'Template Tags', 
+            					'custom' => 'Custom Meta',
+            					'featured' => 'Custom Featured Image',
+            					'tags' => 'Default Tags',
+            					'map' => 'Map Settings',
+            					'links' => 'Useful Links',        					
+            				)
+        ),
+        array(
             'id' => 'credit-link',
             'title' => __( 'Link Love', $plugin_l10n ),
             'desc' => __( 'Check this to enable a credit link to the plugin page after images posted.', $plugin_l10n ),
@@ -155,9 +169,15 @@ $wpsfigp_settings[] = array(
 // Support Settings section
 $wpsfigp_settings[] = array(
     'section_id' => 'support',
-    'section_title' => 'Support',
+    'section_title' => 'License &amp; Support',
     'section_order' => 2,
     'fields' => array(
+         array(
+            'id' => 'license',
+            'title' => __( 'Instagrate Pro License', $plugin_l10n ),
+            'type' => 'license',
+            'std' => ''
+        ),
         array(
             'id' => 'debug-mode',
             'title' => __( 'Debug Mode', $plugin_l10n ),
@@ -195,9 +215,6 @@ $wpsfigp_settings[] = array(
             'std' => 'Website: <a href="http://www.instagrate.co.uk">Instagrate Pro</a><br />
             Support: <a href="http://www.polevaultweb.com/support/forum/instagrate-pro-plugin/">Support Forum</a><br />
             Changelog: <a href="http://www.instagrate.co.uk/category/release/">Changelog</a><br/><br/>
-			<a target="_blank" title="Plugin by polevaultweb.com" href="http://www.polevaultweb.com/">
-				<img width="190" alt="polevaultweb logo" src="'. str_replace('includes/', 'assets/img/', plugin_dir_url( __FILE__ )) . 'pvw_logo.png">
-			</a><br/><br/>			
 			<a href="https://twitter.com/share" class="twitter-share-button" data-url="http://www.instagrate.co.uk" data-text="I\'m using the Instagrate Pro WordPress plugin" data-via="instagrate">Tweet</a>
 	<script>!function(d,s,id){var js,fjs=d.getElementsByTagName(s)[0];if(!d.getElementById(id)){js=d.createElement(s);js.id=id;js.src="//platform.twitter.com/widgets.js";fjs.parentNode.insertBefore(js,fjs);}}(document,"script","twitter-wjs");</script>'
         )

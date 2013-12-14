@@ -11,27 +11,30 @@ var scrollPadding = 0; //give a little resistance/delay when scrolling past a se
 /* detect browser */
 
 function getBrowser (){
-if(jQuery.uaMatch(navigator.userAgent).browser == 'webkit'){
-var userAgent = navigator.userAgent.toLowerCase();
-if ( userAgent.indexOf("chrome") === -1 ) { 
-return 'safari';
+	if(jQuery.uaMatch(navigator.userAgent).browser == 'webkit'){
+	var userAgent = navigator.userAgent.toLowerCase();
+	if ( userAgent.indexOf("chrome") === -1 ) { 
+	return 'safari';
 }
 else {
-return jQuery.uaMatch(navigator.userAgent).browser;
+	return jQuery.uaMatch(navigator.userAgent).browser;
 }
 }
 }
 /* end browser test */
 
 function getEndOfURL(url){
-arr = url.split('/');
-
-   return arr[arr.length-2];
+	arr = url.split('/');
+	return arr[arr.length-2];
 }
+function getURLHash(url){
+	arr = url.split('#');
 
+	return arr[arr.length-1];
+}
 /* no link - void clicks */
 function noLink(){
-return false;
+	return false;
 }
 function navTabActivate(tab, target){ //displays the portfolio navigation tab
 	jQuery(tab).click(function(e){
@@ -186,20 +189,15 @@ function whichSectionIsActive(){
 		jQuery('.menu-main-menu-container').slideUp('slow');
 		jQuery('#portfolio-nav').slideUp('fast');
 		jQuery('#portfolio .nav-tab').hide();
-	}
-	
+	}	
 	else if (jQuery('#services').hasClass('active')) {
-	jQuery('#portfolio-nav').slideUp('fast');
-	jQuery('#portfolio .nav-tab').hide();
-	
-	
-		
+		jQuery('#portfolio-nav').slideUp('fast');
+		jQuery('#portfolio .nav-tab').hide();	
 	}
 	else if(jQuery('#portfolio').hasClass('active')){
 		jQuery('.menu-main-menu-container').slideDown('slow');
 		jQuery('#portfolio .nav-tab').show('slow');
-		resizePortfolioSections();
-	
+		resizePortfolioSections();	
 	}
 	else if (jQuery('#case-studies').hasClass('active')) {
 		jQuery('#portfolio .nav-tab').hide();
@@ -210,10 +208,7 @@ function whichSectionIsActive(){
 		jQuery('#portfolio .nav-tab').hide();
 		jQuery('.menu-main-menu-container').slideDown('slow');
 		jQuery('#portfolio-nav').slideUp('fast');
-		/* Isotope Activation */
-			
-		
-	
+		/* Isotope Activation */	
 	}
 	else if (jQuery('#clients').hasClass('active')) {
 		jQuery('#portfolio .nav-tab').hide();
@@ -313,51 +308,76 @@ function moveMenuIndicator(){
 	}
 	
 	jQuery('#'+$menu+' .menu-item a').each(function(){
+			var sectionID;
 			if($menu == 'menu-main-menu'){
-				var sectionID = jQuery(this).attr('href');
+				sectionID = jQuery(this).attr('href');
 				
 			}
 			else if($menu == 'menu-global-menu'){
-				if(jQuery(this).parent().hasClass('current-menu-item')){
-				var sectionID = jQuery('#'+getEndOfURL(jQuery('.current-menu-item a').attr('href')));
+				
+				if(getURLHash(jQuery(this).attr('href')).indexOf('http') == -1){
+					 sectionID = '#'+getURLHash(jQuery(this).attr('href'));
 				}
-			else {
-				sectionID = false;
+				else {
+					sectionID = false;
+				}
 			}
-		}
-		if(sectionID.top){
+		if(sectionID != false){
 			var sectionOffset = jQuery(sectionID).offset();
+			
 			menuLeftPos = jQuery(this).parent().parent().offset().left;
-			sectionOffset.bottom = sectionOffset.top + jQuery(sectionID).height();
-			if(jQuery(this).attr('href') == currentSection.selector){//give the active menu item its own class
-			//console.log('current section ', currentSection);
+			
+			if(sectionOffset){
+				sectionOffset.bottom = sectionOffset.top + jQuery(sectionID).height();
+			}
+			
+			if(jQuery(this).attr('href') == '/'+sectionID){//give the active menu item its own class
+			
 			jQuery('#'+$menu+' .menu-item a').removeClass('active-item');
 			jQuery(this).addClass('active-item');
 			}
 		}
 	});//end each for menu item links
 	
-	//menu for touch devices
+if($menu == 'menu-main-menu'){
 	if(currentSection == null){
-	var activeSection = jQuery('.active').first();
-	
+		var activeSection = jQuery('.active').first();
 	}
-	else { activeSection = currentSection; }
-	if(jQuery('#'+$menu+' a[href="#'+ activeSection.attr("id") +'"]').length > 0){
-	var currentItem = jQuery('#'+$menu+' a[href="#'+ activeSection.attr("id") +'"]');
+	else { var activeSection = currentSection; }
+		if(jQuery('#'+$menu+' a[href="#'+ activeSection.attr("id") +'"]').length > 0){
+		var currentItem = jQuery('#'+$menu+' a[href="#'+ activeSection.attr("id") +'"]');
 	}
 	else{
-	currentItem = jQuery('#'+$menu+' .current-menu-item a');
+	var currentItem = jQuery('#'+$menu+' .current-menu-item a');
 	}
-	//console.log('current item', currentItem);
-	var itemOffset = currentItem.offset().left;
-	var itemWidth = currentItem.width();
 	
+	if(currentItem.length > 0){
+		var itemOffset = currentItem.offset().left;
+		var itemWidth = currentItem.width();
+	}
 	
 	var tabPosition = itemOffset + itemWidth/2; 
 	jQuery('.'+$menu+'-container').css({'backgroundPosition': tabPosition});
 	
+}
+else if($menu == 'menu-global-menu'){
+	var activeSection = currentSection; 
+	if(jQuery('#'+$menu+' a[href="/#'+ activeSection.attr("id") +'"]').length > 0){
+		var currentItem = jQuery('#'+$menu+' a[href="/#'+ activeSection.attr("id") +'"]');
+	}
+	else{
+	var currentItem = jQuery('#'+$menu+' .active-item');
+	}
+	
+	if(currentItem.length > 0){
+		var itemOffset = currentItem.offset().left;
+		var itemWidth = currentItem.width();
+	}
+	
+	var tabPosition = itemOffset + itemWidth/2; 
+	jQuery('.'+$menu+'-container').css({'backgroundPosition': tabPosition});
 
+}
 	
 	
 }//end moveMenuIndicator function
@@ -399,13 +419,14 @@ document.body.addEventListener("gesturechange", gestureChange, false);
 
 }
 function playAnimation(compID){
-	var animation = AdobeEdge.getComposition(compID);
-			if(animation != undefined)	{
-				stage = animation.getStage();
-				stage.play(0);
-				}
+	if(typeof getComposition == 'function'){
+		var animation = AdobeEdge.getComposition(compID);
+		if(animation != undefined)	{
+			stage = animation.getStage();
+			stage.play(0);
+		}
+	}
 }
-
 function makePortfolioCycles(){
 		var navID;
 		var navBar;
@@ -557,8 +578,8 @@ function makeCaseStudyCycles(){
 	if(slidePos.length > 0){
 		var listItems = jQuery('casestudy');
 		var startID = jQuery(casestudy).index('#case-study-wrapper .page, #case-study-wrapper .post');
-		console.log(startID,' ', casestudy);
-		console.log(jQuery(casestudy));
+		//console.log(startID,' ', casestudy);
+		//console.log(jQuery(casestudy));
 	}
 		jQuery('#case-study-wrapper.cycle').before('<div id="case-study-nav-container"><ul id="case-study-nav">').cycle({ 
 		    fx:     'scrollHorz', 

@@ -6,6 +6,10 @@ img.video {
 	display: none;
 }
 
+video, .wp-video-shortcode {
+	max-width: 100%;
+}
+
 .jp-video br {
 	display: none;
 }
