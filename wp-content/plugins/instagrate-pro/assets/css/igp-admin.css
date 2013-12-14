@@ -54,7 +54,6 @@
 
 .igp-details {
 	float: left;
-	width: 60px;
 }
 
 .igp-details p {
@@ -273,4 +272,8 @@ input.loading, select.loading {
 
 a.edit-image.video .video-ind {
 	display: block;
+}
+
+#igp_license .spinner, #igp_license #deactivate-license, #igp_license #activate-license {
+	float: left;
 }

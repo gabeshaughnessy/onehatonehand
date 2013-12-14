@@ -203,7 +203,7 @@ jQuery(document).ready(function($){
 	}
 	 
 	//Logout from Instagram
-	 $('#igp-logout').live('click', function(){      
+	$('#igp-logout').on('click', function(){      
         var r = confirm("Disconnect this account from Instagram?");
 		if (r==true) {
 			$('#poststuff').addClass('processing top');   
@@ -220,8 +220,26 @@ jQuery(document).ready(function($){
 		}
 	});
 	
+	// Refresh user from Instagram
+	$('#igp-refresh').on('click', function(){      
+        document.getElementById("igp-refresh").disabled = true;
+		$('.igp-details .spinner').show(); 
+		var post_id = $('#post_ID').val();     
+		$.post(ajaxurl, 
+			{ 	action:'igp_refresh',
+				post_id:post_id,
+				nonce: instagrate_pro.nonce
+			 }, 
+			function(data){
+				$('#user-thumb').attr("src", data.user_thumb);
+				$('.igp-details .spinner').hide();
+				document.getElementById("igp-refresh").disabled = false;  
+			}
+		, 'json');
+	});
+	
 	// Duplicate Account
-	 $('.igp-duplicate').live('click', function(){      
+	$('.igp-duplicate').on('click', function(){      
         var r = confirm("Are you sure you want to duplicate this account?");
 		if (r==true) {
 			$('#wpbody').addClass('processing');   
@@ -239,7 +257,7 @@ jQuery(document).ready(function($){
 	});
 	
 	// Sync Likes Account
-	$('.igp-sync-likes').live('click', function(){      
+	$('.igp-sync-likes').on('click', function(){      
         var r = confirm("Are you sure you want to sync likes for this account? This may take some time.");
 		if (r==true) {
 			$('#wpbody').addClass('processing');   
@@ -257,7 +275,7 @@ jQuery(document).ready(function($){
 	});
 	
 	// Sync Comments Account
-	$('.igp-sync-comments').live('click', function(){      
+	$('.igp-sync-comments').on('click', function(){      
         var r = confirm("Are you sure you want to sync comments for this account? This may take some time.");
 		if (r==true) {
 			$('#wpbody').addClass('processing');   
@@ -286,7 +304,7 @@ jQuery(document).ready(function($){
 	}
 	
 	//Load Earlier Images
-	 $('#igp-load-images').live('click', function(){      
+	 $('#igp-load-images').on('click', function(){      
         var post_id = $('#post_ID').val();
         $('#igp-images').addClass('processing');
 		var img_count = $('#igp-images li').length;
@@ -320,7 +338,7 @@ jQuery(document).ready(function($){
     });
     
     // Edit Image Meta
-    $('#igp-images .edit-image').live('click', function(){
+    $('#igp-images .edit-image').on('click', function(){
         var edit = $(this);
         var post_id = $('#post_ID').val();
         $('#igp_meta_caption').val('');
@@ -378,7 +396,7 @@ jQuery(document).ready(function($){
     });
     
     // Save Image Meta
-    $('#igp_meta_submit').live('click', function(){
+    $('#igp_meta_submit').on('click', function(){
         $('#igp_meta_submit').val('Saving…');
         var post_id = $('#post_ID').val();
         var image_id = $('#igp-edit-image').data('image_id');
@@ -407,7 +425,7 @@ jQuery(document).ready(function($){
     });
     
     // Bulk Status Change Meta
-    $('#igp-set-bulk-status').live('click', function(){
+    $('#igp-set-bulk-status').on('click', function(){
         $('#igp-images').addClass('processing');  
         $('#igp-set-bulk-status').attr('disabled', 'disabled');	
 		$('#igp-set-bulk-status').val('Setting...');	
@@ -587,7 +605,7 @@ jQuery(document).ready(function($){
 	}
 	
 	// Send Install Data
-	 $('#igp-send-data').live('click', function(){      
+	 $('#igp-send-data').on('click', function(){      
         $('#wpbody-content').addClass('processing');  
 		$.post(ajaxurl, 
 			{ 	action:'igp_send_install_data',
@@ -602,7 +620,7 @@ jQuery(document).ready(function($){
 	});
 	
 	// Send Debug Data
-	 $('#igp-send-debug').live('click', function(){      
+	 $('#igp-send-debug').on('click', function(){      
         $('#wpbody-content').addClass('processing');  
 		$.post(ajaxurl, 
 			{ 	action:'igp_send_debug_data',
@@ -617,7 +635,7 @@ jQuery(document).ready(function($){
 	});
 	
 	// Manual Posting
-	 $('#igp-manual-post').live('click', function(){      
+	 $('#igp-manual-post').on('click', function(){      
         var post_id = $('#post_ID').val();
 		var frequency = $('select[name="_instagrate_pro_settings[posting_frequency]"] option:selected').val();
 		$('#manual-posting .ig_ajax-loading').show(); 
@@ -646,13 +664,82 @@ jQuery(document).ready(function($){
 	});
 	
 	// Toggle Bulk
-	$('#toggle_bulk').live('click', function(){
+	$('#toggle_bulk').on('click', function(){
         if( $(this).is(':checked')) {
 			$('#igp-images input[type=checkbox]').attr('checked', true);
 		} else {
 			$('#igp-images input[type=checkbox]').attr('checked', false);
 		}
     });
+    
+    $('#activate-license').on('click', function(){
+	     var license_key = $('input[name="igpsettings_settings[igpsettings_support_license-key]"]').val();
+	     if (license_key != '') {
+			$('#igp_license .spinner').show();
+			document.getElementById("activate-license").disabled = true;
+        	$.ajax({
+	            url: ajaxurl, 
+	            type: 'POST',
+	            dataType: 'json',
+	            data: { action:'igp_activate_license',
+	            		nonce: instagrate_pro.nonce,
+	            		license_key: license_key,        		
+	            	 }, 
+	            success: function(response){
+	                if(response.error){
+	                    alert(response.message);
+	                    $('#igp_license .spinner').hide();
+	                    document.getElementById("activate-license").disabled = false;
+	                } else {
+	                    $('input[name="igpsettings_settings[igpsettings_support_license-status]"]').val(response.license_status);
+	                    if (response.license_status == 'activated') window.location = response.redirect;
+	                    else {
+	                    	alert('License ' + response.license_status);
+							$('#igp_license .spinner').hide();
+							document.getElementById("activate-license").disabled = false;
+	                    }
+	                }
+	            },
+	            error: function(response, status, error){
+	            	alert('Error: ' + error.replace(/(<([^>]+)>)/ig,""));
+	            	$('#igp_license .spinner').hide();
+	            	document.getElementById("activate-license").disabled = false;
+	            }
+	        });
+	      }
+	});
+	
+	$('#deactivate-license').on('click', function(){
+		$('#igp_license .spinner').show();
+		document.getElementById("deactivate-license").disabled = true;
+		$.ajax({
+            url: ajaxurl, 
+            type: 'POST',
+            dataType: 'json',
+            data: { action:'igp_deactivate_license',
+            		nonce: instagrate_pro.nonce,      		
+            	 }, 
+            success: function(response){
+                if(response.error){
+                    alert(response.message);
+                    $('#igp_license .spinner').hide();
+                    document.getElementById("deactivate-license").disabled = false;
+                } else {
+                    if (response.license_status == 'deactivated') {
+                    	$('input[name="igpsettings_settings[igpsettings_support_license-status]"]').val('');
+					}
+					window.location = response.redirect;
+                }
+            },
+            error: function(response, status, error){
+            	alert('Error: ' + error.replace(/(<([^>]+)>)/ig,""));
+            	$('#igp_license .spinner').hide();
+            	document.getElementById("deactivate-license").disabled = false;
+            }
+        });
+	      
+	});
+
 	
 
 	 	 
