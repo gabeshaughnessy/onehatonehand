@@ -4,7 +4,7 @@ Plugin Name: Instagrate Pro
 Plugin URI: http://www.instagrate.co.uk/  
 Description: Instagrate Pro is a powerful WordPress plugin that allows you to automatically integrate Instagram images into your WordPress site.
 Author: polevaultweb 
-Version: 1.5
+Version: 1.5.1
 Author URI: http://www.polevaultweb.com/
 
 Copyright 2012  polevaultweb  (email : info@polevaultweb.com)
@@ -76,17 +76,17 @@ class instagrate_pro {
 	private $debug_mode;
 	private $debug_text;
 	
-	static $video_count = 0;
+	public $video_count = 0;
 
     function __construct()
     {	
         // Set up default vars
         $this->plugin_path = plugin_dir_path( __FILE__ );
         $this->plugin_url = plugin_dir_url( __FILE__ );
-		$this->plugin_version = '1.5';
+		$this->plugin_version = '1.5.1';
 		$this->plugin_db_version = '1.3';
         $this->plugin_table = 'igp_images';
-		$this->plugin_l10n = 'instagrate-pro';
+		$this->plugin_l10n = 'or-ro';
 		
 		// Sellwire 
 		$this->sellwire_id = 'uz';
@@ -448,13 +448,12 @@ class instagrate_pro {
 							<p>'. sprintf(
 					__("%sSafe mode%s is enabled on your server, so the PHP time and memory limits cannot be set by this plugin.
 					Your time limit is %s seconds and your memory limit is %s, so if your accounts are posting lots of images at a time and saving them to the WordPress Media Library this may exceed the execution time. Each host has different methods available to increase these settings and a quick Google search should
-					yield some information. If not, please contact your host or search the support %sforum%s for help.
+					yield some information. If not, please contact your host for help.
 					If you cannot find an answer, please feel free to post a new topic.", $this->plugin_l10n),
 					'<a href="http://php.net/manual/en/features.safe-mode.php"><strong>',
 					'</a></strong>',
 					ini_get('max_execution_time'),
 					ini_get('memory_limit'),
-					'<a href="http://www.polevaultweb.com/support/forum/instagrate-pro-plugin/">',
 					'</a>') .' </p>
 						</div>';
 			}
@@ -978,7 +977,7 @@ class instagrate_pro {
 		if (instagrate_pro::is_license_constant()) {
 			$license = IGP_LICENSE;
 		} else {
-			if ($settings !== false) $settings = $this->settings;
+			if (!$settings) $settings = get_option('igpsettings_settings');
 			$license = trim(instagrate_pro::default_val($settings, 'igpsettings_support_license-key', ''));
 		}
 		return $license;
@@ -986,11 +985,10 @@ class instagrate_pro {
     
     function plugin_row() {
 		$licence = $this->get_license_key();
-		if( empty( $licence ) ) {
+		if( empty( $licence ) || $licence == '') {
 			$settings_link = sprintf( '<a href="%s">%s</a>', admin_url('edit.php?post_type=instagrate_pro&page=instagrate-pro-settings&tab=support'), __( 'Settings', $this->plugin_l10n ) );
 			$message = 'To finish activating Instagrate Pro, please go to ' . $settings_link . ' and enter your licence key and activate it to enable automatic updates.';
-		}
-		else return;
+		} else return;
 		?>
 		<tr class="plugin-update-tr igp-custom">
 			<td colspan="3" class="plugin-update">
@@ -1442,7 +1440,7 @@ class instagrate_pro {
 					<div class="igp-details">
 						<p><b><?php echo $options['username']; ?></b></p>
 						<input id="igp-logout" class="button" type="button" value="Disconnect">
-						<input id="igp-refresh" class="button" type="button" value="Refresh">
+						<input id="igp-refresh" class="button" type="button" value="Refresh" title="Refresh Profile Image">
 						<div class="spinner"></div>
 					</div>
 				</div>
@@ -2081,7 +2079,7 @@ class instagrate_pro {
         $html = '<ul>';
 		$html .= '<li><a target="_blank" href="http://www.instagrate.co.uk/help">'. __( 'Help', $this->plugin_l10n ) .'</a> - '. __( 'get help on what settings mean and how to use them', $this->plugin_l10n ) .'</li>';
 		$html .= '<li><a target="_blank" href="http://www.instagrate.co.uk/help#templates">'. __( 'Template Tags', $this->plugin_l10n ) .'</a> - '. __( 'get some simple examples of using template tags for the custom content', $this->plugin_l10n ) .'</li>';
-		$html .= '<li><a target="_blank" href="http://www.polevaultweb.com/support/forum/instagrate-pro-plugin/">'. __( 'Support', $this->plugin_l10n ) .'</a> - '. __( 'read the support forum and post a new topic', $this->plugin_l10n ) .'</li>';
+		$html .= '<li><a target="_blank" href="http://www.instagrate.co.uk/support/">'. __( 'Support', $this->plugin_l10n ) .'</a> - '. __( 'get support for the plugin', $this->plgin_l10n ) .'</li>';
 		$html .= '<li><a target="_blank" href="http://www.instagrate.co.uk/category/release/">'. __( 'Changelog', $this->plugin_l10n ) .'</a> - '. __( 'read the plugin\'s changelog', $this->plugin_l10n ) .'</li>';
 		$html .= '</ul>';
 		echo $html; 
@@ -2143,37 +2141,62 @@ class instagrate_pro {
 		return $callback;
 	}
 	
+	private function custom_api_client() {
+		$enabled = $this->default_val($this->settings, 'igpsettings_api_enable-custom-client', '0');
+		if ($enabled == '0') return false;
+
+		$client_id = $this->default_val($this->settings, 'igpsettings_api_custom-client-id', '');
+		$client_secret = $this->default_val($this->settings, 'igpsettings_api_custom-client-secret', '');
+		
+		if ($client_id == '' || $client_secret == '') return false;	
+		return true;	
+	}
+	
+	private function get_client_id() {
+		return ($this->custom_api_client()) ? $this->default_val($this->settings, 'igpsettings_api_custom-client-id', '') : $this->consumer_key;
+	}
+	
+	private function get_client_secret() {
+		return ($this->custom_api_client()) ? $this->default_val($this->settings, 'igpsettings_api_custom-client-secret', '') : $this->consumer_secret;
+	}
+	
+	private function get_redirect_uri($callback = '') {
+		if ($callback == '') $callback = $this->instagram_callback_url();
+		$return_uri = base64_encode($callback); 
+		return (($this->custom_api_client()) ? get_admin_url() : $this->redirect_uri) .'?return_uri='. $return_uri;
+	}
+	
 	function instagram_authorise_url() {
 		$callback = $this->instagram_callback_url();
 		$return_uri = base64_encode($callback); 
 		$redirect = $this->redirect_uri .'?return_uri='. $return_uri;
-		return $this->authorize_url.'?client_id='. $this->consumer_key. '&redirect_uri='. $redirect . '&response_type=code&scope=basic';
+		return $this->authorize_url.'?client_id='. $this->get_client_id(). '&redirect_uri='. $this->get_redirect_uri() . '&response_type=code&scope=basic';
 	}
 	
 	function instagram_auth_token($code) {
 		$callback = $this->instagram_callback_url();
 		$callback = substr($callback, 0, strpos($callback, 'igp_code') - 1);
-		$return_uri = base64_encode($callback); 
-		$redirect = $this->redirect_uri .'?return_uri='. $return_uri;
 		$token = array();
 		$token['error'] = false;
 		$token['message'] = '';
 		$token['token'] = '';
-		$data = array(	'client_id' => $this->consumer_key,
-						'client_secret' => $this->consumer_secret,
+		$client_id = $this->get_client_id();
+		$client_secret = $this->get_client_secret();
+		$redirect_uri = $this->get_redirect_uri( $callback );
+		$data = array(	'client_id' => $client_id,
+						'client_secret' => $client_secret,
 						'grant_type' => 'authorization_code',
-						'redirect_uri' => $redirect,
+						'redirect_uri' => $redirect_uri,
 						'code' => $code
 					);
-		$response = wp_remote_retrieve_body( 
-						wp_remote_post	( 	$this->access_token_url, 
-											array(	'method' => 'POST',
-													'sslverify' => false,
-													'timeout' => $this->http_timeout,
-													'user-agent' => $this->http_user_agent,
-													'body' => $data	)
-										)
-					);	
+		$remote = wp_remote_post( 	$this->access_token_url, 
+									array(	'method' => 'POST',
+											'sslverify' => false,
+											'timeout' => $this->http_timeout,
+											'user-agent' => $this->http_user_agent,
+											'body' => $data	)
+				);			
+		$response = wp_remote_retrieve_body( $remote );	
 		if ( is_wp_error($response) ) {
 			$token['error'] = true;
 			$token['message'] = $response->get_error_message();
@@ -2215,6 +2238,30 @@ class instagrate_pro {
 	}
 	
 	function instagram_connect() {
+		if ( $this->custom_api_client() ) {
+			if( isset( $_GET['return_uri'] ) ){
+				$redirect = '';
+				if(isset($_GET['error']) || isset($_GET['error_reason']) || isset($_GET['error_description'])){
+					$error = $_GET['error'];
+					$reason = $_GET['error_reason'];
+					$descp = $_GET['error_description'];
+					$url = base64_decode($_GET['return_uri']);
+					$redirect = $url.'&igp_error='.$error.'&igp_error_reason='.$reason.'&igp_error_description='.$descp;
+				}
+				else if(isset($_GET['code'])){
+					$code = $_GET['code'];
+					$url = base64_decode($_GET['return_uri']);
+					$redirect = $url.'&igp_code='. $code;
+				}
+				
+				if ($redirect != '') {
+					wp_redirect($redirect);
+					die();
+				}
+				
+			}	
+		} 
+	
 		if(isset($_GET['post']) && (isset($_GET['igp_code']) ||  isset($_GET['igp_error']))) {
 			if (isset($_GET['igp_code'])) {
 				$code = $_GET['igp_code'];

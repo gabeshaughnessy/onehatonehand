@@ -5,7 +5,7 @@ Author URI: http://www.polevaultweb.com/
 Tags: instagram, posts, integration, automatic, post, wordpress, posting, images
 Requires at least: 3.0
 Tested up to: 3.7.1
-Stable tag: 1.4.2
+Stable tag: 1.5.1
 
 The best plugin to automatically integrate Instagram images with WordPress.
 
@@ -30,6 +30,13 @@ To update the plugin either use the automatic updater or manually follow these s
 4. Activate the plugin through the 'Plugins' menu in WordPress.
 
 == Changelog ==
+
+= 1.5.1 =
+
+* New - Use your own Instagram API client
+* Fix - Strict standards notices
+* Fix - License message still showing after activation on plugins screen
+* Improvement - Changed links to support page
 
 = 1.5 =
 

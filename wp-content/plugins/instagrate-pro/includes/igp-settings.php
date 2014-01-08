@@ -18,7 +18,7 @@ $wpsfigp_settings[] = array(
         ),
         array(
             'id' => 'title-limit-type',
-            'title' => __( 'Title Length Limit', $plugin_l10n ),
+            'title' => __( 'Title Length Type', $plugin_l10n ),
             'desc' => __( 'Set type of length limit.', $plugin_l10n ),
             'type' => 'select',
             'choices' => array('characters' => 'Characters', 'words' => 'Words'),
@@ -88,12 +88,12 @@ $wpsfigp_settings[] = array(
             'desc' => __( 'Hide meta boxes on the edit account page.', $plugin_l10n ),
             'type' => 'checkboxes',
             'std' => 0,
-            'choices' => array( 'template' => 'Template Tags', 
+            'choices' => array( 'template' => 'Template Tags',
             					'custom' => 'Custom Meta',
             					'featured' => 'Custom Featured Image',
             					'tags' => 'Default Tags',
             					'map' => 'Map Settings',
-            					'links' => 'Useful Links',        					
+            					'links' => 'Useful Links',
             				)
         ),
         array(
@@ -165,12 +165,49 @@ $wpsfigp_settings[] = array(
 	)
 );
 
+// Comments Settings section
+$wpsfigp_settings[] = array(
+    'section_id' => 'api',
+    'section_title' => 'API',
+    'section_order' => 2,
+    'fields' => array(
+		array(
+            'id' => 'enable-custom-client',
+            'title' => __( 'Use Custom Instagram API Client', $plugin_l10n ),
+            'desc' => __( 'Connect the plugin with your own Instagram API client. Register it here', $plugin_l10n ) .' <a target="_blank" href="http://instagram.com/developer/register/">here</a>',
+            'type' => 'checkbox',
+            'std' => 0
+        ),
+		array(
+            'id' => 'custom-client-id',
+            'title' => __( 'Client ID', $plugin_l10n ),
+            'desc' => __( 'Enter the Client ID once you have registered your client', $plugin_l10n ),
+            'type' => 'text',
+            'std' => ''
+        ),
+        array(
+            'id' => 'custom-client-secret',
+            'title' => __( 'Client Secret', $plugin_l10n ),
+            'desc' => __( 'Enter the Client Secret once you have registered your client', $plugin_l10n ),
+            'type' => 'text',
+            'std' => ''
+        ),
+        array(
+            'id' => 'custom-redirect-uri',
+            'title' => __( 'Redirect URI', $plugin_l10n ),
+            'desc' => '',
+            'type' => 'custom',
+            'std' => __( 'When registering your Instagram API client use this as your Redirect URI:<br>', $plugin_l10n ) . '<code>'.  get_admin_url() . '</code>'
+        ),
+	)
+);
+
 
 // Support Settings section
 $wpsfigp_settings[] = array(
     'section_id' => 'support',
     'section_title' => 'License &amp; Support',
-    'section_order' => 2,
+    'section_order' => 3,
     'fields' => array(
          array(
             'id' => 'license',
@@ -190,7 +227,7 @@ $wpsfigp_settings[] = array(
             'title' => __( 'Debugging', $plugin_l10n ),
             'desc' => '',
             'type' => 'custom',
-            'std' => 'Please raise an issue on the <a href="http://www.polevaultweb.com/support/forum/instagrate-pro-plugin/">Support Forum</a> before sending the below debug files. Without knowing the issue they aren\'t much help on their own and will not be responded too.'
+            'std' => 'Please raise an issue on the <a href="http://www.instagrate.co.uk/support/">Support Forum</a> before sending the below debug files. Without knowing the issue they aren\'t much help on their own and will not be responded too.'
         ),
 		array(
             'id' => 'send-debug',
@@ -213,7 +250,7 @@ $wpsfigp_settings[] = array(
             'desc' => '',
             'type' => 'custom',
             'std' => 'Website: <a href="http://www.instagrate.co.uk">Instagrate Pro</a><br />
-            Support: <a href="http://www.polevaultweb.com/support/forum/instagrate-pro-plugin/">Support Forum</a><br />
+            Support: <a href="http://www.instagrate.co.uk/support">Support Forum</a><br />
             Changelog: <a href="http://www.instagrate.co.uk/category/release/">Changelog</a><br/><br/>
 			<a href="https://twitter.com/share" class="twitter-share-button" data-url="http://www.instagrate.co.uk" data-text="I\'m using the Instagrate Pro WordPress plugin" data-via="instagrate">Tweet</a>
 	<script>!function(d,s,id){var js,fjs=d.getElementsByTagName(s)[0];if(!d.getElementById(id)){js=d.createElement(s);js.id=id;js.src="//platform.twitter.com/widgets.js";fjs.parentNode.insertBefore(js,fjs);}}(document,"script","twitter-wjs");</script>'
