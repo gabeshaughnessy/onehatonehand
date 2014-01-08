@@ -180,6 +180,7 @@ body{
 }
 #scroll-cta p{
 	padding: 0px 26px;
+	margin-top: 0;
 }
 #keys-cta,  #checkback-cta{
 	font-size: 22px;
@@ -190,6 +191,7 @@ body{
 }
 #keys-cta p {
 	margin-right: 10px;
+	margin-top: 0;
 }
 #checkback-cta p{
 	margin:  0 45px;
