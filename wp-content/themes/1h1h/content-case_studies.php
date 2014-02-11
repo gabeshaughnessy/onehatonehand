@@ -40,7 +40,7 @@
 								
 								//get meta value for pdf upload and assign to variable.
 								$post_list.= '<div class="details"><a href="/case-studies?case='.$post->post_name.'" class=""><h2 class="post-title muli '.$has_parent.'">'.get_the_title().'</h2></a>';
-								$post_list .= //assign the meta value here
+								$post_list .= '';//assign the meta value here
 								//'<a href="/case-studies?case='.$post->post_name.'" class="">Read More &rArr; </a>';
 								if(is_user_logged_in() && current_user_can('edit_post', $post->ID)){
 									$post_list .= '<p class="muli"><a href="'.get_edit_post_link($post->ID).'" title="edit post">Edit Case Study</a></div>';
