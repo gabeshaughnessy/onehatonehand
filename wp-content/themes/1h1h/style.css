@@ -1024,18 +1024,27 @@ cursor: pointer;
 
 /* Edit Post Link */
 #wrapper .edit-post {
-	position: absolute;
-	top: 52px;
-	left: 52px;
-	
+position: absolute;
+top: 0;
+left: 0;
+background: #fff;
+padding: 1em 1em 1em .5em;
+border-top-right-radius: 1em;
+border-bottom-right-radius: 1em;
+opacity: .1;
+box-shadow: 1px 1px 3px rgba(0,0,0,.8);
+-webkit-transition: all .7s ease-in-out;
+}
+
+#wrapper .edit-post:hover {
+	opacity: 1;
 }
 
 
 #wrapper .edit-post a {
-	color:  #bbb;
+	color:  #333;
 	font-weight:  bold;
 	text-transform: uppercase;
-	text-shadow: 0 0 2px rgba(0,0,0, .5);
 	text-decoration: none;
 }
 /* image styles for alignment and positioning */

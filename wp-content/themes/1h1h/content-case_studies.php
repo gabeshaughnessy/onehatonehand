@@ -6,7 +6,7 @@
 			<h2 class="fredericka centered">Case Studies</h2>
 			<div id="case_studies-posts" class="">
 				<div class="primary">
-						<div class="content" role="main">
+					<div class="content" role="main">
 				<?php
 				if(!is_user_logged_in()){
 				$post_list = get_transient('case-study-list');
@@ -35,10 +35,19 @@
 								 $post_list .= hh_get_the_thumbnails('rectangle_grid', false);
 								
 								global $post;
+
 								$post->post_parent ? $has_parent = 'has-parent' : $has_parent = '';
-								
 								$post_list.= '<div class="details"><a href="/case-studies?case='.$post->post_name.'" class=""><h2 class="post-title muli '.$has_parent.'">'.get_the_title().'</h2></a>';
-								$post_list .= '<a href="/case-studies?case='.$post->post_name.'" class="">Read More &rArr; </a>';
+
+								//get meta value for pdf upload and assign to variable.
+								$pdf_file = get_field('case_study_file');
+								if(!empty($pdf_file) && !empty($pdf_file['url'])){
+									$post_list .= '<a href="'.$pdf_file["url"].'" target="_blank" >View the PDF</a>';//assign the meta value here
+									
+								}
+								else {
+									$post_list .=  '<a href="/case-studies?case='.$post->post_name.'" class="">Read More &rArr; </a>';
+								}
 								if(is_user_logged_in() && current_user_can('edit_post', $post->ID)){
 									$post_list .= '<p class="muli"><a href="'.get_edit_post_link($post->ID).'" title="edit post">Edit Case Study</a></div>';
 								}
