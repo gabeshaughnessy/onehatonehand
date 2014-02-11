@@ -215,62 +215,13 @@ $meta_boxes[] = array(
 	'priority' => 'high',
 	'show_names' => true, // Show field names on the left
 	'fields' => array( //field declarations create the fields in the metabox then get content from the callback function below
-		array(
-			'name' => 'Description',
-			'desc' => 'case study description',
-			'id' => $prefix . 'description',
-			'type' => 'textarea', // text area
+				array(
+			'name' => 'PDF CASE STUDY FILE',
+			'desc' => 'upload a web optimized pdf file',
+			'id' => $prefix . 'pdf_file',
+			'type' => 'image', // flyer image
 			'std' => ''
 		),
-		array(
-			'name' => 'Challenges',
-			'desc' => 'what were the challenges involved?',
-			'id' => $prefix . 'challenges',
-			'type' => 'textarea', // text area
-			'std' => ''
-		),
-		array(
-			'name' => 'Solutions',
-			'desc' => 'How did One Hat One Hand overcome the challenges?',
-			'id' => $prefix . 'challenges',
-			'type' => 'textarea', // text area
-			'std' => ''
-		),
-		array(
-			'name' => 'Imagined By',
-			'desc' => 'Who came up with this?',
-			'id' => $prefix . 'imagined',
-			'type' => 'textarea', // text area
-			'std' => ''
-		),
-		array(
-			'name' => 'Designed By',
-			'desc' => 'Who figured out how to make this work?',
-			'id' => $prefix . 'designed',
-			'type' => 'textarea', // text area
-			'std' => ''
-		),
-		array(
-			'name' => 'Built By',
-			'desc' => 'Who built this?',
-			'id' => $prefix . 'built',
-			'type' => 'textarea', // text area
-			'std' => ''
-		),
-		array(
-			'name' => 'Vimeo Video',
-			'desc' => 'If there is a video about this project, you can put full url (http: NOT https: of a video on Vimeo.com',
-			'id' => $prefix . 'vimeo_video',
-			'type' => 'text', // video
-			'std' => ''
-		),
-		array(
-			'name' => 'Youtube Video',
-			'desc' => 'Same goes for YouTube, although vimeo is prefered, you can put the url of a video on youtube video here.',
-			'id' => $prefix . 'youtube_video',
-			'type' => 'text', // video
-			'std' => ''
-		)		
 	)
 );
 
