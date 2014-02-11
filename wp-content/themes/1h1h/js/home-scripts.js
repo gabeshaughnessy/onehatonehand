@@ -672,6 +672,7 @@ function buildPageAnchors(slide){
 	
 /* ============= Global Scripts ========*/
 jQuery(window).load(function(){
+
 	/* Psuedo Hover Events for touch devices */
 	jQuery('.hover').click(function(e){
 	jQuery(this).toggleClass('hovered');
@@ -681,7 +682,10 @@ jQuery(window).load(function(){
 	
 	//fade the wrapper in after it loads
 	jQuery('#wrapper').animate({'opacity':1},1400);
-	jQuery('.loader').animate({'opacity':0},400);
+	jQuery('.loader').animate({'opacity':0},400, function(){
+		jQuery('.loader').remove();
+	});
+
 	
 	
 	makePortfolioCycles();

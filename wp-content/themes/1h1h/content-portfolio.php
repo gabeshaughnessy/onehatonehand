@@ -18,11 +18,6 @@
 			<h2 class="fredericka">Portfolio</h2>
 			<div class="prev arrow"></div>
 		</div>
-		<!--<div class="instructions" ><?php 
-		//$page = get_page_by_path( 'instructions' );
-		//$content = $page->post_content;
-		//echo $content; 
-		?></div>-->
 	</div>
 	
 	
