@@ -439,14 +439,15 @@ function makePortfolioCycles(){
 			navID = false;
 			navBar = '';
 		}
-		jQuery('#portfolio .cycle').before(navBar).cycle({ 
+		jQuery('#portfolio .cycle').cycle({ 
 		    fx:     'scrollHorz', 
 		    speed:  500, 
 		    timeout: 0, 
-		    pager:  navID, 
+		    //pager:  navID, 
 		    next: '#portfolio-control .next',
 		    prev: '#portfolio-control .prev',
-		    after: afterCycle,
+		    after: afterPortfolioCycle,
+		    skipInitializationCallbacks: true,
 		     
 		    // callback fn that creates a thumbnail to use as pager anchor 
 		    pagerAnchorBuilder: function(idx, slide) { 
@@ -463,10 +464,43 @@ function makePortfolioCycles(){
 		jQuery('#portfolio .next, #portfolio .prev').click(function(){
 			resizePortfolioSections();
 		});
-		function afterCycle(currSlideElement, nextSlideElement, options, forwardFlag){
+		
+		
+		jQuery('#tour .cycle').cycle({ 
+		    fx:     'scrollHorz', 
+		    speed:  500, 
+		    timeout: 0,  
+		    next: '#tour .next',
+		    prev: '#tour .prev',
+		   after: afterTourCycle,
+		}
+		);
+		jQuery('#tour .next, #tour .prev').click(function(){
+		
+			resizeTourSections();
+			
+		});
+		
+
+function afterPortfolioCycle(currSlideElement, nextSlideElement, options, forwardFlag){
 			nextElementID = jQuery(nextSlideElement).attr('data-target');
 			if(nextElementID != undefined && nextElementID.indexOf('shop-tour') != -1){		
 				playAnimation("animate-shop-tour");
+			}
+			//ajax load next few slides and remove this one
+			if (typeof portfolioItems != 'undefined'){ //look for global array with portfolio items
+				currentImgSrc = jQuery(currSlideElement).find('img').attr('src');
+					
+						if( currentImgSrc != '' || currentImgSrc != undefined){
+							jQuery(currSlideElement).find('img').attr('src', portfolioItems[0]);
+							portfolioItems.splice(0,1);
+							if(currentImgSrc.indexOf('paper_bg2') == -1){
+								portfolioItems.push(currentImgSrc);
+								jQuery('#portfolio-control h2').remove();
+							}
+							
+						}
+					
 			}
 			//Stop video Playback
 			videoElement = jQuery(currSlideElement).find('iframe');
@@ -497,27 +531,43 @@ function makePortfolioCycles(){
 				}
 				
 			}
+		}		
+function afterTourCycle(currSlideElement, nextSlideElement, options, forwardFlag){
+	nextElementID = jQuery(nextSlideElement).attr('data-target');
+	if(nextElementID != undefined && nextElementID.indexOf('shop-tour') != -1){		
+		playAnimation("animate-shop-tour");
+	}
+	
+	//Stop video Playback
+	videoElement = jQuery(currSlideElement).find('iframe');
+	if(videoElement){
+		videoSrc = jQuery(videoElement).attr('src');
+		jQuery(videoElement).attr('src', '');
+		jQuery(videoElement).attr('src', videoSrc);
+	}
+
+	var nextslide = jQuery(nextSlideElement).attr('data-target');
+	var currslide = jQuery(currSlideElement).attr('data-target');
+	
+	if(jQuery(nextSlideElement).parent().parent().attr('id') == 'portfolio'){
+		if(nextslide.indexOf('hh_project/portfolio-page') >= 0){
+			jQuery('#portfolio-control h2').fadeIn('slow');
+		}
+		else if(nextslide.indexOf('hh_project/portfolio-page') == -1){
+			jQuery('#portfolio-control h2').fadeOut('slow');
+		}
+	}
+	if(jQuery(nextSlideElement).hasClass('isotope-grid')){
+		var $container = jQuery('.filter-target');
+		if($container.length > 0){
+			$container.isotope({
+			  filter: '.artist'
+			});
+			$container.find('.isotope-item').animate({'opacity':1}, 500);	
 		}
 		
-		jQuery('#tour .cycle').cycle({ 
-		    fx:     'scrollHorz', 
-		    speed:  500, 
-		    timeout: 0,  
-		    next: '#tour .next',
-		    prev: '#tour .prev',
-		   after: afterCycle,
-		}
-		);
-		jQuery('#tour .next, #tour .prev').click(function(){
-		
-			resizeTourSections();
-			
-		});
-		
-				
-		jQuery('#portfolio-nav').after('<a class="nav-tab">+</a>');
-		
-			
+	}
+}			
 function buildPageAnchors(slide){
 		if(jQuery(slide).find('.post-title').html()){
 		var linkTitle = jQuery(slide).find('.post-title').html();

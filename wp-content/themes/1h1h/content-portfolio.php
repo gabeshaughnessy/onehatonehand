@@ -2,6 +2,12 @@
 //The portfolio page content
 ?>
 <div id="portfolio" class="section">
+	<script type="text/javascript">
+		var portfolioItems = Array();
+	</script>
+	<?php 
+		$portfolio_image_srcs = array();
+	?>
 		<div class="portfolio-wrapper cycle">
 		
 				<?php //Portfolio Loop Goes Here
@@ -9,6 +15,14 @@
 				
 				 ?>
 	</div>
+	<script>
+	<?php 
+	global $portfolio_image_srcs;
+	foreach ($portfolio_image_srcs as $src) {
+			echo 'portfolioItems.push("'.$src.'");';
+		}
+	?>
+	</script>
 	<div id="portfolio-control" class="instructions-modal">
 		<!--<div id="portfolio-title" > <span class="hh_text">One Hat One Hand</span> <span class="fredericka" >Portfolio</span></div>
 	
