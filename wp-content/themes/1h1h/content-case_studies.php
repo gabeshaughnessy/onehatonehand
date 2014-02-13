@@ -7,26 +7,30 @@
 			<div id="case_studies-posts" class="">
 				<div class="primary">
 					<div class="content" role="main">
-				<?php
-				if(!is_user_logged_in()){
-				$post_list = get_transient('case-study-list');
-					}
-				elseif (is_user_logged_in()) {
-					$post_list = false;
-				}
-				
-				if($post_list == false){
-				$args = array(
-								
+						<?php
+						if(!is_user_logged_in()){
+						$post_list = get_transient('case-study-list');
+							}
+						elseif (is_user_logged_in()) {
+							$post_list = false;
+						}
+						if($post_list == false){
+						$args = array(
+										
 										'post_type' => 'hh_case_study',
-										'post_count' => 6,
+										'post_count' => -1,
 										'orderby' => 'menu_order  parent',
 										'order' => 'ASC'
-									
-							);
-							$custom_query = new WP_Query( $args );
+											
+									);
+						$custom_query = new WP_Query( $args );
+
+						$post_count = 1;
+
+						$post_list .=  '<div id="slide-container" class="cycle">';
 							if ( $custom_query->have_posts() ) : while ( $custom_query->have_posts() ) : $custom_query->the_post(); 
 								
+								if($post_count == 1 || $post_count % 3 == 1){ $post_list .=  '<div class="slide">';}
 								$meta_values = hh_get_meta_values(get_the_ID());
 								
 								$post_list .= '<div id="post_'.get_the_ID().'" class="post case-study three columns hover">';
@@ -56,26 +60,46 @@
 								}
 								
 								$post_list .= '</div>';
+
+								//placeholder images
+								if($post_count == $custom_query->post_count){
+									if($post_count % 3 - 2 == 0){
+										$post_list .= '<div class="post coming-soon hat case-study three columns hover"><img class="placeholder" width="300" height="150" src="'.get_bloginfo('stylesheet_directory').'/images/coming-soon-hat.jpg"  /><p>coming soon!</p></div>';
+										
+									}
+									if($post_count % 3 - 1  == 0){
+
+										$post_list .= '<div class="post coming-soon hat case-study three columns hover"><img class="placeholder" width="300" height="150" src="'.get_bloginfo('stylesheet_directory').'/images/coming-soon-hand.jpg" /><p>coming soon!</p></div>';
+										$post_list .= '<div class="post coming-soon hat case-study three columns hover"><img class="placeholder" width="300" height="150" src="'.get_bloginfo('stylesheet_directory').'/images/coming-soon-hat.jpg" /><p>coming soon!</p></div>';
+
+									}
+								}
+								if($post_count % 3 == 0 || $post_count == $custom_query->post_count){ $post_list .=  '</div>';}//close slide
+								$post_count++;
 								endwhile; 		
 								else : 
 				
 								$post_list .= '<p> nothing for you here</p>';
 				
 							endif; 
-							// Reset Post Data
-							wp_reset_postdata();
-				if(!is_user_logged_in()){
-					set_transient('case-study-list', $post_list, 60*60*24*7);
-				}
-				}
-				echo $post_list;
-				
-				?>
-				</div>
+
+						$post_list .=  '</div>';
+						// Reset Post Data
+						wp_reset_postdata();
+						if(!is_user_logged_in()){
+							set_transient('case-study-list', $post_list, 60*60*24*7);
+						}
+					}
+					echo $post_list;			
+					?>
+					</div>
+					
 				<?php get_template_part('post_footer'); ?>
 				</div>
 			</div>
-			
-
+			<div id="slider-nav" class="hand-navigation">
+						<div class="next arrow"></div>
+						<div class="prev arrow"></div>
+					</div>
 	</div><!-- end case_studies wrapper -->
 </div><!-- end case_studies section -->
