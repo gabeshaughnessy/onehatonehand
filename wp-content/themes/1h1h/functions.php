@@ -285,7 +285,6 @@ function modal_more_link( $more_link, $more_link_text ) {
 function hh_portfolio_loop($hhpost_type, $hhcount){ 
 $portfolio_list = '';//disable transients or this doesn't work right get_transient('portfolio_items');
 global $portfolio_image_srcs;
-error_log('$portfolio_image_srcs: before loop '. print_r($portfolio_image_srcs, true))	;
 if($portfolio_list == ''){
 
 $args = array(
