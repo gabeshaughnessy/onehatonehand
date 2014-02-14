@@ -10,17 +10,19 @@
 	?>
 		<div class="portfolio-wrapper cycle">
 		
-				<?php //Portfolio Loop Goes Here
-		hh_portfolio_loop('hh_project', 10);
-				
-				 ?>
+			<?php //Portfolio Loop Goes Here
+				hh_portfolio_loop('hh_project', 10);
+			
+			 ?>
 	</div>
 	<script>
 	<?php 
 	global $portfolio_image_srcs;
-	foreach ($portfolio_image_srcs as $src) {
+	if(is_array($portfolio_image_srcs)){
+	foreach($portfolio_image_srcs as $src) {
 			echo 'portfolioItems.push("'.$src.'");';
 		}
+	}
 	?>
 	</script>
 	<div id="portfolio-control" class="instructions-modal">

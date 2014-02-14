@@ -283,9 +283,8 @@ function modal_more_link( $more_link, $more_link_text ) {
 /* +++++ T H E   P O R T F O L I O   L O O P ++++++ */
 //////////////////////////////////////////////////////
 function hh_portfolio_loop($hhpost_type, $hhcount){ 
-$portfolio_list = get_transient('portfolio_items');
+$portfolio_list = '';//disable transients or this doesn't work right get_transient('portfolio_items');
 global $portfolio_image_srcs;
-
 if($portfolio_list == ''){
 
 $args = array(
@@ -294,7 +293,7 @@ $args = array(
 			'post_count' => $hhcount
 );
 $custom_query = new WP_Query( $args );
-$posts_to_show = 3;
+$posts_to_show = 4;
 $current_post_index = 1;
 if ( $custom_query->have_posts() ) : while ( $custom_query->have_posts() ) : $custom_query->the_post(); 
 

@@ -487,19 +487,26 @@ function afterPortfolioCycle(currSlideElement, nextSlideElement, options, forwar
 			if(nextElementID != undefined && nextElementID.indexOf('shop-tour') != -1){		
 				playAnimation("animate-shop-tour");
 			}
+		
 			//ajax load next few slides and remove this one
 			if (typeof portfolioItems != 'undefined'){ //look for global array with portfolio items
-				currentImgSrc = jQuery(currSlideElement).find('img').attr('src');
-					
-						if( currentImgSrc != '' || currentImgSrc != undefined){
-							jQuery(currSlideElement).find('img').attr('src', portfolioItems[0]);
-							portfolioItems.splice(0,1);
-							if(currentImgSrc.indexOf('paper_bg2') == -1){
-								portfolioItems.push(currentImgSrc);
-								jQuery('#portfolio-control h2').remove();
-							}
-							
+				//Preload Images
+				var index;
+				for (index = 0; index < portfolioItems.length; ++index) {
+						var image = new Image();
+						image.src = portfolioItems[index];
+					}
+
+				currentImgSrc = jQuery(currSlideElement).find('img').attr('src');					
+					if( currentImgSrc != '' || currentImgSrc != undefined){
+						jQuery(currSlideElement).find('img').attr('src', portfolioItems[0]);
+						portfolioItems.splice(0,1);
+						if(currentImgSrc.indexOf('paper_bg2') == -1){
+							portfolioItems.push(currentImgSrc);
+							jQuery('#portfolio-control h2').remove();
 						}
+						
+					}
 					
 			}
 			//Stop video Playback
