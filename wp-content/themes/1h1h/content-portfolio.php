@@ -19,7 +19,7 @@
 	<?php 
 	global $portfolio_image_srcs;
 	if(is_array($portfolio_image_srcs)){
-	foreach ($portfolio_image_srcs as $src) {
+	foreach($portfolio_image_srcs as $src) {
 			echo 'portfolioItems.push("'.$src.'");';
 		}
 	}

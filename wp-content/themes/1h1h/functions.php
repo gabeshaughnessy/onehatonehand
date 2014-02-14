@@ -283,9 +283,9 @@ function modal_more_link( $more_link, $more_link_text ) {
 /* +++++ T H E   P O R T F O L I O   L O O P ++++++ */
 //////////////////////////////////////////////////////
 function hh_portfolio_loop($hhpost_type, $hhcount){ 
-$portfolio_list = get_transient('portfolio_items');
+$portfolio_list = '';//disable transients or this doesn't work right get_transient('portfolio_items');
 global $portfolio_image_srcs;
-
+error_log('$portfolio_image_srcs: before loop '. print_r($portfolio_image_srcs, true))	;
 if($portfolio_list == ''){
 
 $args = array(
