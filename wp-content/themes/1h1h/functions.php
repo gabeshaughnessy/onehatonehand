@@ -294,7 +294,7 @@ $args = array(
 			'post_count' => $hhcount
 );
 $custom_query = new WP_Query( $args );
-$posts_to_show = 3;
+$posts_to_show = 5;
 $current_post_index = 1;
 if ( $custom_query->have_posts() ) : while ( $custom_query->have_posts() ) : $custom_query->the_post(); 
 
