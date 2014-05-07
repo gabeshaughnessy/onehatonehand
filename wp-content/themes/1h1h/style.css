@@ -561,7 +561,7 @@ float: left;
 #portfolio-control, #case-study-control, #tour-control {
 	position: absolute;
 	text-align: center;
-	width:  40%;
+	width:  100%;
 	z-index: 900;
 	height:  auto;
 	top: 330px;
@@ -954,6 +954,12 @@ cursor: pointer;
 	
 }
 
+#tour-control .hand.next, #tour-control .arrow.next{
+	right: 10px;
+}
+#tour-control .hand.prev, #tour-control .arrow.prev{
+	left: 10px;
+}
 .prev.hand:hover, .next.hand:hover{
 	background-position-y: -80px;
 }
