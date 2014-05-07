@@ -357,7 +357,9 @@ clear: both;
 .portfolio_bg.no-image{
 
 }
-
+.portfolio-group {
+	display: none;
+}
 .portfolio-content.centered {
 	position: absolute;
 	top: 0;

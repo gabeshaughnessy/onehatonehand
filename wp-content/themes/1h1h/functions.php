@@ -324,7 +324,8 @@ foreach ($portfolio_groups as $group) { //loop through each group and show one p
 			)
 	);
 	$group_slug = get_term_by('id', $group, 'hh_portfolio');
-	$group_slug = $group_slug->name;
+	$group_name = $group_slug->name;
+	$group_slug = $group_slug->slug;
 	$custom_query = new WP_Query( $args );
 	if ( $custom_query->have_posts() ) : while ( $custom_query->have_posts() ) : $custom_query->the_post(); 
 		if (has_post_thumbnail()) {
@@ -337,7 +338,7 @@ foreach ($portfolio_groups as $group) { //loop through each group and show one p
 
 			
 			if($current_post_index <= $posts_to_show){
-				$portfolio_list .='<div class="portfolio-entry post" data-target="'.get_permalink(get_the_ID()).'" id="portfolio_post_'.get_the_ID().'"><div class="portfolio-group">'.$group_slug.'</div>'.hh_get_portfolio_backgrounds("full-bg", false).'</div>';
+				$portfolio_list .='<div class="portfolio-entry post" data-target="'.get_permalink(get_the_ID()).'" id="portfolio_post_'.get_the_ID().'"><div class="portfolio-group">'.$group_name.'</div><a href="/portfolio-groups?group='.$group_slug.'" title="View Portfolio" target="_blank">'.hh_get_portfolio_backgrounds("full-bg", false).'</a></div>';
 			}
 			else {
 				$portfolio_image_srcs[] = $img_src[0];
