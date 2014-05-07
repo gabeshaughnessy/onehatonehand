@@ -293,42 +293,71 @@ $args = array(
 			'post_count' => $hhcount
 );
 $custom_query = new WP_Query( $args );
-$posts_to_show = 4;
+$posts_to_show = 6;
 $current_post_index = 1;
+$portfolio_groups = array(); //array of portfolio group terms
 if ( $custom_query->have_posts() ) : while ( $custom_query->have_posts() ) : $custom_query->the_post(); 
 
+$post_id = get_the_ID();
 
-if (has_post_thumbnail()) {
-	//save the image markup to a global javascript variable.
-			
-	$img = get_the_post_thumbnail();
-	$img_id = get_post_thumbnail_id();
-	$img_src = wp_get_attachment_image_src($img_id, $thumbnail_size );
-	$thumbnail = htmlentities('<div class="portfolio_bg"><img src="'.urlencode($img_src[0]).'" width="100%" height="auto" alt=" '.get_the_title().'"/></div>');
+$portfolio_group = get_the_terms( $post_id, 'hh_portfolio');
+if(!empty($portfolio_group)){
+	foreach ($portfolio_group as $group) {
+	 	$portfolio_groups[] = $group->term_id;
+	 } 
+}
+endwhile;
+endif;
 
+$portfolio_groups = array_unique($portfolio_groups); //remove the dupes
+error_log(print_r($portfolio_groups, true));
+foreach ($portfolio_groups as $group) { //loop through each group and show one post
+	$args = array(
 	
-	if($current_post_index <= $posts_to_show){
-		$portfolio_list .='<div class="portfolio-entry post" data-target="'.get_permalink(get_the_ID()).'" id="portfolio_post_'.get_the_ID().'">'.hh_get_portfolio_backgrounds("full-bg", false).'</div>';
-	}
-	else {
-		$portfolio_image_srcs[] = $img_src[0];
+			'post_type' => $hhpost_type,
+			'posts_per_page' => 1,
+			'tax_query' => array(
+				array(
+					'taxonomy' => 'hh_portfolio',
+					'terms' => $group
+				)
+			)
+	);
+	$group_slug = get_term_by('id', $group, 'hh_portfolio');
+	$group_slug = $group_slug->name;
+	$custom_query = new WP_Query( $args );
+	if ( $custom_query->have_posts() ) : while ( $custom_query->have_posts() ) : $custom_query->the_post(); 
+		if (has_post_thumbnail()) {
+			//save the image markup to a global javascript variable.
 
-	}
-}
-elseif(!has_post_thumbnail()){
-	if($current_post_index <= $posts_to_show){
-		$portfolio_list .='<div class="portfolio-entry post" data-target="'.get_permalink(get_the_ID()).'" id="portfolio_post_'.get_the_ID().'"><div class="portfolio_bg"><img src="'.get_bloginfo('stylesheet_directory').'/images/paper_bg2.png" width="100%" height="auto" alt=" '.get_the_title().'"/><div class="portfolio-content centered">'.wpautop(get_the_content()).'</div></div></div>';
-	}
-}
-				$current_post_index++;
-				endwhile; 
-				
-				else : 
-				$portfolio_list .='<p> No Items to display </p>';				
-				endif; 
-			// Reset Post Data
-			wp_reset_postdata();
+			$img = get_the_post_thumbnail();
+			$img_id = get_post_thumbnail_id();
+			$img_src = wp_get_attachment_image_src($img_id, $thumbnail_size );
+			$thumbnail = htmlentities('<div class="portfolio_bg"><img src="'.urlencode($img_src[0]).'" width="100%" height="auto" alt=" '.get_the_title().'"/></div>');
+
 			
+			if($current_post_index <= $posts_to_show){
+				$portfolio_list .='<div class="portfolio-entry post" data-target="'.get_permalink(get_the_ID()).'" id="portfolio_post_'.get_the_ID().'"><div class="portfolio-group">'.$group_slug.'</div>'.hh_get_portfolio_backgrounds("full-bg", false).'</div>';
+			}
+			else {
+				$portfolio_image_srcs[] = $img_src[0];
+
+			}
+		}
+		elseif(!has_post_thumbnail()){
+			if($current_post_index <= $posts_to_show){
+				$portfolio_list .='<div class="portfolio-entry post" data-target="'.get_permalink(get_the_ID()).'" id="portfolio_post_'.get_the_ID().'"><div class="portfolio_bg"><img src="'.get_bloginfo('stylesheet_directory').'/images/paper_bg2.png" width="100%" height="auto" alt=" '.get_the_title().'"/><div class="portfolio-content centered">'.wpautop(get_the_content()).'</div></div></div>';
+			}
+		}
+						$current_post_index++;
+						endwhile; 
+						
+						else : 
+						$portfolio_list .='<p> No Items to display </p>';				
+						endif; 
+					// Reset Post Data
+					wp_reset_postdata();
+}//end loop through portfolio groups
 
 set_transient('portfolio_items', $portfolio_list, 60*60*24*7);
 }

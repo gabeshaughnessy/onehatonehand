@@ -6,13 +6,13 @@ function build_taxonomies() {
 	
 	'query_var' => true, 'rewrite' => true)); 
 	
-	/*register_taxonomy('hh_size', array('hh_project'), array(
+	register_taxonomy('hh_portfolio', array('hh_project'), array(
 	  
-	  'hierarchical' => false,  'label' => 'Size',
+	  'hierarchical' => true,  'label' => 'Portfolio',
 	  
 	  'query_var' => true, 'rewrite' => true)); 
 	  
-	register_taxonomy('hh_related_artist', array('hh_project', 'hh_client', 'hh_artist', 'hh_service', 'hh_portfolio', 'hh_resource', 'hh_testimonial', 'hh_case_study', 'hh_press'), array(
+	/* register_taxonomy('hh_related_artist', array('hh_project', 'hh_client', 'hh_artist', 'hh_service', 'hh_portfolio', 'hh_resource', 'hh_testimonial', 'hh_case_study', 'hh_press'), array(
 	  
 	  'hierarchical' => false,  'label' => 'Related Artist',
 	  
