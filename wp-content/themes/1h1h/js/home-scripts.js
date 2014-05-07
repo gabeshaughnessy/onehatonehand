@@ -499,7 +499,7 @@ function afterPortfolioCycle(currSlideElement, nextSlideElement, options, forwar
 
 				currentImgSrc = jQuery(currSlideElement).find('img').attr('src');					
 					if( currentImgSrc != '' || currentImgSrc != undefined){
-						jQuery(currSlideElement).find('img').attr('src', portfolioItems[0]);
+						jQuery(currSlideElement).find('img').attr('src', portfolioItems[1]);
 						portfolioItems.splice(0,1);
 						if(currentImgSrc.indexOf('paper_bg2') == -1){
 							portfolioItems.push(currentImgSrc);
@@ -939,7 +939,9 @@ $('body').keydown(function(e){
 		
 		if(currentSection == null) {
 		currentSection = jQuery('.section.active');
+
 		}
+
 		if(currentSection.attr('id') != 'landing'){
 			targetSection = currentSection.prev('.section');
 		}
@@ -987,7 +989,7 @@ $('body').keydown(function(e){
 			}//end open modal	
 			
 			else {
-				jQuery('#portfolio .portfolio-wrapper').cycle('prev'); //this is reversed to match wp post order
+				jQuery('#portfolio .portfolio-wrapper, #portfolio #portfolio-wrapper').cycle('prev'); //this is reversed to match wp post order
 				resizePortfolioSections();
 			} 
 		}
@@ -1025,7 +1027,7 @@ $('body').keydown(function(e){
 				jQuery('#modal').find('.modal-link a[rel="prev"]').click();
 			}//end open modal	
 			else {
-				jQuery('.portfolio-wrapper').cycle('next'); //this is reversed to match wp post order
+				jQuery('#portfolio .portfolio-wrapper,  #portfolio #portfolio-wrapper').cycle('next'); //this is reversed to match wp post order
 				resizePortfolioSections();
 			}
 			
