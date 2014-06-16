@@ -290,10 +290,12 @@ if($portfolio_list == ''){
 $args = array(
 	
 			'post_type' => $hhpost_type,
-			'post_count' => $hhcount
+			'post_count' => -1,
+			'posts_per_page' => 100
 );
 $custom_query = new WP_Query( $args );
-$posts_to_show = 6;
+error_log(print_r($custom_query, true));
+$posts_to_show = $hhcount;
 $current_post_index = 1;
 $portfolio_groups = array(); //array of portfolio group terms
 if ( $custom_query->have_posts() ) : while ( $custom_query->have_posts() ) : $custom_query->the_post(); 
@@ -308,9 +310,11 @@ if(!empty($portfolio_group)){
 }
 endwhile;
 endif;
+error_log(print_r($portfolio_groups, true));
 
 $portfolio_groups = array_unique($portfolio_groups); //remove the dupes
 error_log(print_r($portfolio_groups, true));
+
 foreach ($portfolio_groups as $group) { //loop through each group and show one post
 	$args = array(
 	
