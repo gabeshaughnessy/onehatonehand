@@ -499,11 +499,11 @@ function afterPortfolioCycle(currSlideElement, nextSlideElement, options, forwar
 
 				currentImgSrc = jQuery(currSlideElement).find('img').attr('src');					
 					if( currentImgSrc != '' || currentImgSrc != undefined){
-						jQuery(currSlideElement).find('img').attr('src', portfolioItems[0]);
+						jQuery(currSlideElement).find('img').attr('src', portfolioItems[1]);
 						portfolioItems.splice(0,1);
 						if(currentImgSrc.indexOf('paper_bg2') == -1){
 							portfolioItems.push(currentImgSrc);
-							jQuery('#portfolio-control h2').remove();
+							//jQuery('#portfolio-control h2').remove();
 						}
 						
 					}
@@ -521,12 +521,10 @@ function afterPortfolioCycle(currSlideElement, nextSlideElement, options, forwar
 			var currslide = jQuery(currSlideElement).attr('data-target');
 			
 			if(jQuery(nextSlideElement).parent().parent().attr('id') == 'portfolio'){
-				if(nextslide.indexOf('hh_project/portfolio-page') >= 0){
-					jQuery('#portfolio-control h2').fadeIn('slow');
-				}
-				else if(nextslide.indexOf('hh_project/portfolio-page') == -1){
-					jQuery('#portfolio-control h2').fadeOut('slow');
-				}
+				var portfolioGroup = jQuery(nextSlideElement).find('.portfolio-group').html();
+					jQuery('#portfolio-control h2').text(portfolioGroup);
+				
+				
 			}
 			if(jQuery(nextSlideElement).hasClass('isotope-grid')){
 				var $container = jQuery('.filter-target');
@@ -556,14 +554,7 @@ function afterTourCycle(currSlideElement, nextSlideElement, options, forwardFlag
 	var nextslide = jQuery(nextSlideElement).attr('data-target');
 	var currslide = jQuery(currSlideElement).attr('data-target');
 	
-	if(jQuery(nextSlideElement).parent().parent().attr('id') == 'portfolio'){
-		if(nextslide.indexOf('hh_project/portfolio-page') >= 0){
-			jQuery('#portfolio-control h2').fadeIn('slow');
-		}
-		else if(nextslide.indexOf('hh_project/portfolio-page') == -1){
-			jQuery('#portfolio-control h2').fadeOut('slow');
-		}
-	}
+
 	if(jQuery(nextSlideElement).hasClass('isotope-grid')){
 		var $container = jQuery('.filter-target');
 		if($container.length > 0){
@@ -805,7 +796,7 @@ jQuery(window).load(function(){
 	   jQuery('#portfolio .nav-tab').show('fast');
 	   
 	   showInstructions(); 
-	   var hideThem=setTimeout(function(){hideInstructions()},3000);
+	   //var hideThem=setTimeout(function(){hideInstructions()},3000);
 	  
 	   	
 	  } 
@@ -948,7 +939,9 @@ $('body').keydown(function(e){
 		
 		if(currentSection == null) {
 		currentSection = jQuery('.section.active');
+
 		}
+
 		if(currentSection.attr('id') != 'landing'){
 			targetSection = currentSection.prev('.section');
 		}
@@ -996,7 +989,7 @@ $('body').keydown(function(e){
 			}//end open modal	
 			
 			else {
-				jQuery('#portfolio .portfolio-wrapper').cycle('prev'); //this is reversed to match wp post order
+				jQuery('#portfolio .portfolio-wrapper, #portfolio #portfolio-wrapper').cycle('prev'); //this is reversed to match wp post order
 				resizePortfolioSections();
 			} 
 		}
@@ -1034,7 +1027,7 @@ $('body').keydown(function(e){
 				jQuery('#modal').find('.modal-link a[rel="prev"]').click();
 			}//end open modal	
 			else {
-				jQuery('.portfolio-wrapper').cycle('next'); //this is reversed to match wp post order
+				jQuery('#portfolio .portfolio-wrapper,  #portfolio #portfolio-wrapper').cycle('next'); //this is reversed to match wp post order
 				resizePortfolioSections();
 			}
 			
@@ -1103,22 +1096,22 @@ makeSwipes('.portfolio-wrapper');
 		if (orientation == 0) {
 		  //portraitMode, do your stuff here
 		  showInstructions(); 
-		  var hideThem=setTimeout(function(){hideInstructions()},3000);
+		  //var hideThem=setTimeout(function(){hideInstructions()},3000);
 		}
 		else if (orientation == 90) {
 		  //landscapeMode
 		  showInstructions(); 
-		  var hideThem=setTimeout(function(){hideInstructions()},3000);
+		 // var hideThem=setTimeout(function(){hideInstructions()},3000);
 		}
 		else if (orientation == -90) {
 		  //landscapeMode
 		  showInstructions(); 
-		  var hideThem=setTimeout(function(){hideInstructions()},3000);
+		 // var hideThem=setTimeout(function(){hideInstructions()},3000);
 		}
 		else if (orientation == 180) {
 		  //portraitMode
 		  showInstructions(); 
-		  var hideThem=setTimeout(function(){hideInstructions()},3000);
+		 // var hideThem=setTimeout(function(){hideInstructions()},3000);
 		}
 		else {
 		}
@@ -1347,7 +1340,7 @@ jQuery(window).resize(function() {
   resizeAllSections();
   showInstructions(); 
   
-  var hideThem=setTimeout(function(){hideInstructions()},3000);
+  //var hideThem=setTimeout(function(){hideInstructions()},3000);
   jQuery(window).scroll();
 });
 
@@ -1367,10 +1360,10 @@ jQuery(window).mousemove(function(event) {
 		
 			},200);
 		
-		 hideThem =setTimeout(function(){
+		/* hideThem =setTimeout(function(){
 		hideInstructions();  
 		clearTimeout(hideThem); 
-		},2000); 
+		},2000); */
 	
 		
 			}

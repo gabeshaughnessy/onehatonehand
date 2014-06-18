@@ -11,7 +11,7 @@
 		<div class="portfolio-wrapper cycle">
 		
 			<?php //Portfolio Loop Goes Here
-				hh_portfolio_loop('hh_project', 10);
+				hh_portfolio_loop('hh_project', 40);
 			
 			 ?>
 	</div>
