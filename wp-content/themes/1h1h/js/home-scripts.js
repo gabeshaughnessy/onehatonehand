@@ -522,7 +522,12 @@ function afterPortfolioCycle(currSlideElement, nextSlideElement, options, forwar
 			
 			if(jQuery(nextSlideElement).parent().parent().attr('id') == 'portfolio'){
 				var portfolioGroup = jQuery(nextSlideElement).find('.portfolio-group').html();
+				if(portfolioGroup != null){
 					jQuery('#portfolio-control h2').text(portfolioGroup);
+				}
+				else{
+					jQuery('#portfolio-control h2').text('Portfolio');
+				}
 				
 				
 			}

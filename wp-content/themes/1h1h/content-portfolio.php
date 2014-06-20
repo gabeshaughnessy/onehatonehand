@@ -7,6 +7,7 @@
 	</script>
 	<?php 
 		$portfolio_image_srcs = array();
+		$portfolio_groups = array(); //array of portfolio group terms
 	?>
 	<div class="portfolio-wrapper cycle">
 		
@@ -28,7 +29,7 @@
 
 				
 				
-				$portfolio_groups = array(); //array of portfolio group terms
+				
 				
 				if ( $custom_query->have_posts() ) : while ( $custom_query->have_posts() ) : $custom_query->the_post(); 
 				//query to get the portfolio group from all the posts
@@ -47,6 +48,25 @@
 				
 
 		//Now we have each portfolio group and we can query them and print posts from them.
+        
+        //First slide
+		$portfolio_list .='<div class="portfolio-entry post index" data-target="" id="pre_portfolio_post">'; 	
+			$portfolio_list .='<div class="row">';
+				$portfolio_list .='<div class="portfolio-content large-4 columns centered"><ul class=" index-list inline-list">';
+					foreach ($portfolio_groups as $group) { 
+						$group_meta = get_term_by('id', $group, 'hh_portfolio');
+						$group_name = $group_meta->name;
+						$group_slug = $group_meta->slug;
+					$portfolio_list .='<li><a href="/portfolio-groups?group='.$group_slug.'" title="Explore" class="group-link" target="_blank">';	
+						$portfolio_list .= '<p>'.$group_name.'</p>';	
+					$portfolio_list .='</a></li>';
+					}
+				$portfolio_list .='</ul></div>';
+
+			$portfolio_list .='</div>';
+			$portfolio_list .= '<div class="portfolio_bg"><img src="'.get_bloginfo('stylesheet_directory').'/images/paper_bg2.png" width="100%" height="auto" alt=" Index"/></div>';
+
+		$portfolio_list .='</div>';
 
 		foreach ($portfolio_groups as $group) { //loop through each group and show one post
 			$args = array(
@@ -75,7 +95,7 @@
 					$img_sizes = array("full-size", 'thumbnail');
 					$img = get_the_post_thumbnail();
 					$img_id = get_post_thumbnail_id();
-					$img_src = wp_get_attachment_image_src($img_id, ($count == 0 ? 'full-size' : 'thumbnail') );
+					$img_src = wp_get_attachment_image_src($img_id, ($count == 0 ? 'feature_slide' : 'post-thumbnail') );
 
 					
 					

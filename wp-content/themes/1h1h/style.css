@@ -75,6 +75,15 @@ time, mark, audio, video {
 	width: 100%;
 }
 
+/* lists */
+ul.inline-list{
+	list-style: none;
+}
+ul.inline-list li{
+	display: inline-block;
+	padding: 0 1em;
+}
+
 /* Fonts */
 	.muli{
 		font-family: 'Muli', arial, sans-serif;
@@ -425,6 +434,23 @@ clear: both;
 	margin: 0 auto;
 	float: none;
 }
+.portfolio-content .group-link{
+	text-decoration: none;
+	color: #333;
+	font-family: 'Muli', sans-serif;
+	
+}
+.portfolio-entry.index .portfolio-content {
+	top: 300px;
+	bottom: 0;
+	left: 0;
+	right: 0;
+	float: left;
+	padding-top: 150px;
+	width: 100%;
+	text-shadow: 0 0 5px #fff;
+	position: absolute;
+}
 .nav-spacer {
 	height: 25px;
 	width: 100%;
@@ -620,7 +646,7 @@ float: left;
 	width:  100%;
 	z-index: 900;
 	height:  auto;
-	top: 330px;
+	top: 370px;
 	-webkit-backface-visibility: hidden;
 	-moz-backface-visibility: hidden;
 	-o-backface-visibility: hidden;
