@@ -4,6 +4,9 @@
 <div id="portfolio" class="section">
 	<script type="text/javascript">
 		var portfolioItems = Array();
+		function cycleNav(index){
+			jQuery("#portfolio .portfolio-wrapper").cycle(index); 
+		}
 	</script>
 	<?php 
 		$portfolio_image_srcs = array();
@@ -53,14 +56,17 @@
 		$portfolio_list .='<div class="portfolio-entry post index" data-target="" id="pre_portfolio_post">'; 	
 			$portfolio_list .='<div class="row">';
 				$portfolio_list .='<div class="portfolio-content large-4 columns centered"><ul class=" index-list inline-list">';
+					$i = 1;
 					foreach ($portfolio_groups as $group) { 
 						$group_meta = get_term_by('id', $group, 'hh_portfolio');
 						$group_name = $group_meta->name;
 						$group_slug = $group_meta->slug;
-					$portfolio_list .='<li><a href="/portfolio-groups?group='.$group_slug.'" title="Explore" class="group-link" target="_blank">';	
+					$portfolio_list .='<li><a onClick="cycleNav('.$i.')" "href="/portfolio-groups?group='.$group_slug.'" title="Explore" class="group-link" target="_blank">';	
 						$portfolio_list .= '<p>'.$group_name.'</p>';	
 					$portfolio_list .='</a></li>';
+					$i++;
 					}
+
 				$portfolio_list .='</ul></div>';
 
 			$portfolio_list .='</div>';
