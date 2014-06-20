@@ -34,6 +34,46 @@ time, mark, audio, video {
 }
 /* end of the reset */
 
+/* grid */
+.columns {
+	box-sizing: border-box;
+}
+.large-1{
+	width: 8.33%;
+}
+.large-2{
+	width: 16.66%;
+}
+.large-3{
+	width: 25%;
+}
+.large-4{
+	width: 33.33%;
+}
+.large-5{
+	width: 41.66%;
+}
+.large-6{
+	width: 50%;
+}
+.large-7{
+	width: 58.33%;
+}
+.large-8{
+	width: 66.66%;
+}
+.large-9{
+	width: 75%;
+}
+.large-10{
+	width: 83.33%;
+}
+.large-11{
+	width: 91.66%;
+}
+.large-12{
+	width: 100%;
+}
 
 /* Fonts */
 	.muli{
@@ -361,13 +401,29 @@ clear: both;
 	display: none;
 }
 .portfolio-content.centered {
-	position: absolute;
+	position: relative;
 	top: 0;
 	bottom: 0;
 	left: 0;
 	right: 0;
 	max-height: 600px;
 	padding-top: 150px;
+	float: none;
+}
+.portfolio-content.centered.thumbnail{
+	padding-top: 0;
+	float: left;
+}
+.portfolio-entry .thumbnails{
+	position: relative;
+	top: 0;
+	bottom: 0;
+	left: 0;
+	right: 0;
+	width: 50%;
+	padding-top: 20px;
+	margin: 0 auto;
+	float: none;
 }
 .nav-spacer {
 	height: 25px;
