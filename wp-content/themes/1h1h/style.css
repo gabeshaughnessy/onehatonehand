@@ -864,8 +864,20 @@ cursor: pointer;
 	.menu-main-menu-container, .menu-global-menu-container {
 		max-width: 100%;
 	}
+	#menu-main-menu .menu-item, #menu-global-menu .menu-item {
+		font-size: 12px;
+		display: inline-block;
+		float: none;
+		margin-right: 10px;	
+	}
 	#menu-main-menu, #menu-global-menu {
-		width:100%;
+		width:96%;
+	}
+	#menu-main-menu .hathand a {
+		width: 40px;
+		height: 25px;
+		background-size: contain;
+		background-position: center center;
 	}
 
 }
@@ -874,10 +886,15 @@ cursor: pointer;
 		font-size: 12px;
 		margin-top: 14px;
 		margin-right: 0;	
-		
+
+	}
+	#menu-main-menu .hathand a {
+		width: 20px;
+		height: 20px;
 	}
 	#menu-main-menu .menu-item a, #menu-global-menu .menu-item a{
 		color: #333;
+		padding-top: 3px;
 	}
 	#main-logo {
 		background-size: contain;
