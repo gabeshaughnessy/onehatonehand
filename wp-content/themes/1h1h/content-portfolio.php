@@ -110,7 +110,7 @@
 					
 
 						if($count == 0){
-						$portfolio_list .='<div class="row"><div class="portfolio-content large-6 columns centered">';
+						$portfolio_list .='<div class="row"><div class="portfolio-content large-8 columns centered">';
 						$portfolio_list .='<a href="/portfolio-groups?group='.$group_slug.'" title="View Portfolio" target="_blank">';
 							
 						$portfolio_list .= '<div class="portfolio_bg"><img src="'.$img_src[0].'" width="100%" height="auto" alt=" '.get_the_title().'"/></div>';
@@ -122,7 +122,7 @@
 							}
 						
 						else {
-						$portfolio_list .='<div class="portfolio-content large-3 thumbnail columns">';
+						$portfolio_list .='<div class="portfolio-content large-3 hide-for-small thumbnail columns">';
 						$portfolio_list .='<a href="/portfolio-groups?group='.$group_slug.'" title="View Portfolio" target="_blank">';
 							
 						$portfolio_list .= '<div class="portfolio_bg"><img src="'.$img_src[0].'" width="100%" height="auto" alt=" '.get_the_title().'"/></div>';
