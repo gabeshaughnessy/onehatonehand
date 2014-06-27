@@ -80,7 +80,7 @@ function resizeAllSections(){
 	var windowWidth = jQuery(window).width();
 	var windowHeight = jQuery(window).height();
 	jQuery('#fixed_bg').css({'height':windowHeight});
-	jQuery('.portfolio-wrapper').css({"width": windowWidth, "height": windowHeight + 100});
+	jQuery('.portfolio-wrapper').css({"width": windowWidth, "height": windowHeight + 500});
 	jQuery('.section').css({"width": windowWidth, "min-height": windowHeight + 100});
 	jQuery('#hand-navigation .hand').animate({'top': windowHeight/3}, 500);
 	//centerElement(jQuery('#portfolio-control'));
@@ -522,7 +522,12 @@ function afterPortfolioCycle(currSlideElement, nextSlideElement, options, forwar
 			
 			if(jQuery(nextSlideElement).parent().parent().attr('id') == 'portfolio'){
 				var portfolioGroup = jQuery(nextSlideElement).find('.portfolio-group').html();
+				if(portfolioGroup != null){
 					jQuery('#portfolio-control h2').text(portfolioGroup);
+				}
+				else{
+					jQuery('#portfolio-control h2').text('Portfolio');
+				}
 				
 				
 			}
@@ -1073,6 +1078,13 @@ if($container.length > 0){
 	$container.find('.isotope-item').animate({'opacity':1}, 500);		
 	
 }
+
+//responsive menu scrolls
+jQuery('#services-menu').on('click', 'a', function(e){
+	if(jQuery(window).width() < 600){
+		jQuery(window).scrollTo(jQuery('#services-posts'), 500, {'offset': -100})
+	}
+});
 
 //++++ Touch EVENTS +++++
 if(jQuery('html').hasClass('touch')){//Scripts for touch-enabled devices

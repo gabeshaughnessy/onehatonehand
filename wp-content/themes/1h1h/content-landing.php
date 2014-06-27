@@ -12,7 +12,7 @@
 			<div id="login-link">
 				<span class="thin-line line"></span><a href="login" title="login to the site" class="parisienne">login</a><span class="thin-line line"></span>
 			</div>
-			<p class="fredericka centered">A Collective Approach to Design and Fabrication</p>
+			<p class="fredericka centered tagline">A Collective Approach to Design and Fabrication</p>
 			<div id="main-hand" class="hand"></div>
 		</div><!--end post box -->
 	</div><!-- end landing-wrapper -->
