@@ -57,8 +57,8 @@ echo $case_study_list;
 
 ?>
 
-			<div id="case-studies" class="section">
-					<div id="case-study-wrapper" class="wrapper cycle">
+			<div id="projects" class="section">
+					<div id="project-wrapper" class="wrapper cycle">
 					
 			
 					<?php
@@ -81,7 +81,7 @@ echo $case_study_list;
 										 
 										 ?>
 				</div>
-				<div id="case-study-control" class="instructions-modal">
+				<div id="project-control" class="instructions-modal">
 					<!--<div id="portfolio-title" > <span class="hh_text">One Hat One Hand</span> <span class="fredericka" >Portfolio</span></div>
 				
 					<div id="slider"></div>-->

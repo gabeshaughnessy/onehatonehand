@@ -549,7 +549,7 @@ clear: both;
 float: left;
 
 }
-#case-study-nav-container {
+#project-nav-container {
 	display: block;
 	overflow: hidden;
 	position: fixed;
@@ -561,32 +561,32 @@ float: left;
 	padding: 12px 0;
 	
 }
-#case-study-nav {
+#project-nav {
 	width: 960px;
 	display: block;
 	margin:  0 auto;
 	text-align: left;
 }
-#case-study-nav li{
+#project-nav li{
 	float:  left;
 	padding:  0 4px 0 20px;
 	text-align: left;
 	list-style: none;
 	line-height: 2;
 }
-#case-study-nav li.sub{
+#project-nav li.sub{
 	padding: 0 2px 0px 1px;
 	font-size: 32px;
 	line-height: .5;
 }
-#case-study-nav li.first{
+#project-nav li.first{
 	padding: 0;
 	line-height: 1.2;
 	top: 6px;
 	position: relative;
 	left: 17px;
 }
-#case-study-nav li.first a{
+#project-nav li.first a{
 	padding: 0;
 	display: block;
 	width: 16px;
@@ -597,19 +597,19 @@ float: left;
 	border-radius: 2px;
 	-webkit-transition: all .5s ease-in-out;
 }
-#case-study-nav li.activeSlide a{
+#project-nav li.activeSlide a{
 	color: #ddd;
 	
 }
-#case-study-nav li.first.activeSlide a{
+#project-nav li.first.activeSlide a{
 	background: #ddd;
 }
-#case-study-nav a{
+#project-nav a{
 	color:  #aaa;
 	text-decoration: none;
 	-webkit-transition: color .5s ease-in-out;
 }
-#case_studies-wrapper{
+#project-wrapper{
 	position: relative;
 	overflow: visible;
 }
@@ -665,7 +665,7 @@ float: left;
 .logged-in .nav-tab {
 	top: 77px;
 }
-#portfolio-control, #case-study-control, #tour-control {
+#portfolio-control, #project-control, #tour-control {
 	position: absolute;
 	text-align: center;
 	width:  100%;
@@ -869,7 +869,7 @@ cursor: pointer;
 		width: 100%;
 		height: auto;
 	}
-	.case-study .details {
+	.project .details {
 		font-size: .75em
 	}
 	#slider-nav .next.arrow {
@@ -1086,12 +1086,12 @@ cursor: pointer;
 #case_studies-posts {
 	margin-top: 18px;
 }
-.case-study a .post-title{
+.project a .post-title{
 	font-family: 'Muli', sans-serif;
 	font-size: 1.3em;
 
 }
-.case-study a {
+.project a {
 	color: #555;
 	text-decoration: none;
 }
@@ -1121,10 +1121,10 @@ cursor: pointer;
 	float: left;
 }
 
-.case-study {
+.project {
 	position: relative;
 }
-.case-study .details{
+.project .details{
 	position: absolute;
 	top: 0;
 	bottom: 0;
@@ -1144,7 +1144,7 @@ cursor: pointer;
 	-webkit-transition: opacity .7s ease-in-out;
 	opacity: 0;
 }
-.case-study:hover .details, .touch .case-study.hovered .details {
+.project:hover .details, .touch .project.hovered .details {
 	opacity: 1;
 }
 #menu-main-menu .hathand,
@@ -1250,14 +1250,14 @@ cursor: pointer;
 	background-position-y: -53px;
 }
 
-#case-study-control, #portfolio-control {
+#project-control, #portfolio-control {
 	width:  100%;
 	height:  0;
 	z-index: 1000;
 	display: block;
 	float:  left;
 }
-#case-study-control .hand-navigation, #portfolio-control .hand-navigation {
+#project-control .hand-navigation, #portfolio-control .hand-navigation {
 	position: absolute;
 	z-index: 10000;
 	width: 100%;
@@ -1266,14 +1266,14 @@ cursor: pointer;
 	margin: 0 auto;
 	padding: 0 20%;
 }
-#case-study-control .hand-navigation .prev.arrow, #portfolio.tour .hand-navigation .prev.arrow{
+#project-control .hand-navigation .prev.arrow, #portfolio.tour .hand-navigation .prev.arrow{
 	left:  1%;
 }
 #portfolio-control .hand-navigation .prev.arrow{
 	left:  10%;
 }
 
-#case-study-control .hand-navigation .next.arrow, #portfolio.tour .hand-navigation .next.arrow{
+#project-control .hand-navigation .next.arrow, #portfolio.tour .hand-navigation .next.arrow{
 	right:  1%;
 }
 #portfolio-control .hand-navigation .next.arrow{
