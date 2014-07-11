@@ -1,5 +1,6 @@
 <?php 
 //The portfolio page content
+
 ?>
 <div id="portfolio" class="section">
 	<script type="text/javascript">
@@ -16,39 +17,102 @@
 		
 			<?php /* +++++ T H E   P O R T F O L I O   L O O P ++++++ */
 				//////////////////////////////////////////////////////
-				$hhpost_type = 'hh_project';
-				$current_post_index = 1;
-				//global $portfolio_image_srcs;
-				if($portfolio_list == ''){
 
-				$args = array(
-					
-							'post_type' => $hhpost_type,
-							'post_count' => -1,
-							'posts_per_page' => 100
-				);
-				
-				$custom_query = new WP_Query( $args );
+//INTERNAL PAGE
+if(!is_front_page()){
+	global $post;
+	$content_type = get_post_meta($post->ID, 'hh_content_post_type', true);
+	$filter_tax = get_post_meta($post->ID, 'hh_filter_taxonomy', true);
 
-				
-				
-				
-				
-				if ( $custom_query->have_posts() ) : while ( $custom_query->have_posts() ) : $custom_query->the_post(); 
-				//query to get the portfolio group from all the posts
+						$group = $_GET['group'];
+						if($group == ''){
+							$terms = get_terms('hh_portfolio');
+							$group = array();
+							foreach ($terms as $term) {
+								if(isset($term->slug)) :
+									$group[] = $term->slug;
+								endif;
+							}
+							$group_name = 'Portfolio';
+						}
+						
+						$args = array(	
+							'post_type' => 'hh_project',
+							'posts_per_page' => -1,
+							'tax_query' => array(
+								array(
+									'taxonomy' => 'hh_portfolio',
+									'field' => 'slug',
+									'terms' => $group
+								)
+							)
+						);	
+						if(!isset($group_name)){
+							$group_name = get_term_by('slug', $group, 'hh_portfolio');	
+							$group_name = $group_name->name;
+							}
+							
+						$custom_query = new WP_Query( $args );
+						
+						if ( $custom_query->have_posts() ) : while ( $custom_query->have_posts() ) : $custom_query->the_post(); 
+							if (has_post_thumbnail()) {
+								//save the image markup to a global javascript variable.
 
-					$portfolio_group = get_the_terms( get_the_ID(), 'hh_portfolio');
-					if(!empty($portfolio_group)){
-						foreach ($portfolio_group as $group) {
-						 	$portfolio_groups[] = $group->term_id;
-						 } 
-					}
-				endwhile;
-				endif;
-				
+								$img = get_the_post_thumbnail();
+								$img_id = get_post_thumbnail_id();
+								$img_src = wp_get_attachment_image_src($img_id, 'feature_slide' );
+								$thumbnail = htmlentities('<div class="portfolio_bg"><img src="'.urlencode($img_src[0]).'" width="100%" height="auto" alt=" '.get_the_title().'"/></div>');
 
-				$portfolio_groups = array_unique($portfolio_groups); //remove the dupes
-				
+								
+								echo '<div class="portfolio-entry post" data-target="'.get_permalink(get_the_ID()).'" id="portfolio_post_'.get_the_ID().'"><div class="portfolio-content large-8 columns centered"><div class="portfolio-group">'.$group_slug.'</div>'.hh_get_portfolio_backgrounds("full-bg", false).'</div></div>';
+								
+							}
+							elseif(!has_post_thumbnail()){
+								if($current_post_index <= $posts_to_show){
+									$portfolio_list .='<div class="portfolio-entry post" data-target="'.get_permalink(get_the_ID()).'" id="portfolio_post_'.get_the_ID().'"><div class="portfolio_bg"><img src="'.get_bloginfo('stylesheet_directory').'/images/paper_bg2.png" width="100%" height="auto" alt=" '.get_the_title().'"/><div class="portfolio-content centered">'.wpautop(get_the_content()).'</div></div></div>';
+								}
+							}
+							endwhile; 
+
+							endif; 
+							
+	}//not the front page
+	
+//FRONT PAGE - part of the long scroll
+	else{
+		$hhpost_type = 'hh_project';
+		$current_post_index = 1;
+		//global $portfolio_image_srcs;
+		if($portfolio_list == ''){
+
+		$args = array(
+			
+					'post_type' => $hhpost_type,
+					'post_count' => -1,
+					'posts_per_page' => 100
+		);
+		
+		$custom_query = new WP_Query( $args );
+
+		
+		
+		
+		
+		if ( $custom_query->have_posts() ) : while ( $custom_query->have_posts() ) : $custom_query->the_post(); 
+		//query to get the portfolio group from all the posts
+
+			$portfolio_group = get_the_terms( get_the_ID(), 'hh_portfolio');
+			if(!empty($portfolio_group)){
+				foreach ($portfolio_group as $group) {
+				 	$portfolio_groups[] = $group->term_id;
+				 } 
+			}
+		endwhile;
+		endif;
+		
+
+		$portfolio_groups = array_unique($portfolio_groups); //remove the dupes
+		
 
 		//Now we have each portfolio group and we can query them and print posts from them.
         
@@ -167,8 +231,9 @@
 				}
 				
 				echo $portfolio_list;
-			
-			 ?>
+	}
+
+ ?>
 	</div>
 	<script>
 	<?php 
@@ -188,7 +253,7 @@
 		<div id="slider"></div>	
 		<div class="hand-navigation">
 			<div class="next arrow"></div>
-			<h2 class="fredericka">Portfolio</h2>
+			<h2 class="fredericka"><?php echo (!is_front_page() ? $group_name : 'Portfolio');?></h2>
 			<div class="prev arrow"></div>
 		</div>
 	</div>

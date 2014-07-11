@@ -3,7 +3,7 @@
 ?>
 <div id="case-studies" class="section">
 	<div id="case_studies-wrapper" class="wrapper post-type-wrapper">
-			<h2 class="fredericka centered">Case Studies</h2>
+			<h2 class="fredericka centered">Projects</h2>
 			<div id="case_studies-posts" class="">
 				<div class="primary">
 					<div class="content" role="main">
@@ -53,7 +53,7 @@
 									$post_list .=  '<a href="/case-studies?case='.$post->post_name.'" class="">Read More &rArr; </a>';
 								}
 								if(is_user_logged_in() && current_user_can('edit_post', $post->ID)){
-									$post_list .= '<p class="muli"><a href="'.get_edit_post_link($post->ID).'" title="edit post">Edit Case Study</a></div>';
+									$post_list .= '<p class="muli"><a href="'.get_edit_post_link($post->ID).'" title="edit post">Edit Project</a></div>';
 								}
 								else{
 									$post_list .= '</div>';
