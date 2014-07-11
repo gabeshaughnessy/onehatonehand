@@ -66,6 +66,15 @@ function centerElementX(element){
 	'left' : elementOffset.x,
 	});
 }
+function centerElementY(element){
+	var windowHeight = jQuery(window).height();
+	var elementHeight = element.height();
+	var elementOffset = new Object();
+	elementOffset.y = windowHeight/2 - elementHeight/2;
+	element.css({
+	'margin-top' : elementOffset.y,
+	});
+}
 function falsePageHeight(){ //make the page the total height of all the sections with fixed positions
 	pageHeight = 0;
 	
