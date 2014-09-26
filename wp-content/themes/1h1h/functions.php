@@ -141,7 +141,7 @@ wp_deregister_script('jquery');
 	if(is_home()){
 	wp_enqueue_script('home_scripts',
 		get_template_directory_uri() . '/js/home-scripts.js',
-		array('jquery', 'mousewheel', 'isotope') );
+		array('jquery', 'cycle', 'mousewheel', 'isotope') );
 	}
 	else{
 	wp_enqueue_script('custom_scripts',
