@@ -158,8 +158,8 @@ body{
 
 .logged-in .menu-main-menu-container, 
 .logged-in .menu-global-menu-container {
-	top: 27px;
-}
+/*	top: 27px;
+*/}
 #menu-main-menu, 
 #menu-global-menu {
 	width: 960px;
@@ -202,7 +202,7 @@ body{
 	display: block;
 	background-image: url(images/big_hat.png);
 	background-repeat: no-repeat;
-	margin: 10px auto;
+	margin: 60px auto;
 	background-position: top center;
 }
 #main-hat span, #main-hat-contact span{
@@ -368,13 +368,14 @@ body{
 }
 
 .home .section {
-	top: -300px;
-	margin-top: 300px;
+/*	top: -300px;
+	margin-top: 300px;*/
 }
 .section {
+	width: 100%;
 padding-top: 150px;
-padding-bottom: 150px;
-
+/*padding-bottom: 150px;
+*/
 /*background-image: url(images/section_bg.jpg);*/
 background-size: cover;
 clear: both;
@@ -643,8 +644,8 @@ float: left;
 	z-index: 900;
 }
 .logged-in #portfolio-nav {
-		top: 27px;
-}
+/*		top: 27px;
+*/}
 .nav-tab {
 	cursor: pointer;
 	display: block;

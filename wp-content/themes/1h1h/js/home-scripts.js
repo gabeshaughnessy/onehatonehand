@@ -89,8 +89,8 @@ function resizeAllSections(){
 	var windowWidth = jQuery(window).width();
 	var windowHeight = jQuery(window).height();
 	jQuery('#fixed_bg').css({'height':windowHeight});
-	jQuery('.portfolio-wrapper').css({"width": windowWidth, "height": windowHeight + 500});
-	jQuery('.section').css({"width": windowWidth, "min-height": windowHeight + 100});
+	jQuery('.portfolio-wrapper').css({"width": windowWidth, "height": windowHeight + 400});
+	jQuery('.section').css({"width": windowWidth, "min-height": windowHeight});
 	jQuery('#hand-navigation .hand').animate({'top': windowHeight/3}, 500);
 	//centerElement(jQuery('#portfolio-control'));
 	//match the nav-spacer position instead
