@@ -5,7 +5,7 @@
         <div class="primary">
           <div class="content" role="main">
 
-            <div class="small-6 columns">
+            <div class="small-4 columns">
               
               <h3 class="subtitle fredericka centered">Newsletter</h3>
 
@@ -20,7 +20,7 @@
 
             </div>
             
-            <div class="small-6 columns">
+            <div class="small-4 columns">
               
               <h3 class="subtitle fredericka centered">Social Networks</h3>
 
@@ -28,6 +28,14 @@
                 <a class="instagram" target="_blank" href="http://instagram.com/onehatonehand">Instagram</a>
                 <a class="facebook" target="_blank" href="https://www.facebook.com/pages/One-Hat-One-Hand/231016490378800">Facebook</a>
               </div>
+
+            </div>
+
+            <div class="small-4 columns">
+              
+              <h3 class="subtitle fredericka centered">Lookbook</h3>
+
+              <p>Download our <a href="#">case studies.</a></p>
 
             </div>
 
