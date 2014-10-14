@@ -25,17 +25,18 @@
               <h3 class="subtitle fredericka centered">Social Networks</h3>
 
               <div class="social-link">
-                <a class="instagram" target="_blank" href="http://instagram.com/onehatonehand">Instagram</a>
                 <a class="facebook" target="_blank" href="https://www.facebook.com/pages/One-Hat-One-Hand/231016490378800">Facebook</a>
+                <a class="instagram" target="_blank" href="http://instagram.com/onehatonehand">Instagram</a>
+                <a class="vimeo" target="_blank" href="http://vimeo.com/user8878703">Vimeo</a>
               </div>
 
             </div>
 
             <div class="small-4 columns">
               
-              <h3 class="subtitle fredericka centered">Lookbook</h3>
+              <h3 class="subtitle fredericka centered">Selected Works</h3>
 
-              <p>Download our <a href="#">case studies.</a></p>
+              <p>Download our <a href="#">lookbook.</a></p>
 
             </div>
 

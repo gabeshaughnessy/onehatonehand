@@ -260,10 +260,12 @@ transition: all .25s ease-in-out;
 
 .social-link a.facebook {
 	background-image: url(images/facebook-icon.png);
-
 }
 .social-link a.instagram {
 	background-image: url(images/instagram-icon.png) ;
+}
+.social-link a.vimeo {
+	background-image: url(images/vimeo-icon.png) ;
 }
 
 .full-width.wrapper.media .section-title {margin-bottom: 0;}
