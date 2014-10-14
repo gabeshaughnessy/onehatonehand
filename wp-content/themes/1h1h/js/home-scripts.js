@@ -764,7 +764,7 @@ jQuery(window).load(function(){
 	
 	
 	makePortfolioCycles();
-	//caseStudyCycles();
+	caseStudyCycles();
 	
 	if(jQuery('. page-template-page-case_studies-php')){//only do case studies on the case study page.
 		makeCaseStudyCycles();
