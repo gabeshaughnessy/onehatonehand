@@ -263,8 +263,9 @@ body{
 	text-transform: uppercase;
 	padding: 15px 0;
 }
-#call-cta p{
+#call-cta p {
 	padding: 0 12px;
+	margin: 0 auto;
 }
 .page#call-cta p{
 	padding: 0 26px;
@@ -278,8 +279,9 @@ body{
 	margin:  10px auto 30px;
 	padding: 15px 0;
 }
-#address-cta p{
-	padding:  0 10px;
+#address-cta p {
+	padding: 0 10px;
+	margin: 0 auto;
 }
 #contact-form-container{
 	text-transform: uppercase;
