@@ -20,8 +20,20 @@
 			$tour_items= '';
 			if ( $custom_query->have_posts() ) : while ( $custom_query->have_posts() ) : $custom_query->the_post(); 
 			
+			//if the page uses the edge-animation template:
+			if(get_post_meta( $post->ID, '_wp_page_template', true )=='page-animation.php'){
+				$tour_items .='<div class="tour-entry media edge-animation wrapper" data-target="'.get_permalink().'" id="tour_post_'.get_the_ID().'"><div class=" primary"><div class="content">';
+				$tour_items .= get_the_content($post->ID);
+					$tour_items .= '</div></div>';
+					if ( is_user_logged_in() && current_user_can('edit_post', $post->ID) ) {
+						$tour_items .= '<div class="edit-post"><a href="'.get_edit_post_link( get_the_ID() ).'">Edit This Item</a></div>';
+					}
+					
+					$tour_items .= '</div>';
+			}//end edge-animation template
+			
 			//if this page uses the grid template
-			if(get_post_meta( $post->ID, '_wp_page_template', true )=='page-grid.php'){
+			else if(get_post_meta( $post->ID, '_wp_page_template', true )=='page-grid.php'){
 				$tour_items .= '<div class="tour-entry post-grid isotope-grid post" id="tour_post_'.get_the_ID().'"><div id="artists-wrapper" class="wrapper post-type-wrapper"><div id="artists-sidebar" class="sidebar"><h2 class="section-title" id="artists-title">'.get_the_title(get_the_id()).'</h2><p class="section-logo">One Hat One Hand</p><p>filter by:<ul id="profile-filter" class="filter-menu button-group nine columns">';
 								
 				 $filter_menu = get_transient('filter_menu_classification');
@@ -144,18 +156,6 @@
 					
 					$tour_items .= '</div>';
 			}//end media-grid with title template
-
-			//if the page uses the edge-animation template:
-			else if(get_post_meta( $post->ID, '_wp_page_template', true )=='page-animation.php'){
-				$tour_items .='<div class="tour-entry media edge-animation wrapper" data-target="'.get_permalink().'" id="tour_post_'.get_the_ID().'"><div class=" primary"><div class="content">';
-				$tour_items .= get_the_content($post->ID);
-					$tour_items .= '</div></div>';
-					if ( is_user_logged_in() && current_user_can('edit_post', $post->ID) ) {
-						$tour_items .= '<div class="edit-post"><a href="'.get_edit_post_link( get_the_ID() ).'">Edit This Item</a></div>';
-					}
-					
-					$tour_items .= '</div>';
-			}//end edge-animation template
 
 			//all other posts/pages/projects/etc use this output:
 			else{
