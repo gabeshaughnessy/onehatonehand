@@ -940,7 +940,10 @@ var targetSection;
 var currentSection;
 jQuery(document).ready(function($){
 
-
+	if ( Modernizr.touch ) {
+		// remove loader for mobile
+		jQuery('.loader').remove();
+	}
 
 //KEYBOARD EVENTS
 
