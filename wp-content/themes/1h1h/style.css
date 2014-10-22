@@ -101,17 +101,15 @@ ul.inline-list li{
 		text-decoration: none;
 		
 	}
-	
-	.parisienne {
-		font-family: 'Parisienne', cursive, sans-serif;
-	}
+
 @font-face {
 	font-family: 'ArialBlack';
 	src: url('fonts/arial_black/1h1h_black-webfont.eot#iefix') format('embedded-opentype'), 
 	     url('fonts/arial_black/1h1h_black-webfont.woff') format('woff'), 
 	     url('fonts/arial_black/1h1h_black-webfont.ttf')  format('truetype'),
 	     url('fonts/arial_black/1h1h_black-webfont.svg#svgFontName') format('svg');
-	}	
+}
+
 body{
  color:  #333;
  font-family: 'Muli', arial, sans-serif; 
