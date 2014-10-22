@@ -36,7 +36,7 @@
               
               <h3 class="subtitle fredericka centered">Lookbook</h3>
 
-              <p>Download our <a href="#" target="_blank">Selected Works.</a></p>
+              <p>Download our <a href="http://onehatonehand.staging.wpengine.com/wp-content/uploads/2014/10/OneHatOnehand-Selected-Works.pdf" target="_blank">Selected Works.</a></p>
 
             </div>
 
