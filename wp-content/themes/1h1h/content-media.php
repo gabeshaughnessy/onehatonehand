@@ -11,7 +11,7 @@
 
               <p>Our first newsletter is coming soon!</p>
 
-              <p>Sign up to get updates</p>
+              <p>Sign up to get updates.</p>
 
               <form class="newsletter-form" action="">
                 <input type="email" class="input-email" placeholder="Email">
@@ -36,7 +36,7 @@
               
               <h3 class="subtitle fredericka centered">Lookbook</h3>
 
-              <p>Download our <a href="#" target="_blank">selected works.</a></p>
+              <p>Download our <a href="#" target="_blank">Selected Works.</a></p>
 
             </div>
 
