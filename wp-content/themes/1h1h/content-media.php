@@ -1,49 +1,58 @@
-<div id="media" class="section">
-  <div id="media-wrapper" class="wrapper post-type-wrapper">
-      <h2 class="fredericka centered">Media</h2>
-      <div id="media-posts" class="">
-        <div class="primary">
-          <div class="content" role="main">
+<?php 
+  $mediaArgs = array (
+    'pagename' => 'media',
+  );
+  $mediaQuery = new WP_Query( $mediaArgs );
 
-            <div class="small-4 columns">
+  if ( $mediaQuery->have_posts() ) : while ( $mediaQuery->have_posts() ) : $mediaQuery->the_post();
+?>
+
+  <div id="media" class="section">
+    <div id="media-wrapper" class="wrapper post-type-wrapper">
+        <h2 class="fredericka centered"><?php the_title(); ?></h2>
+        <div id="media-posts" class="">
+          <div class="primary">
+            <div class="content" role="main">
+
+              <div class="small-4 columns">
+                
+                <h3 class="subtitle fredericka centered"><?php the_field('newsletter_title'); ?></h3>
+
+                <?php the_field('newsletter_copy'); ?>
+
+                <form class="newsletter-form" action="">
+                  <input type="email" class="input-email" placeholder="Email">
+                  <input type="submit" class="submit" value="Send">
+                </form>
+
+              </div>
               
-              <h3 class="subtitle fredericka centered">Newsletter</h3>
+              <div class="small-4 columns">
+                
+                <h3 class="subtitle fredericka centered"><?php the_field('social_media_title'); ?></h3>
 
-              <p>Our first newsletter is coming soon!</p>
+                <div class="social-link">
+                  <a class="facebook" target="_blank" href="<?php the_field('facebook_link'); ?>">Facebook</a>
+                  <a class="instagram" target="_blank" href="<?php the_field('instagram_link'); ?>">Instagram</a>
+                  <a class="vimeo" target="_blank" href="<?php the_field('vimeo_link'); ?>">Vimeo</a>
+                </div>
 
-              <p>Sign up to get updates.</p>
+              </div>
 
-              <form class="newsletter-form" action="">
-                <input type="email" class="input-email" placeholder="Email">
-                <input type="submit" class="submit" value="Send">
-              </form>
+              <div class="small-4 columns">
+                
+                <h3 class="subtitle fredericka centered"><?php the_field('lookbook_title'); ?></h3>
 
-            </div>
-            
-            <div class="small-4 columns">
-              
-              <h3 class="subtitle fredericka centered">Social Networks</h3>
+                <?php the_field('lookbook_copy'); ?>
 
-              <div class="social-link">
-                <a class="facebook" target="_blank" href="https://www.facebook.com/pages/One-Hat-One-Hand/231016490378800">Facebook</a>
-                <a class="instagram" target="_blank" href="http://instagram.com/onehatonehand">Instagram</a>
-                <a class="vimeo" target="_blank" href="http://vimeo.com/user8878703">Vimeo</a>
               </div>
 
             </div>
-
-            <div class="small-4 columns">
-              
-              <h3 class="subtitle fredericka centered">Lookbook</h3>
-
-              <p>Download our <a href="http://onehatonehand.staging.wpengine.com/wp-content/uploads/2014/10/OneHatOnehand-Selected-Works.pdf" target="_blank">Selected Works.</a></p>
-
-            </div>
-
+            
+          <?php get_template_part('post_footer'); ?>
           </div>
-          
-        <?php get_template_part('post_footer'); ?>
         </div>
-      </div>
+    </div>
   </div>
-</div>
+  
+<?php endwhile; endif; wp_reset_postdata(); ?>
