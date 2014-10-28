@@ -1316,36 +1316,57 @@ cursor: pointer;
 	margin: 16px auto 0;
 	width: 100%;
 }
-#media .newsletter-form .input-email {
+#media .newsletter-form input.email {
 	border: 2px solid #333;
 	color: #333;
 	padding: 10px;
 	height: 36px;
 	font-size: 16px;
-	width: 80%;
+	width: 75%;
 	float: left;
 	line-height: 1;
 	outline: none;
 	border-radius: 0;
+	margin: 0;
+	clear: none;
 }
-#media .newsletter-form .submit {
-	width: 20%;
+#media .newsletter-form input.mce_inline_error {
+	border-color: red;
+}
+#media .newsletter-form input.submit {
+	width: 24%;
+	margin: 0;
 	float: left;
 	height: 36px;
 	text-align: center;
-	font-style: 14px;
+	font-size: 12px;
 	text-transform: uppercase;
-	letter-spacing: 1px;
 	line-height: 1;
 	color: #fff;
 	border: none;
 	outline: none;
 	background-color: #333;
 	cursor: pointer;
+	clear: none;
 	-webkit-transition: all .5s linear;
 }
 #media .newsletter-form .submit:hover {
 	background-color: #000;
+}
+#media #mc_embed_signup div#mce-responses {
+	padding: 0;
+	margin: 0;
+	width: 100%;
+	top: 0;
+}
+#media #mc_embed_signup div.response {
+	margin: 0;
+	padding: .5em 0;
+	font-weight: normal;
+	float: left;
+	top: 0;
+	font-size: 13px;
+	width: 100%;
 }
 
 #media .subtitle {
